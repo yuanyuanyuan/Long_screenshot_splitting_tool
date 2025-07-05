@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yuanyuanyuan.github.io/Long_screenshot_splitting_tool/sitemap.xml 
