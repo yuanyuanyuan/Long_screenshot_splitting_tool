@@ -34,5 +34,9 @@
   "js.fileName.default": "sliced_images",
   "feedback.title": "Submit Feedback or Feature Request",
   "feedback.description": "Scan the QR code or click the button below to submit your valuable feedback.",
-  "feedback.button": "Go to Feedback Form"
+  "feedback.button": "Go to Feedback Form",
+  "lang.switcher.en": "English",
+  "lang.switcher.zh-CN": "Simplified Chinese",
+  "lang.switcher.zh-TW": "Traditional Chinese",
+  "lang.current": "Language"
 } 

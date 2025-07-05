@@ -34,5 +34,9 @@
   "js.fileName.default": "分割结果",
   "feedback.title": "提交反馈或功能需求",
   "feedback.description": "扫描二维码或点击下方按钮，提交您宝贵的反馈。",
-  "feedback.button": "前往反馈表单"
+  "feedback.button": "前往反馈表单",
+  "lang.switcher.en": "英语",
+  "lang.switcher.zh-CN": "简体中文",
+  "lang.switcher.zh-TW": "繁体中文",
+  "lang.current": "语言"
 } 

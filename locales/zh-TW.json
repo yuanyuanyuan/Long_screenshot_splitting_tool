@@ -34,5 +34,9 @@
   "js.fileName.default": "分割結果",
   "feedback.title": "提交回饋或功能請求",
   "feedback.description": "掃描二維碼或點擊下方按鈕，提交您寶貴的回饋。",
-  "feedback.button": "前往回饋表單"
+  "feedback.button": "前往回饋表單",
+  "lang.switcher.en": "英文",
+  "lang.switcher.zh-CN": "簡體中文",
+  "lang.switcher.zh-TW": "繁體中文",
+  "lang.current": "語言"
 } 

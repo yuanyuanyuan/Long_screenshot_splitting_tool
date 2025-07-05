@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("i18n:ready", () => {
   // 全局变量
   let originalImage = null;
   let imageSlices = [];
@@ -33,6 +33,23 @@ document.addEventListener("DOMContentLoaded", () => {
   exportPdfBtn.addEventListener("click", exportAsPdf);
   selectAllBtn.addEventListener("click", selectAllSlices);
   deselectBtn.addEventListener("click", deselectAllSlices);
+
+  // 当语言切换时，刷新UI
+  document.addEventListener("language:switched", () => {
+    // 重新渲染预览
+    if (imageSlices.length > 0) {
+      updatePreviewsUI();
+    }
+    // 更新其他UI文本
+    updateSelectedCount();
+    // 如果文件名是默认值，则更新它
+    if (
+      fileNameInput.value === "分割结果" ||
+      fileNameInput.value === "screenshot_slices"
+    ) {
+      fileNameInput.value = window.i18n.t("js.fileName.default");
+    }
+  });
 
   // 处理文件选择
   function handleFileSelect(e) {
@@ -147,16 +164,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 默认选择所有片段
       selectedSlices.add(i);
-
-      // 创建预览
-      createPreview(imageData, i, originalImage.width, sliceActualHeight);
     }
 
+    updatePreviewsUI();
     previewSection.classList.remove("hidden");
     updateSelectedCount();
   }
 
-  // 创建预览元素
+  // 创建并更新所有预览UI
+  function updatePreviewsUI() {
+    previewContainer.innerHTML = ""; // 清空现有预览
+    imageSlices.forEach((slice) => {
+      createPreview(slice.data, slice.index, slice.width, slice.height);
+    });
+
+    // 恢复之前的选择状态
+    document.querySelectorAll(".preview-checkbox").forEach((checkbox) => {
+      const index = parseInt(checkbox.parentElement.dataset.index);
+      const isSelected = selectedSlices.has(index);
+      checkbox.checked = isSelected;
+      checkbox.parentElement.classList.toggle("selected", isSelected);
+    });
+  }
+
+  // 创建单个预览元素
   function createPreview(imageData, index, width, height) {
     const previewItem = document.createElement("div");
     previewItem.className = "preview-item";
@@ -166,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "preview-checkbox";
-    checkbox.checked = true;
+    checkbox.checked = selectedSlices.has(index);
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         selectedSlices.add(index);
@@ -206,8 +237,8 @@ document.addEventListener("DOMContentLoaded", () => {
     previewItem.appendChild(infoDiv);
     previewContainer.appendChild(previewItem);
 
-    // 初始选中状态
-    previewItem.classList.add("selected");
+    // 根据选择状态更新样式
+    previewItem.classList.toggle("selected", selectedSlices.has(index));
   }
 
   // 更新选中计数
