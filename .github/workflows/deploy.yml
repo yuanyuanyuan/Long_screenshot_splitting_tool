@@ -18,7 +18,7 @@ jobs:
       - name: Install, build, and upload your site
         uses: withastro/action@v2
         with:
-          path: ./my-astro-tool # The root location of your project
+          path: . # The root location of your project
 
   deploy:
     needs: build
