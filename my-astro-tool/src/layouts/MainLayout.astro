@@ -1,0 +1,84 @@
+---
+import '../styles/style.css';
+export interface Props {
+    title: string;
+}
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content="一个在线工具，用于分割长截图，支持自由选择片段并导出为ZIP或PDF。" />
+    <meta name="keywords" content="长截图, 分割, 工具, 在线, 图片处理, c截图拼接" />
+    <!-- Open Graph (用于社交分享) -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="一个在线工具，用于分割长截图，支持自由选择片段并导出为ZIP或PDF。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://your-domain.com" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+        <header>
+            <!-- Language Switcher -->
+            <div class="absolute top-4 right-4 text-white">
+              <nav
+                id="lang-switcher"
+                class="flex items-center space-x-2 text-sm font-medium"
+              >
+                <a href="?lang=en" class="px-2 py-1 hover:underline">English</a>
+                <span class="opacity-50">|</span>
+                <a href="?lang=zh-CN" class="px-2 py-1 hover:underline">简体中文</a>
+                <span class="opacity-50">|</span>
+                <a href="?lang=zh-TW" class="px-2 py-1 hover:underline">繁體中文</a>
+              </nav>
+            </div>
+
+            <h1 data-i18n="header.title">长截图分割工具</h1>
+            <p class="subtitle" data-i18n="header.subtitle">
+              上传长截图，自由选择需要的片段，导出为ZIP压缩包或PDF文档
+            </p>
+        </header>
+
+        <main>
+            <slot />
+        </main>
+
+        <footer>
+            <p data-i18n="footer.copyright">
+              © 2023 长截图分割工具 | 所有处理均在浏览器中完成，保护您的隐私安全
+            </p>
+            <p
+              style="margin-top: 10px; font-weight: 500"
+              data-i18n-html="footer.nextFeatures"
+            >
+              下一阶段：加入<span class="feature-highlight">OCR文字识别</span
+              >和<span class="feature-highlight">智能排版</span>功能
+            </p>
+            <p class="mt-4 text-sm">
+              Crafted with ❤️ by
+              <a
+                href="https://github.com/yuanyuanyuan"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-semibold text-blue-600 hover:underline"
+                >Stark Yuan</a
+              >
+            </p>
+        </footer>
+    </div>
+
+    <!-- App Logic & Integrations -->
+    <script src="/js/i18n.js" defer></script>
+    <script src="/js/main.js" defer></script>
+    <script src="/js/feedback.js" defer></script>
+  </body>
+</html> 

@@ -1,0 +1,119 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+<MainLayout title="长截图分割工具 - 支持片段选择">
+    <div class="app-container">
+        <div class="step-indicator">
+          <div class="step active">
+            <div class="step-number">1</div>
+            <div class="step-text" data-i18n="steps.1">上传图片</div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-text" data-i18n="steps.2">分割设置</div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-text" data-i18n="steps.3">选择片段</div>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-text" data-i18n="steps.4">导出结果</div>
+          </div>
+        </div>
+
+        <div class="upload-section" id="dropZone">
+          <div class="upload-icon">📱</div>
+          <h2 class="upload-text" data-i18n="upload.title">上传长截图</h2>
+          <p class="upload-hint" data-i18n="upload.hint">
+            支持 JPG、PNG 格式 | 最大尺寸 10MB
+          </p>
+          <button class="btn" id="uploadBtn">
+            <span data-i18n="upload.button">选择文件</span>
+          </button>
+          <input type="file" id="fileInput" accept="image/*" hidden />
+        </div>
+
+        <div class="controls hidden" id="controls">
+          <div class="control-group">
+            <label for="sliceHeight" data-i18n="controls.sliceHeight"
+              >📏 分割高度 (像素)</label
+            >
+            <input
+              type="number"
+              id="sliceHeight"
+              min="100"
+              max="5000"
+              value="1200"
+            />
+          </div>
+
+          <div class="control-group">
+            <label for="fileName" data-i18n="controls.fileName"
+              >📝 输出文件名</label
+            >
+            <input
+              type="text"
+              id="fileName"
+              data-i18n="js.fileName.default"
+              data-i18n-attr="value"
+              value="分割结果"
+            />
+          </div>
+
+          <div class="control-group">
+            <label data-i18n="controls.actions">⚙️ 操作</label>
+            <div style="display: flex; gap: 10px">
+              <button class="btn" id="processBtn">
+                <span data-i18n="buttons.process">开始分割</span>
+              </button>
+              <button class="btn secondary" id="resetBtn">
+                <span data-i18n="buttons.reset">重新上传</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-section hidden" id="previewSection">
+          <div class="preview-header">
+            <h2 class="section-title" data-i18n="preview.title">
+              选择需要导出的片段
+            </h2>
+            <div class="selection-controls">
+              <div class="selected-count" id="selectedCount">
+                已选择 0 个片段
+              </div>
+              <button
+                class="btn select-all"
+                id="selectAllBtn"
+                data-i18n="buttons.selectAll"
+              >
+                全选
+              </button>
+              <button
+                class="btn select-all secondary"
+                id="deselectBtn"
+                data-i18n="buttons.deselectAll"
+              >
+                取消选择
+              </button>
+            </div>
+          </div>
+          <div class="preview-container" id="previewContainer">
+            <!-- 分割预览将通过JS动态生成 -->
+          </div>
+
+          <div class="output-actions">
+            <h2 class="section-title" data-i18n="export.title">导出选定内容</h2>
+            <div class="action-buttons">
+              <button class="btn export-btn" id="exportZipBtn">
+                <span data-i18n="buttons.exportZip">📦 下载ZIP压缩包</span>
+              </button>
+              <button class="btn export-btn" id="exportPdfBtn">
+                <span data-i18n="buttons.exportPdf">📄 下载PDF文档</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+</MainLayout>

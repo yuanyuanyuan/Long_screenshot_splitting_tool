@@ -1,0 +1,16 @@
+{
+  "name": "my-astro-tool",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.4.1",
+    "astro": "^5.11.0",
+    "astro-robots-txt": "^1.0.0"
+  }
+}
