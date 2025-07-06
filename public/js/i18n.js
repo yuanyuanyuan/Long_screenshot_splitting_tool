@@ -50,9 +50,17 @@ class I18nService {
    */
   async loadTranslations(lang) {
     try {
-      const response = await fetch(`./locales/${lang}.json`);
+      const baseUrl = window.APP_BASE_URL || "/";
+      // Astro's BASE_URL includes a trailing slash when not root, but we ensure it here for safety.
+      const pathPrefix =
+        baseUrl.length > 1 && !baseUrl.endsWith("/") ? baseUrl + "/" : baseUrl;
+      const fetchUrl = `${pathPrefix}locales/${lang}.json`;
+
+      const response = await fetch(fetchUrl);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          `HTTP error! status: ${response.status} for ${fetchUrl}`
+        );
       }
       this.translations = await response.json();
       return this.translations;
@@ -95,6 +103,8 @@ class I18nService {
     if (this.translations["meta.title"]) {
       document.title = this.translations["meta.title"];
     }
+
+    this.updateLanguageSwitcherUI();
   }
 
   /**
@@ -122,6 +132,27 @@ class I18nService {
     document.dispatchEvent(
       new CustomEvent("language:switched", { detail: { lang } })
     );
+  }
+
+  /**
+   * 更新语言切换器UI，高亮当前语言
+   */
+  updateLanguageSwitcherUI() {
+    const switcher = document.getElementById("lang-switcher");
+    if (!switcher) return;
+
+    switcher.querySelectorAll("a").forEach((link) => {
+      const urlParams = new URLSearchParams(link.search);
+      const lang = urlParams.get("lang");
+
+      if (lang === this.currentLang) {
+        link.classList.add("active");
+        link.classList.remove("hover:underline");
+      } else {
+        link.classList.remove("active");
+        link.classList.add("hover:underline");
+      }
+    });
   }
 
   /**

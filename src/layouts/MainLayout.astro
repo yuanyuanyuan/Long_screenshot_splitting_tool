@@ -1,5 +1,6 @@
 ---
 import '../styles/style.css';
+import Feedback from '../components/Feedback.astro';
 export interface Props {
     title: string;
 }
@@ -20,25 +21,22 @@ const { title } = Astro.props;
     <meta property="og:url" content="https://your-domain.com" />
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
   </head>
   <body>
     <div class="container">
         <header>
             <!-- Language Switcher -->
-            <div class="absolute top-4 right-4 text-white">
+            <div class="absolute top-4 right-4">
               <nav
                 id="lang-switcher"
                 class="flex items-center space-x-2 text-sm font-medium"
               >
-                <a href="?lang=en" class="px-2 py-1 hover:underline">English</a>
-                <span class="opacity-50">|</span>
-                <a href="?lang=zh-CN" class="px-2 py-1 hover:underline">简体中文</a>
-                <span class="opacity-50">|</span>
-                <a href="?lang=zh-TW" class="px-2 py-1 hover:underline">繁體中文</a>
+                <a href="?lang=en" class="btn btn-lang">English</a>
+                <a href="?lang=zh-CN" class="btn btn-lang">简体中文</a>
+                <a href="?lang=zh-TW" class="btn btn-lang">繁體中文</a>
               </nav>
             </div>
 
@@ -76,9 +74,11 @@ const { title } = Astro.props;
         </footer>
     </div>
 
+    <Feedback />
+
     <!-- App Logic & Integrations -->
+    <script is:inline set:html={`window.APP_BASE_URL = "${import.meta.env.BASE_URL}";`} />
     <script src="/js/i18n.js" defer></script>
     <script src="/js/main.js" defer></script>
-    <script src="/js/feedback.js" defer></script>
   </body>
 </html> 

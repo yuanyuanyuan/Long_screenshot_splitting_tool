@@ -12,7 +12,10 @@
       fill="currentColor"
     >
       <path
-        d="M10 2.5a.75.75 0 01.75.75v.5a.75.75 0 01-1.5 0v-.5A.75.75 0 0110 2.5zM7.5 6a.75.75 0 000 1.5h5a.75.75 0 000-1.5h-5zM6 10a.75.75 0 000 1.5h8a.75.75 0 000-1.5H6z"
+        d="M10 2.5a.75.75 0 01.75.75v.5a.75.75 0 01-1.5 0v-.5A.75.75 0 0110 2.5z"
+      />
+      <path
+        d="M7.5 6a.75.75 0 000 1.5h5a.75.75 0 000-1.5h-5zM6 10a.75.75 0 000 1.5h8a.75.75 0 000-1.5H6z"
       />
       <path
         fill-rule="evenodd"
@@ -70,7 +73,7 @@
     <!-- QR Code -->
     <div class="mb-6 flex justify-center">
       <img
-        src="assets/feishu-feedback-erweima.png"
+        src="/assets/feishu-feedback-erweima.png"
         alt="Feishu Form QR Code"
         class="w-48 rounded-lg border-4 border-slate-200"
       />
@@ -88,3 +91,43 @@
     </a>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const openBtn = document.getElementById("open-feedback-btn");
+    const closeBtn = document.getElementById("close-feedback-btn");
+    const modal = document.getElementById("feedback-modal");
+    const modalContent = modal ? modal.querySelector("div") : null;
+
+    if (openBtn && modal && closeBtn && modalContent) {
+      const openModal = () => {
+        modal.classList.remove("hidden");
+        // Use a short timeout to allow the 'hidden' class removal to be processed
+        // before starting the transition.
+        setTimeout(() => {
+          modal.classList.add("opacity-100");
+          modalContent.classList.remove("opacity-0", "scale-95");
+          modalContent.classList.add("opacity-100", "scale-100");
+        }, 10);
+      };
+
+      const closeModal = () => {
+        modalContent.classList.add("opacity-0", "scale-95");
+        modal.classList.remove("opacity-100");
+        setTimeout(() => {
+          modal.classList.add("hidden");
+        }, 300); // Match the duration-300 class
+      };
+
+      openBtn.addEventListener("click", openModal);
+      closeBtn.addEventListener("click", closeModal);
+      
+      // Close modal if clicking on the background overlay
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    }
+  });
+</script> 
