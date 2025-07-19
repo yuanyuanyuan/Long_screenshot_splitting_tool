@@ -204,4 +204,8 @@ appState = {
 - **[task-2.2]** 在主页面中添加进度条 UI 组件 (`#progress-container`)
 - **[task-2.2]** 实现核心进度条元素 (`#progress-bar`) 及相关显示组件
 - **[task-2.2]** 集成现代化视觉设计和平滑动画效果
-- **[task-2.2]** 建立处理进度的可视化反馈机制 
+- **[task-2.2]** 建立处理进度的可视化反馈机制
+- **[task-2.3]** 在 `src/scripts/main.js` 中实现缩略图动态添加功能
+- **[task-2.3]** 创建 `addThumbnailToList()` 函数处理 Worker 发来的图片数据
+- **[task-2.3]** 集成 `URL.createObjectURL()` API 和 Tailwind CSS 响应式样式
+- **[task-2.3]** 建立缩略图与大图预览的交互基础，为 task-2.4 做准备 
