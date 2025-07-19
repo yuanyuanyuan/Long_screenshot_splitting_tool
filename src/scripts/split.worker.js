@@ -112,6 +112,57 @@ async function processImage(file, splitHeight) {
     // 释放 imageBitmap 资源
     imageBitmap.close();
     
+    // task-1.4: 开始图片切割、Blob 生成与进度上报
+    console.log('Starting image splitting...');
+    
+    // 计算切片总数
+    const totalChunks = Math.ceil(canvas.height / splitHeight);
+    console.log(`Total chunks to create: ${totalChunks}`);
+    
+    // 循环处理每个切片
+    for (let i = 0; i < totalChunks; i++) {
+      const startY = i * splitHeight;
+      const chunkHeight = Math.min(splitHeight, canvas.height - startY);
+      
+      console.log(`Processing chunk ${i + 1}/${totalChunks}, startY: ${startY}, height: ${chunkHeight}`);
+      
+      // 创建临时 OffscreenCanvas 用于当前切片
+      const chunkCanvas = new OffscreenCanvas(canvas.width, chunkHeight);
+      const chunkCtx = chunkCanvas.getContext('2d');
+      
+      // 使用 drawImage 复制指定区域到临时 canvas
+      chunkCtx.drawImage(
+        canvas,           // 源 canvas
+        0, startY,        // 源区域起始位置
+        canvas.width, chunkHeight,  // 源区域尺寸
+        0, 0,             // 目标位置
+        canvas.width, chunkHeight   // 目标尺寸
+      );
+      
+      // 转换为 Blob (JPEG 格式，质量 0.9)
+      const blob = await convertToBlob(chunkCanvas, 'image/jpeg', 0.9);
+      
+      console.log(`Chunk ${i + 1} blob created, size: ${blob.size} bytes`);
+      
+      // 发送切片数据
+      self.postMessage({
+        type: 'chunk',
+        blob: blob,
+        index: i
+      });
+      
+      // 计算并发送进度 (25% 到 95%)
+      const progress = Math.round(25 + ((i + 1) / totalChunks) * 70);
+      self.postMessage({
+        type: 'progress',
+        progress: progress
+      });
+      
+      console.log(`Chunk ${i + 1}/${totalChunks} completed, progress: ${progress}%`);
+    }
+    
+    console.log('Image splitting completed');
+    
   } catch (error) {
     console.error('Error in processImage:', error);
     self.postMessage({
@@ -119,4 +170,18 @@ async function processImage(file, splitHeight) {
       message: `Image processing error: ${error.message}`
     });
   }
+}
+
+/**
+ * 将 OffscreenCanvas 转换为 Blob
+ * @param {OffscreenCanvas} canvas - 要转换的 canvas
+ * @param {string} type - 图片类型 (如 'image/jpeg')
+ * @param {number} quality - 图片质量 (0-1)
+ * @returns {Promise<Blob>} - 转换后的 Blob 对象
+ */
+async function convertToBlob(canvas, type = 'image/jpeg', quality = 0.9) {
+  return await canvas.convertToBlob({
+    type: type,
+    quality: quality
+  });
 } 

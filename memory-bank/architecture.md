@@ -74,9 +74,9 @@ src/
 
 - **图片解码:** 使用 `createImageBitmap()` 高效解码 ✅ (task-1.3)
 - **Canvas 绘制:** 在 `OffscreenCanvas` 上进行渲染操作 ✅ (task-1.3)
-- **图片切割:** 按指定高度分割图片 ⏳ (task-1.4)
-- **Blob 生成:** 将切片转换为 Blob 对象 ⏳ (task-1.4)
-- **进度上报:** 实时报告处理进度 ✅ (task-1.3)
+- **图片切割:** 按指定高度分割图片 ✅ (task-1.4)
+- **Blob 生成:** 将切片转换为 Blob 对象 ✅ (task-1.4)
+- **进度上报:** 实时报告处理进度 ✅ (task-1.3, task-1.4)
 - **错误处理:** 捕获并报告处理异常 ✅ (task-1.3)
 
 ## 5. 设计决策记录
@@ -141,4 +141,8 @@ appState = {
 - **[task-1.3]** 实现 Worker 中的图片解码与 OffscreenCanvas 绘制逻辑
 - **[task-1.3]** 集成 `createImageBitmap` 高效图片解码API
 - **[task-1.3]** 建立 OffscreenCanvas 绘制与尺寸验证机制
-- **[task-1.3]** 添加资源管理与内存清理功能 
+- **[task-1.3]** 添加资源管理与内存清理功能
+- **[task-1.4]** 实现图片切割循环与区域复制逻辑
+- **[task-1.4]** 集成 JPEG Blob 生成（质量 0.9）与 `convertToBlob` 工具函数
+- **[task-1.4]** 建立切片数据传输机制（chunk 消息）
+- **[task-1.4]** 完善进度上报系统（25%-95% 覆盖切割阶段） 
