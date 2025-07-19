@@ -29,6 +29,7 @@ if (typeof document !== 'undefined') {
   const thumbnailList = document.getElementById("thumbnail-list");
   const previewImage = document.getElementById("preview-image");
   const currentPreviewInfo = document.getElementById("current-preview-info");
+  const closePreviewBtn = document.getElementById("close-preview-btn");
 
   // 事件监听器
   uploadBtn.addEventListener("click", () => fileInput.click());
@@ -42,6 +43,11 @@ if (typeof document !== 'undefined') {
   exportPdfBtn.addEventListener("click", exportAsPdf);
   selectAllBtn.addEventListener("click", selectAllSlices);
   deselectBtn.addEventListener("click", deselectAllSlices);
+  
+  // task-2.4: 添加预览界面关闭按钮事件监听器
+  if (closePreviewBtn) {
+    closePreviewBtn.addEventListener("click", closePreviewInterface);
+  }
 
   // task-2.3: 实现缩略图动态添加函数
   /**
@@ -63,57 +69,79 @@ if (typeof document !== 'undefined') {
     
     // 创建缩略图容器
     const thumbnailItem = document.createElement('div');
-    thumbnailItem.className = 'flex items-center p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200';
+    thumbnailItem.className = 'thumbnail-item';
     thumbnailItem.dataset.index = index;
     thumbnailItem.dataset.imageUrl = imageUrl;
 
     // 创建缩略图图片
     const img = document.createElement('img');
     img.src = imageUrl;
-    img.className = 'w-16 h-16 object-cover rounded-md shadow-sm';
+    img.className = 'thumbnail-img';
     img.alt = `切片 ${index + 1}`;
     
     // 创建文字信息
     const textInfo = document.createElement('div');
-    textInfo.className = 'ml-3 flex-1';
+    textInfo.className = 'thumbnail-info';
     textInfo.innerHTML = `
-      <div class="text-sm font-medium text-gray-900">切片 ${index + 1}</div>
-      <div class="text-xs text-gray-500">点击查看大图</div>
+      <p class="thumbnail-label">切片 ${index + 1}</p>
+      <p class="thumbnail-hint">点击查看大图</p>
     `;
 
     // 组装缩略图项
     thumbnailItem.appendChild(img);
     thumbnailItem.appendChild(textInfo);
 
-    // 添加点击事件：点击缩略图更新大图预览（为 task-2.4 预留）
-    thumbnailItem.addEventListener('click', () => {
-      // 移除其他缩略图的选中状态
-      document.querySelectorAll('#thumbnail-list > div').forEach(item => {
-        item.classList.remove('bg-blue-100', 'border-blue-300');
-        item.classList.add('bg-gray-50', 'border-gray-200');
-      });
-      
-      // 添加当前缩略图的选中状态
-      thumbnailItem.classList.remove('bg-gray-50', 'border-gray-200');
-      thumbnailItem.classList.add('bg-blue-100', 'border-blue-300');
-      
-      // 更新大图预览（为 task-2.4 预留接口）
-      updatePreviewImage(imageUrl, index);
-    });
-
     // 将缩略图添加到列表中
     thumbnailList.appendChild(thumbnailItem);
 
     console.log(`[task-2.3] 成功添加缩略图 ${index + 1} 到列表`);
+    
+    // task-2.4: 如果这是第一个缩略图，自动选中并显示大图
+    if (index === 0) {
+      selectThumbnail(thumbnailItem);
+    }
   }
 
+  // task-2.4: 实现大图预览与交互功能
+  
   /**
-   * 更新大图预览（为 task-2.4 预留的接口）
+   * 选中指定的缩略图并更新大图预览
+   * @param {HTMLElement} thumbnailItem - 要选中的缩略图元素
+   */
+  function selectThumbnail(thumbnailItem) {
+    if (!thumbnailItem) return;
+    
+    // 移除所有缩略图的选中状态
+    document.querySelectorAll('.thumbnail-item').forEach(item => {
+      item.classList.remove('selected');
+    });
+    
+    // 添加当前缩略图的选中状态
+    thumbnailItem.classList.add('selected');
+    
+    // 获取缩略图信息并更新大图预览
+    const imageUrl = thumbnailItem.dataset.imageUrl;
+    const index = parseInt(thumbnailItem.dataset.index);
+    
+    if (imageUrl && !isNaN(index)) {
+      updatePreviewImage(imageUrl, index);
+    }
+    
+    console.log(`[task-2.4] 选中缩略图 ${index + 1}`);
+  }
+  
+  /**
+   * 更新大图预览
    * @param {string} imageUrl - 图片的 Object URL
    * @param {number} index - 切片索引
    */
   function updatePreviewImage(imageUrl, index) {
-    if (previewImage) {
+    if (!previewImage) {
+      console.error('[task-2.4] preview-image element not found');
+      return;
+    }
+    
+    try {
       previewImage.src = imageUrl;
       previewImage.style.display = 'block';
       
@@ -122,13 +150,74 @@ if (typeof document !== 'undefined') {
       if (placeholder) {
         placeholder.style.display = 'none';
       }
+      
+      // 更新预览信息
+      if (currentPreviewInfo) {
+        currentPreviewInfo.textContent = `切片 ${index + 1}`;
+      }
+      
+      // 添加图片加载错误处理
+      previewImage.onerror = () => {
+        console.error(`[task-2.4] 加载大图预览失败: 切片 ${index + 1}`);
+        if (placeholder) {
+          placeholder.style.display = 'block';
+          placeholder.innerHTML = `
+            <div class="text-center text-gray-500">
+              <div class="text-6xl mb-4">❌</div>
+              <p class="text-lg">图片加载失败</p>
+              <p class="text-sm">切片 ${index + 1}</p>
+            </div>
+          `;
+        }
+      };
+      
+      // 图片加载成功处理
+      previewImage.onload = () => {
+        console.log(`[task-2.4] 成功更新大图预览为切片 ${index + 1}`);
+      };
+      
+    } catch (error) {
+      console.error(`[task-2.4] 更新大图预览时发生错误:`, error);
+    }
+  }
+  
+  /**
+   * 初始化缩略图事件委托（task-2.4 核心功能）
+   */
+  function initializeThumbnailInteraction() {
+    if (!thumbnailList) {
+      console.error('[task-2.4] thumbnail-list element not found');
+      return;
     }
     
-    if (currentPreviewInfo) {
-      currentPreviewInfo.textContent = `切片 ${index + 1}`;
-    }
+    // 在 thumbnail-list 上使用事件委托
+    thumbnailList.addEventListener('click', (event) => {
+      // 找到被点击的缩略图元素
+      const thumbnailItem = event.target.closest('.thumbnail-item');
+      
+      if (thumbnailItem) {
+        selectThumbnail(thumbnailItem);
+        
+        // 可选：平滑滚动到选中的缩略图（如果列表很长）
+        thumbnailItem.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest' 
+        });
+      }
+    });
     
-    console.log(`[task-2.3] 更新大图预览为切片 ${index + 1}`);
+    console.log('[task-2.4] 缩略图交互事件委托已初始化');
+  }
+  
+  /**
+   * 关闭预览界面，返回主界面
+   */
+  function closePreviewInterface() {
+    const newPreviewSection = document.getElementById('preview-section');
+    if (newPreviewSection) {
+      newPreviewSection.classList.add('hidden');
+      console.log('[task-2.4] 预览界面已关闭，返回主界面');
+    }
   }
 
   // 当语言切换时，刷新UI
@@ -451,6 +540,9 @@ if (typeof document !== 'undefined') {
 
   // 初始化时更新一次计数文本
   updateSelectedCount();
+  
+  // task-2.4: 初始化缩略图交互功能
+  initializeThumbnailInteraction();
 
   // task-2.3: 测试函数 - 创建模拟的缩略图数据进行验证
   function testThumbnailFunction() {
@@ -489,13 +581,20 @@ if (typeof document !== 'undefined') {
   // 将测试函数暴露到全局作用域，便于在控制台调用
   window.testThumbnailFunction = testThumbnailFunction;
 
-  // task-2.3: 添加简单的测试入口 - 显示预览界面并添加测试缩略图
+  // task-2.4: 更新测试入口 - 显示正确的预览界面并测试交互功能
   function showPreviewAndTest() {
-    // 显示预览界面
-    const previewSection = document.getElementById('preview-section');
-    if (previewSection) {
-      previewSection.classList.remove('hidden');
-      console.log('[task-2.3] 预览界面已显示');
+    // 显示新的双栏预览界面 (注意：这里使用 preview-section，不是 previewSection)
+    const newPreviewSection = document.getElementById('preview-section');
+    
+    // 隐藏旧的预览界面
+    const oldPreviewSection = document.getElementById('previewSection');
+    if (oldPreviewSection) {
+      oldPreviewSection.classList.add('hidden');
+    }
+    
+    if (newPreviewSection) {
+      newPreviewSection.classList.remove('hidden');
+      console.log('[task-2.4] 新的双栏预览界面已显示');
       
       // 清空现有缩略图
       if (thumbnailList) {
@@ -505,14 +604,49 @@ if (typeof document !== 'undefined') {
       // 添加测试缩略图
       setTimeout(() => {
         testThumbnailFunction();
+        console.log('[task-2.4] 测试提示: 点击左侧任意缩略图测试交互功能');
+        console.log('[task-2.4] 您现在应该看到左右双栏布局：左侧缩略图列表，右侧大图预览');
       }, 100);
     } else {
-      console.error('[task-2.3] 预览界面元素未找到');
+      console.error('[task-2.4] 新预览界面元素未找到 (preview-section)');
     }
+  }
+
+  // task-2.4: 添加专门测试交互功能的函数
+  function testThumbnailInteraction() {
+    console.log('[task-2.4] 开始测试缩略图交互功能...');
+    
+    const thumbnailItems = document.querySelectorAll('.thumbnail-item');
+    
+    if (thumbnailItems.length === 0) {
+      console.warn('[task-2.4] 没有找到缩略图，请先运行 showPreviewAndTest()');
+      return;
+    }
+    
+    console.log(`[task-2.4] 找到 ${thumbnailItems.length} 个缩略图`);
+    
+    // 自动测试：依次选中每个缩略图
+    let currentIndex = 0;
+    const autoSelectNext = () => {
+      if (currentIndex < thumbnailItems.length) {
+        const item = thumbnailItems[currentIndex];
+        console.log(`[task-2.4] 自动选中缩略图 ${currentIndex + 1}`);
+        selectThumbnail(item);
+        currentIndex++;
+        
+        // 延迟1秒后选中下一个
+        setTimeout(autoSelectNext, 1000);
+      } else {
+        console.log('[task-2.4] 自动测试完成！现在可以手动点击缩略图测试交互');
+      }
+    };
+    
+    autoSelectNext();
   }
 
   // 暴露测试入口
   window.showPreviewAndTest = showPreviewAndTest;
+  window.testThumbnailInteraction = testThumbnailInteraction;
 
   });
 }

@@ -135,10 +135,12 @@ appState = {
 **文件位置:** `src/components/Previewer.astro`
 
 **组件职责:**
-- 提供分割后图片的交互式预览界面 ✅ (task-2.1)
-- 支持左侧缩略图列表和右侧大图预览的双栏布局
-- 集成导出功能按钮（ZIP/PDF）
-- 响应式设计，适配不同屏幕尺寸
+- 提供分割后图片的交互式预览界面 ✅ (task-2.1, task-2.4)
+- 支持左侧缩略图列表和右侧大图预览的双栏布局 ✅ (task-2.4)
+- 集成导出功能按钮（ZIP/PDF） ✅ (task-2.4)
+- 响应式设计，适配不同屏幕尺寸 ✅ (task-2.4)
+- 实现事件委托和交互逻辑 ✅ (task-2.4)
+- 提供全屏覆盖模式和返回功能 ✅ (task-2.4)
 
 ### 7.2 进度条 UI 组件设计
 
@@ -152,11 +154,18 @@ appState = {
 
 **核心DOM结构:**
 ```html
-<div id="preview-section" class="hidden">     <!-- 根容器，初始隐藏 -->
-  <div id="thumbnail-list">                  <!-- 左侧缩略图列表 -->
-  <div id="preview-image">                   <!-- 右侧大图预览区 -->
-  <button id="export-zip-btn">               <!-- ZIP导出按钮 -->
-  <button id="export-pdf-btn">               <!-- PDF导出按钮 -->
+<div id="preview-section" class="fullscreen-preview hidden">  <!-- 全屏根容器 -->
+  <div class="preview-sidebar">                              <!-- 左侧栏：缩略图 -->
+    <div class="preview-sidebar-header">                     <!-- 标题和返回按钮 -->
+    <div id="thumbnail-list" class="thumbnail-container">    <!-- 缩略图容器 -->
+  </div>
+  <div class="preview-main">                                 <!-- 右侧栏：大图预览 -->
+    <div class="preview-main-header">                        <!-- 预览标题和导出按钮 -->
+    <div class="preview-image-area">                         <!-- 大图显示区域 -->
+      <img id="preview-image" class="preview-main-image">    <!-- 预览图片 -->
+      <div id="preview-placeholder">                         <!-- 空状态占位符 -->
+    </div>
+  </div>
 </div>
 ```
 
@@ -170,10 +179,16 @@ appState = {
 ```
 
 **设计决策记录:**
-- **问题:** 需要一个专门的预览界面来展示分割结果
-- **决策:** 创建独立的 Astro 组件，使用 Tailwind CSS 实现响应式布局
-- **理由:** 模块化设计，便于维护和测试；响应式布局提升用户体验
-- **权衡:** 增加了组件数量，但提升了代码组织性和可维护性
+- **问题:** 需要一个专门的预览界面来展示分割结果，同时保持组件化架构
+- **决策:** 创建独立的 Astro 组件，使用作用域CSS实现全屏覆盖布局
+- **理由:** 
+  - 模块化设计，便于维护和测试
+  - 样式作用域隔离，不影响全局样式
+  - 响应式布局提升用户体验
+  - 符合 Astro 组件化开发最佳实践
+- **权衡:** 
+  - 优点：完全的样式隔离、可复用性强、维护成本低
+  - 缺点：需要考虑组件间的通信机制
 
 ---
 
@@ -208,4 +223,8 @@ appState = {
 - **[task-2.3]** 在 `src/scripts/main.js` 中实现缩略图动态添加功能
 - **[task-2.3]** 创建 `addThumbnailToList()` 函数处理 Worker 发来的图片数据
 - **[task-2.3]** 集成 `URL.createObjectURL()` API 和 Tailwind CSS 响应式样式
-- **[task-2.3]** 建立缩略图与大图预览的交互基础，为 task-2.4 做准备 
+- **[task-2.3]** 建立缩略图与大图预览的交互基础，为 task-2.4 做准备
+- **[task-2.4]** 重新创建 `src/components/Previewer.astro` 独立组件
+- **[task-2.4]** 实现全屏覆盖双栏布局和事件委托机制
+- **[task-2.4]** 完善缩略图交互逻辑和大图预览功能
+- **[task-2.4]** 建立组件化开发架构，实现样式作用域隔离 

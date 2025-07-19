@@ -3,6 +3,9 @@ import MainLayout from '../layouts/MainLayout.astro';
 import Previewer from '../components/Previewer.astro';
 ---
 <MainLayout title="长截图分割工具 - 支持片段选择">
+    <!-- task-2.4: 预览界面组件 -->
+    <Previewer />
+    
     <div class="app-container">
         <div class="step-indicator">
           <div class="step active">
@@ -140,7 +143,4 @@ import Previewer from '../components/Previewer.astro';
           </div>
         </div>
       </div>
-
-      <!-- 新的预览界面组件 -->
-      <Previewer />
 </MainLayout>
