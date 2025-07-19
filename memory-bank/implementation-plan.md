@@ -1,94 +1,130 @@
-# 实施计划 (Implementation Plan)
+# 实施计划 (Implementation Plan) - v1.1 (Final)
 
-**版本:** 1.0.0
-**关联PRD:** [产品需求文档.md](./memory-bank/产品需求文档.md)
-**关联技术栈:** [tech-stack.md](./memory-bank/tech-stack.md)
+**版本:** 1.1.0
+**关联 PRD 版本:** 2.0.0
+**日期:** 2025-07-19
 
 ---
 
 ## 1. 总体目标
 
-根据产品需求，完成两大核心功能的开发：
-1.  将图片处理上限提升至 20MB。
-2.  增加分割后的图片预览功能。
+本次实施的核心目标是重构应用，以支持高达 50MB 的大文件处理，并引入一个全新的、交互式的预览界面。我们将遵循 `tech-stack.md` 中定义的技术方案，核心是引入 Web Worker 来处理计算密集型任务，确保主线程（UI）的流畅性。
 
-## 2. 任务分解 (Task Breakdown)
+## 2. 实施阶段与原子任务
 
-### 第一部分：提升单图处理上限 (20MB)
-
-#### 任务 1.1: 修改文件上传逻辑
-
--   **文件:** `src/pages/index.astro` (或其他处理文件上传的前端组件)
--   **目标:** 调整前端代码，将文件大小限制从 10MB 修改为 20MB。
--   **原子步骤:**
-    1.  [ ] 定位处理文件上传的 JavaScript 代码块。
-    2.  [ ] 找到 `MAX_FILE_SIZE` 类似的常量或硬编码 `10 * 1024 * 1024`。
-    3.  [ ] 将其值修改为 `20 * 1024 * 1024`。
-    4.  [ ] 同步修改文件过大时的错误提示信息，将 "10MB" 改为 "20MB"。
--   **验收标准:**
-    -   [ ] 尝试上传 15MB 的图片，可以通过验证。
-    -   [ ] 尝试上传 25MB 的图片，会显示 "文件不能超过 20MB" 的错误提示。
-
-#### 任务 1.2: (已在技术栈中识别) 引入 Web Worker 优化性能
-
--   **文件:**
-    -   新建 `src/workers/image-processor.js`
-    -   修改 `src/pages/index.astro`
--   **目标:** 将耗时的图片切割逻辑从主线程剥离到 Web Worker 中，避免 UI 阻塞。
--   **原子步骤:**
-    1.  [ ] 创建 `src/workers/image-processor.js` 文件。
-    2.  [ ] 在 `image-processor.js` 中，设置 `onmessage` 监听器，接收主线程传来的图片数据（如 `ImageBitmap` 或 `ImageData`）和切割高度。
-    3.  [ ] 在 `image-processor.js` 中，实现核心的图片切割算法，将一张大图切割成多个 `ImageData` 对象。
-    4.  [ ] 将切割后的 `ImageData` 数组通过 `postMessage` 回传给主线程。
-    5.  [ ] 在 `src/pages/index.astro` 中，修改原有的分割逻辑。
-    6.  [ ] 在主线程中，创建 `Worker` 实例。
-    7.  [ ] 当用户点击“开始分割”时，通过 `postMessage` 将 `ImageBitmap` 发送给 Worker。（注意：`ImageBitmap` 是可转移对象，可以零成本传递给 Worker）。
-    8.  [ ] 设置 `onmessage` 监听器，接收 Worker 处理完返回的 `ImageData` 数组。
--   **验收标准:**
-    -   [ ] 处理 15MB-20MB 图片时，页面 UI（如 loading 动画）保持流畅。
-    -   [ ] Worker 能成功接收图片数据，并返回切割后的数据。
-    -   [ ] 主线程能正确接收 Worker 返回的数据。
+我们将整个实施过程分为三个主要阶段：**后端逻辑 (Worker)**、**前端界面 (UI)** 和 **集成与收尾**。
 
 ---
 
-### 第二部分：增加分割后预览功能
+### **阶段一：核心后端逻辑 —— Web Worker 实现**
 
-#### 任务 2.1: 构建预览区 UI 组件
+**目标:** 创建一个可以独立运行的 Web Worker，负责接收图片文件、进行切割，并将结果发送回主线程。
 
--   **文件:** `src/pages/index.astro`
--   **目标:** 在页面上添加一个新的区域，用于展示分割后的图片。
--   **原子步骤:**
-    1.  [ ] 在 HTML 结构中，于文件上传区域下方，添加一个新的 `<div>` 作为预览区的容器，例如 `<div id="preview-container" class="hidden ..."></div>`。
-    2.  [ ] 为这个容器和其子元素设计 Tailwind CSS 样式，使其成为一个响应式的网格（grid）布局。
-    3.  [ ] 初始状态下，该区域应被隐藏。
--   **验收标准:**
-    -   [ ] 页面加载后，预览区不可见。
+*   **`task-1.1`**: **创建 Worker 文件与最终版消息契约**
+    *   **描述:** 在 `src/scripts/` 目录下创建一个新的 `split.worker.js` 文件。
+    *   **动作:** 在文件顶部用注释形式定义清晰的消息传递契约 (Data Contract)。
+        ```javascript
+        // Message Contract (v1.1):
+        // From Main to Worker: { file: File, splitHeight: number }
+        // From Worker to Main:
+        // - Progress: { type: 'progress', progress: number } // 0-100 percentage
+        // - Chunk:    { type: 'chunk', blob: Blob, index: number }
+        // - Done:     { type: 'done' } // Simplified completion signal
+        // - Error:    { type: 'error', message: string }
+        ```
+    *   **验证:** 文件被创建，且注释已按 v1.1 版本更新。
 
-#### 任务 2.2: 实现预览逻辑
+*   **`task-1.2`**: **实现 Worker 的消息监听与初始化**
+    *   **描述:** 在 `split.worker.js` 中设置 `self.onmessage` 监听器。
+    *   **动作:** 编写代码以解析传入的 `file` 和 `splitHeight`。添加错误处理。
+    *   **验证:** 在 `main.js` 中发送测试消息，确认 Worker 能接收到数据。
 
--   **文件:** `src/pages/index.astro`
--   **目标:** 将 Web Worker 返回的图片数据显示在预览区。
--   **原子步骤:**
-    1.  [ ] 当主线程的 Worker 监听器收到返回的 `ImageData` 数组后，首先清空预览区 `preview-container` 的内容。
-    2.  [ ] 遍历 `ImageData` 数组。
-    3.  [ ] 对于每一个 `ImageData`，动态创建一个 `<canvas>` 元素。
-    4.  [ ] 设置 canvas 的 `width` 和 `height` 属性，使其与 `ImageData` 的尺寸匹配。
-    5.  [ ] 使用 `canvas.getContext('2d').putImageData(imageData, 0, 0)` 将图片数据绘制到 canvas 上。
-    6.  [ ] 将创建好的 `<canvas>` 元素包裹在一个 `div` 中（便于添加边框、间距等样式），然后追加到 `preview-container` 中。
-    7.  [ ] 所有 canvas 创建并追加完成后，移除 `preview-container` 的 `hidden` class，使其可见。
--   **验收标准:**
-    -   [ ] 分割完成后，预览区正确显示，并包含所有分割出的小图。
-    -   [ ] 图片内容和顺序正确。
-    -   [ ] 页面布局在预览区出现后依然保持正常。
+*   **`task-1.3`**: **实现图片解码与 OffscreenCanvas 绘制**
+    *   **描述:** 在 Worker 中，使用 `createImageBitmap` 解码图片。
+    *   **动作:** 创建一个 `OffscreenCanvas`，设置其尺寸，并将图片位图绘制上去。
+    *   **验证:** `console.log()` OffscreenCanvas 的尺寸，确认与原图一致。
+
+*   **`task-1.4`**: **实现图片切割、Blob 生成与进度上报**
+    *   **描述:** 编写循环逻辑，根据 `splitHeight` 进行切割，并在循环中上报进度。
+    *   **动作:**
+        1.  在循环外部，计算出切片总数 `totalChunks`。
+        2.  在循环内部，每处理完一个切片：
+            a.  创建临时 `OffscreenCanvas` 并使用 `drawImage` 复制区域。
+            b.  调用 `convertToBlob()` 转换为 Blob 对象。
+            c.  通过 `postMessage` 发送 `{ type: 'chunk', ... }` 消息。
+            d.  计算 `progress = Math.round(((index + 1) / totalChunks) * 100)` 并发送 `{ type: 'progress', progress }` 消息。
+    *   **验证:** 在主线程能接收到 `chunk` 消息和 `progress` 消息，且进度值从 0 到 100 增长。
+
+*   **`task-1.5`**: **实现完成与错误消息发送**
+    *   **描述:** 在所有切片处理完成后，发送简化的 `'done'` 消息。
+    *   **动作:** 在循环结束后 `postMessage({ type: 'done' })`。将所有操作包裹在 `try...catch` 块中，在 `catch` 中 `postMessage({ type: 'error', ... })`。
+    *   **验证:** 确认在成功处理后能收到 `done` 消息，在错误场景下能收到 `error` 消息。
 
 ---
 
-## 3. 实施顺序
+### **阶段二：前端界面 —— 预览与进度组件开发**
 
-建议按以下顺序进行开发：
-1.  **任务 1.1**: 先快速修改文件大小限制，这是最简单的变更。
-2.  **任务 2.1**: 构建静态的预览区 UI，确保样式符合预期。
-3.  **任务 2.2 (部分) & 1.2**: 这是核心。将原有的切割逻辑（不含 Web Worker）改造为能生成 `ImageData` 并在预览区 `canvas` 中展示。先保证功能跑通。
-4.  **任务 1.2 (完善)**: 将跑通的切割逻辑迁移到 Web Worker 中，完成性能优化。
+**目标:** 使用 Astro 和 Tailwind CSS 构建新的 UI 组件，初始状态下均隐藏。
 
-这个顺序遵循了“先功能，后性能”、“先静态，后动态”的原则，便于调试和验证。 
+*   **`task-2.1`**: **创建预览界面 Astro 组件**
+    *   **描述:** 创建 `src/components/Previewer.astro`。
+    *   **动作:** 包含一个隐藏的根 `div` (`id="preview-section"`)，内部分为左右两栏 (`#thumbnail-list`, `#preview-image`)。
+    *   **验证:** 组件引入后，页面不可见，但 DOM 结构存在。
+
+*   **`task-2.2`**: **创建进度条 UI 组件**
+    *   **描述:** 在 `pages/index.astro` 或 `MainLayout.astro` 的合适位置，添加一个进度条组件。
+    *   **动作:** 添加一个外层 `div` (`id="progress-container"`)，初始 `hidden`。内部包含一个用于显示进度的条形 `div` (`id="progress-bar"`)。
+    *   **验证:** 页面加载时不可见，但 DOM 结构存在。
+
+*   **`task-2.3`**: **实现缩略图动态添加**
+    *   **描述:** 编写一个函数，用于将 Worker 发来的 `chunk` 渲染为缩略图。
+    *   **动作:** 函数接收 `{ blob, index }`，创建 `<img>` 元素（`src` 来自 `URL.createObjectURL(blob)`），并追加到 `#thumbnail-list`。
+    *   **验证:** 手动调用此函数，缩略图能被正确添加。
+
+*   **`task-2.4`**: **实现大图预览与交互**
+    *   **描述:** 实现点击缩略图后更新大图预览的逻辑。
+    *   **动作:** 在 `#thumbnail-list` 上添加事件委托，点击时更新 `#preview-image` 的 `src`，并处理高亮样式。
+    *   **验证:** 点击不同缩略图，大图和高亮样式均正确更新。
+
+*   **`task-2.5`**: **添加导出按钮**
+    *   **描述:** 在 `Previewer.astro` 中添加“导出为 ZIP”和“导出为 PDF”两个按钮。
+    *   **动作:** 确保按钮有明确的 ID，初始状态为禁用。
+    *   **验证:** 页面上能看到这两个按钮。
+
+---
+
+### **阶段三：集成与状态管理**
+
+**目标:** 将 Worker 逻辑与 UI 组件连接起来，引入状态管理，完成整个工作流程。
+
+*   **`task-3.1`**: **初始化应用状态管理器**
+    *   **描述:** 在 `src/scripts/main.js` 的顶部，初始化一个全局状态对象。
+    *   **动作:** 创建 `let appState = { blobs: [], objectUrls: [] }`。
+    *   **验证:** `appState` 对象存在且结构正确。
+
+*   **`task-3.2`**: **改造主上传逻辑与资源清理**
+    *   **描述:** 修改处理文件上传的函数，在开始时执行清理，并启动 Worker。
+    *   **动作:**
+        1.  当用户点击“开始分割”时，首先执行清理函数：遍历 `appState.objectUrls` 并调用 `URL.revokeObjectURL()`，然后清空 `appState.blobs` 和 `appState.objectUrls`。
+        2.  显示进度条容器 (`#progress-container`)。
+        3.  实例化 `Worker` 并发送初始化消息。
+    *   **验证:** 第二次上传时，前一次的 Object URL 被释放，`appState` 被重置。
+
+*   **`task-3.3`**: **连接 Worker 消息与 UI**
+    *   **描述:** 在 `main.js` 中完整实现 Worker 的 `onmessage` 监听器。
+    *   **动作:**
+        -   收到 `'progress'` 消息时，更新 `#progress-bar` 的宽度样式。
+        -   收到 `'chunk'` 消息时，将 `blob` 存入 `appState.blobs`，调用 `task-2.3` 的函数创建缩略图并将其 URL 存入 `appState.objectUrls`。
+        -   收到 `'done'` 消息时，隐藏进度条，显示预览界面 (`#preview-section`)，并启用导出按钮。
+        -   收到 `'error'` 消息时，隐藏进度条，`alert` 错误信息。
+    *   **验证:** 完成一次完整流程，进度条、缩略图、预览界面按预期工作。
+
+*   **`task-3.4`**: **实现导出功能**
+    *   **描述:** 为“导出”按钮绑定事件监听器。
+    *   **动作:** 点击导出按钮时，从 `appState.blobs` 中读取所有 Blob 数据，并使用 `JSZip` 或 `jsPDF` 生成文件。
+    *   **验证:** 成功导出包含所有预览图片的 ZIP 和 PDF 文件。
+
+*   **`task-3.5`**: **最终清理**
+    *   **描述:** 清理所有临时添加的测试代码和 `console.log`。
+    *   **动作:** 审查代码，移除不再需要的旧逻辑和调试信息。
+    *   **验证:** 代码库整洁，没有遗留的调试代码。 
