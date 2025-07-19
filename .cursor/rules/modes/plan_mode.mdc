@@ -1,0 +1,124 @@
+---
+description: The Vibe Coding Planning Mode (PLAN). Transforms the PRD into a hyper-detailed, atomic, and verifiable implementation plan, embedding advanced practices like TDD/BDD and code size constraints directly into the plan.
+globs: ["plan_mode.mdc"]
+alwaysApply: false
+---
+
+# 📋 PLAN 模式：制定施工蓝图 (Implementation Plan)
+
+> **TL;DR:** 此模式是架构师的核心工作台。输入是`产品需求文档.md`，输出是极致原子化的`implementation-plan.md`。此模式将强制您运用 JTBD、原子化拆解、TDD/BDD 规划等高级工程实践，以确保“AI 施工队”能完美执行您的意图。
+
+```mermaid
+graph TD
+    subgraph "PLAN 模式: 从需求到原子任务"
+        direction TB
+        A[▶️ 开始规划] --> B(1. PRD 深度审查);
+        B --> C(2. 构建任务树);
+        C --> D(3. 极限原子化拆解);
+        D --> E{4. 选择验证模式};
+        E -->|敏捷验证| F(4a. 定义简单测试标准);
+        E -->|极限质量| G(4b. 规划 TDD/BDD 循环);
+        F --> H;
+        G --> H;
+        H(5. 生成实施计划);
+        H --> I(6. 飞行前检查);
+        I --> J[✅ 规划完成];
+    end
+
+    subgraph "输入"
+        PRD[📄 产品需求文档.md]
+        TS[🛠️ tech-stack.md]
+    end
+
+    subgraph "输出"
+        IP[📜 implementation-plan.md]
+    end
+    
+    subgraph "关键方法论"
+        M1["- 需求洞察 (差异比较法)"]
+        M2["- JTBD & 用户故事"]
+        M3["- 数据契约优先"]
+        M4["- 代码规模约束驱动拆解"]
+        M5["- BDD 风格测试定义"]
+    end
+    
+    PRD --> B;
+    TS --> B;
+    J --> IP;
+    B -.-> M1 & M2 & M3
+    D -.-> M4
+    G -.-> M5
+
+    style A fill:#fb8c00,color:white,stroke-width:2px,stroke:black
+    style B fill:#1e88e5,color:white
+    style C fill:#1e88e5,color:white
+    style D fill:#fdd835,color:black
+    style E fill:#e53935,color:white
+    style H fill:#1e88e5,color:white
+    style I fill:#fdd835,color:black
+    style J fill:#43a047,color:white,stroke-width:2px,stroke:black
+```
+
+## 第一步：PRD 深度审查与最终化
+
+在制定实施计划前，我们必须确保需求本身是坚不可摧的。我将引导您：
+
+1.  **需求洞察与穿透**: 再次运用 **“差异比较法”** 和 **“场景化”** 分析，确保 PRD 中定义的需求抓住了用户真正的痛点/爽点。
+2.  **锚定终极目标 (JTBD)**: 确认 PRD 中的所有用户故事都服务于一个或多个清晰、本质的 **Jobs-to-be-Done**。
+3.  **定义数据契约**: **这是强制步骤**。在 PRD 中必须明确关键接口、数据结构或状态模型。AI 将基于此契约开发，而非猜测。
+
+## 第二步：构建任务树（上帝视角）
+
+在动笔写 `implementation-plan.md` 之前，我将协助您在脑中或草稿中，构建一个完整的、层级分明的任务树。
+
+  - **顶端**: 最终产品。
+  - **中间**: 主要功能模块 -\> 子功能。
+  - **底端**: **原子任务** (具体的、可一次性执行的指令)。
+    这将确保您从第一行代码开始，就拥有上帝视角的“大局观”。
+
+## 第三步：极限“原子化”拆解 (核心纪律)
+
+这是 PLAN 模式的核心纪律。任务必须被拆分到“几乎不可能被误解”的原子粒度。
+
+  - **规模约束驱动拆解**: 在定义每一个子任务时，您必须用《Vibe Coding 手册》中的代码规模约束进行预判：
+      - > **“完成这个任务所产生的代码，会超过150行（函数）或500行（文件）的限制吗？”**
+  - 如果答案是“是”，那么这个任务就**太大了**，必须被进一步拆解。例如，“实现用户个人资料页面”必须被拆解为“创建用户头像显示组件”、“创建用户信息编辑表单组件”、“实现表单数据提交逻辑”等多个独立的、远小于规模限制的原子任务。
+  - **赋予唯一标识**: 为每一个原子步骤分配唯一的、层级化的 ID (例如 `step-1.1`, `feature-A.2`)，并与后续的 Git Commit Message 关联。
+
+> 这种基于代码规模的预判式拆解，是防止代码库腐化的第一道，也是最重要的一道防线。
+
+## 第四步：选择你的开发模式并定义“验证标准”
+
+每个原子任务都必须有客观的“完成”定义。我将引导您根据任务的重要性选择模式：
+
+  - **模式一：敏捷验证模式 (默认)**
+
+      - **适用场景**: 快速原型、探索性功能。
+      - **做法**: 定义简单的、描述性的测试方法。
+          - *示例*: `步骤 5: 实现飞船发射子弹。测试: 在浏览器中按下空格键，确认能看到子弹被创建出来。`
+
+  - **模式二：极限质量模式 (TDD/BDD 驱动)**
+
+      - **适用场景**: 核心模块、关键业务逻辑。
+      - **做法**: **在实施计划中就规划好“红-绿-重构”三次指令互动**。
+        1.  **用 BDD 风格定义行为**: 我将引导您使用 **Given-When-Then** 格式来定义测试标准。
+              - *示例*: `行为测试: Given 玩家飞船在屏幕中心, When 我按下“空格键”, Then 游戏世界中应该出现一个“子弹”实例。`
+        2.  **规划 TDD 循环**: 我将协助您在计划中就写下针对该行为的 **三次** 指令草稿：写失败测试（红）、写最简代码通过测试（绿）、重构代码（重构）。
+
+## 第五步：生成 `implementation-plan.md`
+
+完成上述所有思考和规划后，我将为您生成一份结构清晰、内容详尽的 `implementation-plan.md`。
+
+## 第六步：最终保险：“起飞前检查” (强制步骤)
+
+在离开 PLAN 模式前，这是最后一道、也是成本最低的纠错机会。
+
+  - **核心操作**: 我将提示您，将新鲜出炉的 `implementation-plan.md` 交给将要执行编码的 AI，然后向它提问：
+    > “请阅读 memory-bank 里的所有文档，这份实施计划对你来说 100% 清晰吗？你有哪些问题可以帮助你更精确地理解任务？”
+  - **价值所在**: 根据 AI 的提问，您再反过来优化您的施工计划，使其更完美。
+
+**下一步建议**:
+规划已臻于完美。如果计划中有需要复杂设计或探索的模块，建议进入 **CREATIVE 模式**。如果计划足够清晰，可直接进入 **IMPLEMENT 模式** 开始施工。
+
+
+
