@@ -72,12 +72,12 @@ src/
 
 ### 4.2 Worker 职责
 
-- **图片解码:** 使用 `createImageBitmap()` 高效解码
-- **Canvas 绘制:** 在 `OffscreenCanvas` 上进行渲染操作
-- **图片切割:** 按指定高度分割图片
-- **Blob 生成:** 将切片转换为 Blob 对象
-- **进度上报:** 实时报告处理进度
-- **错误处理:** 捕获并报告处理异常
+- **图片解码:** 使用 `createImageBitmap()` 高效解码 ✅ (task-1.3)
+- **Canvas 绘制:** 在 `OffscreenCanvas` 上进行渲染操作 ✅ (task-1.3)
+- **图片切割:** 按指定高度分割图片 ⏳ (task-1.4)
+- **Blob 生成:** 将切片转换为 Blob 对象 ⏳ (task-1.4)
+- **进度上报:** 实时报告处理进度 ✅ (task-1.3)
+- **错误处理:** 捕获并报告处理异常 ✅ (task-1.3)
 
 ## 5. 设计决策记录
 
@@ -137,4 +137,8 @@ appState = {
 - **[task-1.1]** 确立 Web Worker 架构设计模式
 - **[task-1.2]** 实现 Worker 消息监听器与参数验证
 - **[task-1.2]** 修复 Astro SSR 问题，确保脚本正确在客户端执行
-- **[task-1.2]** 建立主线程与 Worker 双向通信机制 
+- **[task-1.2]** 建立主线程与 Worker 双向通信机制
+- **[task-1.3]** 实现 Worker 中的图片解码与 OffscreenCanvas 绘制逻辑
+- **[task-1.3]** 集成 `createImageBitmap` 高效图片解码API
+- **[task-1.3]** 建立 OffscreenCanvas 绘制与尺寸验证机制
+- **[task-1.3]** 添加资源管理与内存清理功能 
