@@ -1,8 +1,6 @@
 ---
 import '../styles/style.css';
 import Feedback from '../components/Feedback.astro';
-import '../scripts/i18n.js';
-import '../scripts/main.js';
 
 export interface Props {
     title: string;
@@ -80,5 +78,9 @@ const { title } = Astro.props;
 
     <!-- App Logic & Integrations -->
     <script is:inline set:html={`window.APP_BASE_URL = "${import.meta.env.BASE_URL}";`} />
+    
+    <!-- Client-side scripts -->
+    <script src="/src/scripts/i18n.js" type="module"></script>
+    <script src="/src/scripts/main.js" type="module"></script>
   </body>
 </html> 

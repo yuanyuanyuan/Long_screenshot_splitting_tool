@@ -134,4 +134,7 @@ appState = {
 ### v1.0.0 (2025-01-19)
 - **[task-1.1]** 新增 `src/scripts/split.worker.js` 文件
 - **[task-1.1]** 定义 Web Worker 消息传递契约 v1.1
-- **[task-1.1]** 确立 Web Worker 架构设计模式 
+- **[task-1.1]** 确立 Web Worker 架构设计模式
+- **[task-1.2]** 实现 Worker 消息监听器与参数验证
+- **[task-1.2]** 修复 Astro SSR 问题，确保脚本正确在客户端执行
+- **[task-1.2]** 建立主线程与 Worker 双向通信机制 

@@ -10,6 +10,11 @@ class I18nService {
    * 简化的语言检测逻辑
    */
   detectLanguage() {
+    // 仅在浏览器环境中执行检测
+    if (typeof window === 'undefined') {
+      return this.defaultLang;
+    }
+
     // 1. URL 参数优先
     const urlParams = new URLSearchParams(window.location.search);
     const urlLang = urlParams.get("lang");
@@ -49,6 +54,12 @@ class I18nService {
    * 异步加载指定语言的翻译文件
    */
   async loadTranslations(lang) {
+    // 仅在浏览器环境中加载翻译
+    if (typeof window === 'undefined') {
+      this.translations = {};
+      return null;
+    }
+
     try {
       const baseUrl = window.APP_BASE_URL || "/";
       // Astro's BASE_URL includes a trailing slash when not root, but we ensure it here for safety.
@@ -76,7 +87,7 @@ class I18nService {
    * 将翻译应用到页面上
    */
   applyTranslations() {
-    if (!this.translations) return;
+    if (!this.translations || typeof document === 'undefined') return;
 
     // 更新页面内容
     document.querySelectorAll("[data-i18n]").forEach((el) => {
@@ -115,6 +126,11 @@ class I18nService {
       return;
     }
 
+    // 仅在浏览器环境中执行语言切换
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+
     this.currentLang = lang;
     localStorage.setItem("preferredLang", lang);
     document.documentElement.lang = lang;
@@ -138,6 +154,8 @@ class I18nService {
    * 更新语言切换器UI，高亮当前语言
    */
   updateLanguageSwitcherUI() {
+    if (typeof document === 'undefined') return;
+    
     const switcher = document.getElementById("lang-switcher");
     if (!switcher) return;
 
@@ -159,6 +177,8 @@ class I18nService {
    * 设置语言切换事件
    */
   setupLanguageSwitcher() {
+    if (typeof document === 'undefined') return;
+    
     const switcher = document.getElementById("lang-switcher");
     if (!switcher) return;
 
@@ -182,26 +202,37 @@ class I18nService {
   async init() {
     const lang = this.detectLanguage();
     this.currentLang = lang;
-    document.documentElement.lang = lang;
+    
+    // 仅在浏览器环境中设置DOM和全局变量
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+    }
 
     await this.loadTranslations(lang);
     this.applyTranslations();
 
     // 暴露到全局，以便 main.js 等其他脚本使用
-    window.i18n = this;
+    if (typeof window !== 'undefined') {
+      window.i18n = this;
+    }
 
     // 通知其他脚本 i18n 已准备就绪
-    document.dispatchEvent(new CustomEvent("i18n:ready"));
+    if (typeof document !== 'undefined') {
+      document.dispatchEvent(new CustomEvent("i18n:ready"));
+    }
 
     // 设置事件监听
     this.setupLanguageSwitcher();
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const i18n = new I18nService(
-    ["en", "zh-CN"], // 支持的语言
-    "zh-CN" // 默认语言
-  );
-  i18n.init();
-});
+// 仅在浏览器环境中执行
+if (typeof document !== 'undefined') {
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = new I18nService(
+      ["en", "zh-CN"], // 支持的语言
+      "zh-CN" // 默认语言
+    );
+    i18n.init();
+  });
+}

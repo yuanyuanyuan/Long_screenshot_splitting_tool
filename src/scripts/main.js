@@ -1,8 +1,12 @@
-document.addEventListener("i18n:ready", () => {
+// 仅在浏览器环境中执行
+if (typeof document !== 'undefined') {
+  document.addEventListener("i18n:ready", () => {
   // 全局变量
   let originalImage = null;
   let imageSlices = [];
   let selectedSlices = new Set();
+  
+  // TODO: 在 task-3.x 中实现实际的 Worker 集成逻辑
 
   // DOM元素
   const dropZone = document.getElementById("dropZone");
@@ -354,4 +358,5 @@ document.addEventListener("i18n:ready", () => {
 
   // 初始化时更新一次计数文本
   updateSelectedCount();
-});
+  });
+}
