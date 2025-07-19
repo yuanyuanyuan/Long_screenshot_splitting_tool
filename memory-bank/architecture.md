@@ -37,10 +37,10 @@ src/
 ├── scripts/
 │   ├── main.js              # 主线程逻辑
 │   ├── i18n.js             # 国际化支持
-│   └── split.worker.js     # 图片分割 Worker [新增]
+│   └── split.worker.js     # 图片分割 Worker ✅
 ├── components/
 │   ├── Feedback.astro      # 反馈组件
-│   └── Previewer.astro     # 预览组件 [待添加]
+│   └── Previewer.astro     # 预览组件 ✅ [新增]
 ├── layouts/                # 页面布局
 ├── pages/                  # 页面文件
 └── styles/                 # 样式文件
@@ -128,9 +128,37 @@ appState = {
 - **内存管理:** 及时清空 blobs 数组避免内存泄漏
 - **错误恢复:** 异常情况下的资源清理机制
 
+## 7. UI 组件架构
+
+### 7.1 Previewer 组件设计
+
+**文件位置:** `src/components/Previewer.astro`
+
+**组件职责:**
+- 提供分割后图片的交互式预览界面 ✅ (task-2.1)
+- 支持左侧缩略图列表和右侧大图预览的双栏布局
+- 集成导出功能按钮（ZIP/PDF）
+- 响应式设计，适配不同屏幕尺寸
+
+**核心DOM结构:**
+```html
+<div id="preview-section" class="hidden">     <!-- 根容器，初始隐藏 -->
+  <div id="thumbnail-list">                  <!-- 左侧缩略图列表 -->
+  <div id="preview-image">                   <!-- 右侧大图预览区 -->
+  <button id="export-zip-btn">               <!-- ZIP导出按钮 -->
+  <button id="export-pdf-btn">               <!-- PDF导出按钮 -->
+</div>
+```
+
+**设计决策记录:**
+- **问题:** 需要一个专门的预览界面来展示分割结果
+- **决策:** 创建独立的 Astro 组件，使用 Tailwind CSS 实现响应式布局
+- **理由:** 模块化设计，便于维护和测试；响应式布局提升用户体验
+- **权衡:** 增加了组件数量，但提升了代码组织性和可维护性
+
 ---
 
-## 7. 变更历史
+## 8. 变更历史
 
 ### v1.0.0 (2025-01-19)
 - **[task-1.1]** 新增 `src/scripts/split.worker.js` 文件
@@ -149,4 +177,8 @@ appState = {
 - **[task-1.4]** 完善进度上报系统（25%-95% 覆盖切割阶段）
 - **[task-1.5]** 实现完成消息发送机制（done 消息）
 - **[task-1.5]** 完善错误处理与异常上报系统
-- **[task-1.5]** 建立完整的进度跟踪（0%-100%）与完成通知流程 
+- **[task-1.5]** 建立完整的进度跟踪（0%-100%）与完成通知流程
+- **[task-2.1]** 新增 `src/components/Previewer.astro` 预览界面组件
+- **[task-2.1]** 实现隐藏的双栏布局设计（缩略图列表+大图预览）
+- **[task-2.1]** 集成响应式 Tailwind CSS 样式和无障碍访问支持
+- **[task-2.1]** 预置导出按钮容器，为后续集成做准备 
