@@ -163,6 +163,22 @@ async function processImage(file, splitHeight) {
     
     console.log('Image splitting completed');
     
+    // task-1.5: 发送完成消息
+    console.log('Sending completion signal...');
+    
+    // 更新进度到 100%
+    self.postMessage({
+      type: 'progress',
+      progress: 100
+    });
+    
+    // 发送简化的完成消息
+    self.postMessage({
+      type: 'done'
+    });
+    
+    console.log('✅ All processing completed successfully');
+    
   } catch (error) {
     console.error('Error in processImage:', error);
     self.postMessage({
