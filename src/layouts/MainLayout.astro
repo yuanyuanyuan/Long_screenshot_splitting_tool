@@ -1,6 +1,9 @@
 ---
 import '../styles/style.css';
 import Feedback from '../components/Feedback.astro';
+import '../scripts/i18n.js';
+import '../scripts/main.js';
+
 export interface Props {
     title: string;
 }
@@ -36,7 +39,6 @@ const { title } = Astro.props;
               >
                 <a href="?lang=en" class="btn btn-lang">English</a>
                 <a href="?lang=zh-CN" class="btn btn-lang">简体中文</a>
-                <a href="?lang=zh-TW" class="btn btn-lang">繁體中文</a>
               </nav>
             </div>
 
@@ -78,7 +80,5 @@ const { title } = Astro.props;
 
     <!-- App Logic & Integrations -->
     <script is:inline set:html={`window.APP_BASE_URL = "${import.meta.env.BASE_URL}";`} />
-    <script src="js/i18n.js" defer></script>
-    <script src="js/main.js" defer></script>
   </body>
 </html> 

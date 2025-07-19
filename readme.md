@@ -29,7 +29,7 @@ It's fast, secure (as all processing happens within your browser and no files ar
 🖼️ **Custom Splitting**: Define a custom pixel height to precisely cut long screenshots into perfectly sized segments.
 🖱️ **Interactive Selection**: Easily select or deselect the image segments you want to keep.
 📦 **Multiple Export Options**: Download your chosen segments as a `.zip` archive or compile them into a single `.pdf` file.
-🌍 **Multi-language Support**: The user interface is fully available in English, Simplified Chinese, and Traditional Chinese.
+🌍 **Multi-language Support**: The user interface is fully available in English and Simplified Chinese.
 🚀 **Lightweight & Fast**: No backend dependencies ensure a swift and smooth user experience.
 
 ## Getting Started

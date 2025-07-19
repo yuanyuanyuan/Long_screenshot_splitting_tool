@@ -200,7 +200,7 @@ class I18nService {
 
 document.addEventListener("DOMContentLoaded", () => {
   const i18n = new I18nService(
-    ["en", "zh-CN", "zh-TW"], // 支持的语言
+    ["en", "zh-CN"], // 支持的语言
     "zh-CN" // 默认语言
   );
   i18n.init();
