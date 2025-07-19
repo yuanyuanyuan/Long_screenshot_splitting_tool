@@ -75,6 +75,29 @@ import Previewer from '../components/Previewer.astro';
           </div>
         </div>
 
+        <!-- 进度条组件 -->
+        <div id="progress-container" class="hidden w-full max-w-4xl mx-auto mt-8 mb-8">
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-800">处理进度</h3>
+              <span id="progress-text" class="text-sm text-gray-600">0%</span>
+            </div>
+            <!-- 进度条容器 -->
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <!-- 进度条 -->
+              <div 
+                id="progress-bar" 
+                class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300 ease-out" 
+                style="width: 0%"
+              ></div>
+            </div>
+            <!-- 进度描述 -->
+            <p id="progress-description" class="text-sm text-gray-500 mt-3">
+              等待开始处理...
+            </p>
+          </div>
+        </div>
+
         <div class="preview-section hidden" id="previewSection">
           <div class="preview-header">
             <h2 class="section-title" data-i18n="preview.title">

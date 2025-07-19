@@ -140,6 +140,16 @@ appState = {
 - 集成导出功能按钮（ZIP/PDF）
 - 响应式设计，适配不同屏幕尺寸
 
+### 7.2 进度条 UI 组件设计
+
+**文件位置:** `src/pages/index.astro` (内嵌)
+
+**组件职责:**
+- 提供图片处理过程的可视化进度反馈 ✅ (task-2.2)
+- 显示实时进度百分比和描述信息
+- 初始状态隐藏，处理时显示
+- 现代化视觉设计和平滑动画效果
+
 **核心DOM结构:**
 ```html
 <div id="preview-section" class="hidden">     <!-- 根容器，初始隐藏 -->
@@ -147,6 +157,15 @@ appState = {
   <div id="preview-image">                   <!-- 右侧大图预览区 -->
   <button id="export-zip-btn">               <!-- ZIP导出按钮 -->
   <button id="export-pdf-btn">               <!-- PDF导出按钮 -->
+</div>
+```
+
+**进度条DOM结构:**
+```html
+<div id="progress-container" class="hidden">  <!-- 进度条容器，初始隐藏 -->
+  <div id="progress-bar">                     <!-- 核心进度条元素 -->
+  <span id="progress-text">                   <!-- 进度百分比显示 -->
+  <p id="progress-description">               <!-- 进度描述文字 -->
 </div>
 ```
 
@@ -181,4 +200,8 @@ appState = {
 - **[task-2.1]** 新增 `src/components/Previewer.astro` 预览界面组件
 - **[task-2.1]** 实现隐藏的双栏布局设计（缩略图列表+大图预览）
 - **[task-2.1]** 集成响应式 Tailwind CSS 样式和无障碍访问支持
-- **[task-2.1]** 预置导出按钮容器，为后续集成做准备 
+- **[task-2.1]** 预置导出按钮容器，为后续集成做准备
+- **[task-2.2]** 在主页面中添加进度条 UI 组件 (`#progress-container`)
+- **[task-2.2]** 实现核心进度条元素 (`#progress-bar`) 及相关显示组件
+- **[task-2.2]** 集成现代化视觉设计和平滑动画效果
+- **[task-2.2]** 建立处理进度的可视化反馈机制 
