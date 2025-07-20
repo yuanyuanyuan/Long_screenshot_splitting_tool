@@ -180,9 +180,31 @@
     - 兼容性验证：原有变量引用保持，现有代码不受影响 ✅
     - 功能验证：状态管理函数实现完整，调试接口正常暴露 ✅
 
-- ⏳ **task-3.2**: 改造主上传逻辑与资源清理
-  - **状态:** 待执行
-  - **调整说明:** 将现有 `processImage()` 函数从 Canvas 模式改为 Worker 模式
+- ✅ **task-3.2**: 改造主上传逻辑与资源清理
+  - **状态:** 已完成
+  - **完成时间:** 2025-01-19
+  - **产出:** 完全重构 `processImage()` 函数，从Canvas模式切换为Worker模式，实现资源清理和Worker管理
+  - **关键实现:**
+    - **资源清理机制:** 在每次开始处理前调用 `cleanupPreviousSession()` 清理之前的资源
+      - 释放所有 Object URLs：`URL.revokeObjectURL()` 清理 `appState.objectUrls`
+      - 清空数据数组：重置 `appState.blobs`, `appState.imageSlices`, `appState.selectedSlices`
+      - 终止现有Worker：安全终止并重置 `appState.worker`
+    - **Worker初始化:** 创建新的Worker实例并建立通信
+      - 实例化 `/src/scripts/split.worker.js`
+      - 设置消息监听器和错误处理机制
+      - 将原始图片转换为File对象并发送给Worker
+    - **进度显示:** 显示进度条容器 (`#progress-container`)
+    - **状态管理:** 更新 `appState.isProcessing`, `splitHeight`, `fileName` 等状态
+    - **完整的错误处理:** Worker创建失败、消息传递异常等场景的处理
+  - **验证:** 三层验证通过
+    - 基础功能验证：`testTask32()` 测试资源清理和Worker初始化 ✅
+    - 核心验证标准：`testSecondUpload()` 验证第二次上传时前一次Object URLs被释放、appState被重置 ✅
+    - 用户界面验证：进度条正确显示，Worker消息接收正常 ✅
+  - **重要变更:** 
+    - 移除了原有的Canvas同步处理循环
+    - 改为异步Worker处理模式，支持大文件处理
+    - 实现了内存管理最佳实践，避免内存泄漏
+  - **测试函数:** 暴露 `window.testTask32()` 和 `window.testSecondUpload()` 用于验证
 
 - ⏳ **task-3.3**: 连接 Worker 消息与 UI
   - **状态:** 待执行
@@ -206,7 +228,7 @@
 ## 总体进度统计
 
 - **总任务数:** 15
-- **已完成:** 10
+- **已完成:** 11
 - **进行中:** 0
-- **待执行:** 5
-- **完成率:** 66.7% 
+- **待执行:** 4
+- **完成率:** 73.3% 

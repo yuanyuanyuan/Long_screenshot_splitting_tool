@@ -502,7 +502,7 @@ if (typeof document !== 'undefined') {
     reader.readAsDataURL(file);
   }
 
-  // 处理图片分割
+  // task-3.2: 改造主上传逻辑与资源清理
   function processImage() {
     if (!originalImage) return;
 
@@ -512,59 +512,76 @@ if (typeof document !== 'undefined') {
       return;
     }
 
-    imageSlices = [];
-    selectedSlices.clear();
-    previewContainer.innerHTML = "";
-    updateSelectedCount();
+    // 1. 执行清理函数：清理之前会话的所有资源
+    console.log('[task-3.2] 开始资源清理...');
+    cleanupPreviousSession();
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = originalImage.width;
-
-    // 计算需要分割的片段数量
-    const numSlices = Math.ceil(originalImage.height / sliceHeight);
-
-    // 分割图片
-    for (let i = 0; i < numSlices; i++) {
-      const startY = i * sliceHeight;
-      const sliceActualHeight = Math.min(
-        sliceHeight,
-        originalImage.height - startY
-      );
-
-      // 设置canvas高度为当前片段高度
-      canvas.height = sliceActualHeight;
-
-      // 绘制图片片段
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(
-        originalImage,
-        0,
-        startY,
-        originalImage.width,
-        sliceActualHeight,
-        0,
-        0,
-        originalImage.width,
-        sliceActualHeight
-      );
-
-      // 获取图片数据URL
-      const imageData = canvas.toDataURL("image/jpeg", 0.9);
-      imageSlices.push({
-        data: imageData,
-        width: originalImage.width,
-        height: sliceActualHeight,
-        index: i,
-      });
-
-      // 默认选择所有片段
-      selectedSlices.add(i);
+    // 2. 显示进度条容器
+    const progressContainer = document.getElementById("progress-container");
+    if (progressContainer) {
+      progressContainer.classList.remove("hidden");
+      console.log('[task-3.2] 进度条容器已显示');
     }
 
-    updatePreviewsUI();
-    previewSection.classList.remove("hidden");
-    updateSelectedCount();
+    // 3. 实例化 Worker 并发送初始化消息
+    try {
+      // 创建新的 Worker 实例
+      appState.worker = new Worker('/src/scripts/split.worker.js');
+      console.log('[task-3.2] Worker 实例已创建');
+
+      // 设置 Worker 消息监听器 (在 task-3.3 中完整实现)
+      appState.worker.onmessage = function(event) {
+        console.log('[task-3.2] 收到 Worker 消息:', event.data);
+        // TODO: task-3.3 将在这里实现完整的消息处理逻辑
+      };
+
+      // 设置 Worker 错误监听器
+      appState.worker.onerror = function(error) {
+        console.error('[task-3.2] Worker 错误:', error);
+        alert(`处理过程中发生错误: ${error.message}`);
+        
+        // 隐藏进度条
+        if (progressContainer) {
+          progressContainer.classList.add("hidden");
+        }
+      };
+
+      // 更新应用状态
+      updateAppState({
+        isProcessing: true,
+        splitHeight: sliceHeight,
+        fileName: fileNameInput.value || "分割结果"
+      });
+
+      // 创建 File 对象从 originalImage
+      const canvas = document.createElement('canvas');
+      canvas.width = originalImage.width;
+      canvas.height = originalImage.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(originalImage, 0, 0);
+
+      // 将 canvas 转换为 Blob，然后创建 File 对象
+      canvas.toBlob((blob) => {
+        const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+        
+        // 发送初始化消息给 Worker
+        appState.worker.postMessage({
+          file: file,
+          splitHeight: sliceHeight
+        });
+        
+        console.log('[task-3.2] 已发送初始化消息给 Worker');
+      }, 'image/jpeg', 0.9);
+
+    } catch (error) {
+      console.error('[task-3.2] Worker 初始化失败:', error);
+      alert(`初始化处理器失败: ${error.message}`);
+      
+      // 隐藏进度条
+      if (progressContainer) {
+        progressContainer.classList.add("hidden");
+      }
+    }
   }
 
   // 创建并更新所有预览UI
@@ -790,6 +807,235 @@ if (typeof document !== 'undefined') {
 
   // 将测试函数暴露到全局作用域，便于在控制台调用
   window.testThumbnailFunction = testThumbnailFunction;
+
+  // task-3.2: 验证测试函数
+  /**
+   * 测试资源清理和 Worker 初始化功能
+   */
+  function testTask32() {
+    console.log('[task-3.2 测试] 开始验证资源清理和 Worker 初始化...');
+    
+    // 模拟创建一些之前的资源
+    console.log('[task-3.2 测试] 1. 模拟创建之前会话的资源...');
+    
+    // 创建一些模拟的 Object URLs
+    const mockCanvas = document.createElement('canvas');
+    mockCanvas.width = 100;
+    mockCanvas.height = 100;
+    const mockCtx = mockCanvas.getContext('2d');
+    mockCtx.fillStyle = '#FF0000';
+    mockCtx.fillRect(0, 0, 100, 100);
+    
+    mockCanvas.toBlob((blob) => {
+      const mockUrl1 = URL.createObjectURL(blob);
+      const mockUrl2 = URL.createObjectURL(blob);
+      
+      // 手动添加到 appState 模拟之前的会话
+      appState.objectUrls.push(mockUrl1, mockUrl2);
+      appState.blobs.push(blob, blob);
+      appState.selectedSlices.add(0);
+      appState.selectedSlices.add(1);
+      
+      console.log('[task-3.2 测试] 模拟资源已创建:', {
+        objectUrls: appState.objectUrls.length,
+        blobs: appState.blobs.length,
+        selectedSlices: appState.selectedSlices.size
+      });
+      
+      // 创建模拟的 originalImage
+      const mockImg = new Image();
+      mockImg.width = 800;
+      mockImg.height = 1600;
+      mockImg.src = mockCanvas.toDataURL();
+      
+      mockImg.onload = () => {
+        originalImage = mockImg;
+        appState.originalImage = mockImg;
+        
+        // 设置分割高度
+        if (sliceHeightInput) {
+          sliceHeightInput.value = '400';
+        }
+        
+        console.log('[task-3.2 测试] 2. 调用 processImage() 测试资源清理...');
+        
+        // 记录清理前的状态
+        const beforeCleanup = {
+          objectUrls: appState.objectUrls.length,
+          blobs: appState.blobs.length,
+          selectedSlices: appState.selectedSlices.size,
+          hasWorker: !!appState.worker
+        };
+        
+        console.log('[task-3.2 测试] 清理前状态:', beforeCleanup);
+        
+        // 调用 processImage
+        processImage();
+        
+        // 验证清理后的状态 (延迟检查，因为 cleanupPreviousSession 是异步的)
+        setTimeout(() => {
+          const afterCleanup = {
+            objectUrls: appState.objectUrls.length,
+            blobs: appState.blobs.length,
+            selectedSlices: appState.selectedSlices.size,
+            hasWorker: !!appState.worker,
+            isProcessing: appState.isProcessing
+          };
+          
+          console.log('[task-3.2 测试] 清理后状态:', afterCleanup);
+          
+          // 验证清理效果
+          console.log('[task-3.2 测试] 3. 验证清理效果:');
+          console.log(`✅ Object URLs 已清空: ${afterCleanup.objectUrls === 0 ? '是' : '否'}`);
+          console.log(`✅ Blobs 已清空: ${afterCleanup.blobs === 0 ? '是' : '否'}`);
+          console.log(`✅ 选择状态已重置: ${afterCleanup.selectedSlices === 0 ? '是' : '否'}`);
+          console.log(`✅ Worker 已创建: ${afterCleanup.hasWorker ? '是' : '否'}`);
+          console.log(`✅ 处理状态已设置: ${afterCleanup.isProcessing ? '是' : '否'}`);
+          
+          // 验证进度条是否显示
+          const progressContainer = document.getElementById("progress-container");
+          const progressVisible = progressContainer && !progressContainer.classList.contains('hidden');
+          console.log(`✅ 进度条已显示: ${progressVisible ? '是' : '否'}`);
+          
+          console.log('[task-3.2 测试] 验证完成！');
+          
+          if (afterCleanup.objectUrls === 0 && 
+              afterCleanup.blobs === 0 && 
+              afterCleanup.selectedSlices === 0 && 
+              afterCleanup.hasWorker && 
+              afterCleanup.isProcessing && 
+              progressVisible) {
+            console.log('🎉 [task-3.2] 所有验证项目都通过了！');
+          } else {
+            console.warn('⚠️ [task-3.2] 某些验证项目未通过，请检查实现');
+          }
+          
+        }, 500);
+      };
+    });
+  }
+
+  // 暴露测试函数
+  window.testTask32 = testTask32;
+
+  /**
+   * 测试第二次上传时的资源清理效果 (task-3.2 验证标准)
+   */
+  function testSecondUpload() {
+    console.log('[task-3.2 第二次上传测试] 开始测试第二次上传的资源清理效果...');
+    
+    // 模拟第一次上传产生的资源
+    console.log('[第二次上传测试] 1. 模拟第一次上传产生的资源...');
+    
+    const firstCanvas = document.createElement('canvas');
+    firstCanvas.width = 200;
+    firstCanvas.height = 200;
+    const firstCtx = firstCanvas.getContext('2d');
+    firstCtx.fillStyle = '#0000FF';
+    firstCtx.fillRect(0, 0, 200, 200);
+    
+    firstCanvas.toBlob((firstBlob) => {
+      // 模拟第一次上传的结果
+      const firstUrl1 = URL.createObjectURL(firstBlob);
+      const firstUrl2 = URL.createObjectURL(firstBlob);
+      
+      appState.objectUrls.push(firstUrl1, firstUrl2);
+      appState.blobs.push(firstBlob, firstBlob);
+      appState.selectedSlices.add(0);
+      appState.selectedSlices.add(1);
+      
+      // 模拟创建第一个 Worker
+      try {
+        appState.worker = new Worker('/src/scripts/split.worker.js');
+        console.log('[第二次上传测试] 第一个 Worker 已创建');
+      } catch (error) {
+        console.log('[第二次上传测试] Worker 创建失败，继续测试...');
+      }
+      
+      console.log('[第二次上传测试] 第一次上传模拟完成:', {
+        objectUrls: appState.objectUrls.length,
+        blobs: appState.blobs.length,
+        selectedSlices: appState.selectedSlices.size,
+        hasWorker: !!appState.worker
+      });
+      
+      // 模拟第二次上传的图片
+      console.log('[第二次上传测试] 2. 准备第二次上传...');
+      
+      const secondCanvas = document.createElement('canvas');
+      secondCanvas.width = 300;
+      secondCanvas.height = 600;
+      const secondCtx = secondCanvas.getContext('2d');
+      secondCtx.fillStyle = '#00FF00';
+      secondCtx.fillRect(0, 0, 300, 600);
+      
+      const secondImg = new Image();
+      secondImg.width = 300;
+      secondImg.height = 600;
+      secondImg.src = secondCanvas.toDataURL();
+      
+      secondImg.onload = () => {
+        originalImage = secondImg;
+        appState.originalImage = secondImg;
+        
+        if (sliceHeightInput) {
+          sliceHeightInput.value = '200';
+        }
+        
+        // 记录第二次上传前的状态
+        const beforeSecondUpload = {
+          objectUrls: appState.objectUrls.length,
+          blobs: appState.blobs.length,
+          selectedSlices: appState.selectedSlices.size,
+          hasWorker: !!appState.worker
+        };
+        
+        console.log('[第二次上传测试] 第二次上传前状态:', beforeSecondUpload);
+        
+        // 执行第二次上传
+        console.log('[第二次上传测试] 3. 执行第二次上传 (processImage)...');
+        processImage();
+        
+        // 验证清理效果
+        setTimeout(() => {
+          const afterSecondUpload = {
+            objectUrls: appState.objectUrls.length,
+            blobs: appState.blobs.length,
+            selectedSlices: appState.selectedSlices.size,
+            hasWorker: !!appState.worker,
+            isProcessing: appState.isProcessing
+          };
+          
+          console.log('[第二次上传测试] 第二次上传后状态:', afterSecondUpload);
+          
+          // 验证关键指标 (task-3.2 验证标准)
+          console.log('[第二次上传测试] 4. 验证清理效果:');
+          
+          const objectUrlsCleared = afterSecondUpload.objectUrls === 0;
+          const blobsCleared = afterSecondUpload.blobs === 0;
+          const selectedSlicesCleared = afterSecondUpload.selectedSlices === 0;
+          const workerRecreated = afterSecondUpload.hasWorker;
+          const processingStarted = afterSecondUpload.isProcessing;
+          
+          console.log(`✅ 前一次的 Object URLs 被释放: ${objectUrlsCleared ? '是' : '否'}`);
+          console.log(`✅ 前一次的 Blobs 被清空: ${blobsCleared ? '是' : '否'}`);
+          console.log(`✅ 前一次的选择状态被重置: ${selectedSlicesCleared ? '是' : '否'}`);
+          console.log(`✅ Worker 被重新创建: ${workerRecreated ? '是' : '否'}`);
+          console.log(`✅ 新的处理流程已开始: ${processingStarted ? '是' : '否'}`);
+          
+          if (objectUrlsCleared && blobsCleared && selectedSlicesCleared && workerRecreated && processingStarted) {
+            console.log('🎉 [task-3.2] 第二次上传测试通过！前一次的 Object URL 被释放，appState 被重置');
+          } else {
+            console.warn('⚠️ [task-3.2] 第二次上传测试未完全通过，请检查资源清理逻辑');
+          }
+          
+        }, 600);
+      };
+    });
+  }
+
+  // 暴露第二次上传测试函数
+  window.testSecondUpload = testSecondUpload;
 
   // task-2.4: 更新测试入口 - 显示正确的预览界面并测试交互功能
   function showPreviewAndTest() {
