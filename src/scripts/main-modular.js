@@ -41,7 +41,13 @@ import {
   testZipExport,
   testPdfExport,
   showPreviewAndTest,
-  getDebugSnapshot
+  getDebugSnapshot,
+  testTask36,
+  testTask36UserExperience,
+  demoTask36Layout,
+  checkSelectionButtons,
+  forceShowSelectionButtons,
+  checkImageCheckboxes
 } from './modules/testUtils.js';
 
 // 仅在浏览器环境中执行
@@ -78,7 +84,7 @@ if (typeof document !== 'undefined') {
       thumbnailList: document.getElementById("thumbnail-list"),
       previewImage: document.getElementById("preview-image"),
       currentPreviewInfo: document.getElementById("current-preview-info"),
-      closePreviewBtn: document.getElementById("close-preview-btn"),
+
       newExportZipBtn: document.getElementById("export-zip-btn"),
       newExportPdfBtn: document.getElementById("export-pdf-btn"),
       newSelectedCount: document.getElementById("new-selected-count"),
@@ -100,10 +106,7 @@ if (typeof document !== 'undefined') {
       domElements.selectAllBtn.addEventListener("click", selectAllSlices);
       domElements.deselectBtn.addEventListener("click", deselectAllSlices);
       
-      // 新预览界面事件监听器
-      if (domElements.closePreviewBtn) {
-        domElements.closePreviewBtn.addEventListener("click", closePreviewInterface);
-      }
+      // 新预览界面事件监听器（已移除关闭按钮）
 
       if (domElements.newExportZipBtn) {
         domElements.newExportZipBtn.addEventListener("click", () => exportAsZip(appState));
@@ -296,6 +299,14 @@ if (typeof document !== 'undefined') {
       
       // 调试工具
       window.getDebugSnapshot = () => getDebugSnapshot(appState);
+      
+      // Task-3.6 验证函数
+      window.testTask36 = () => testTask36();
+      window.testTask36UserExperience = () => testTask36UserExperience();
+      window.demoTask36Layout = () => demoTask36Layout();
+      window.checkSelectionButtons = () => checkSelectionButtons();
+      window.forceShowSelectionButtons = () => forceShowSelectionButtons();
+      window.checkImageCheckboxes = () => checkImageCheckboxes();
     }
 
     // 启动应用

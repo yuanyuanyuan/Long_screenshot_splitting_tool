@@ -1,68 +1,74 @@
 ---
-// Previewer.astro - 预览界面组件
-// task-2.4: 实现大图预览与交互功能
-// 增强：整合原有的图片选择功能
+// Previewer.astro - 预览界面组件 (重构版 - task-3.6)
+// 从全屏布局改为页面内布局，融入现有设计语言
+import '../styles/tailwind.css'
 ---
 
-<!-- 全屏预览界面组件 -->
-<div id="preview-section" class="fullscreen-preview hidden">
-  <!-- 左侧栏：缩略图列表 -->
-  <div class="preview-sidebar">
-    <div class="preview-sidebar-header">
-      <div>
-        <h2 class="preview-title">选择需要导出的片段</h2>
-        <p class="preview-subtitle">
-          <span id="new-selected-count" class="selected-count">已选择 0 个片段</span>
-        </p>
-      </div>
-      <button id="close-preview-btn" class="preview-close-btn" title="返回主界面">
-        ✕ 返回
-      </button>
+<!-- 页面内预览界面组件 -->
+<div id="preview-section" class="hidden my-8 mb-10 bg-light rounded-xl shadow-md border border-light-gray min-h-[400px] transition-all duration-300">
+  <!-- 预览头部 -->
+  <div class="flex justify-between items-center p-5 px-6 bg-white border-b border-light-gray flex-wrap gap-4 shadow-sm">
+    <div class="flex-1">
+      <h2 class="text-primary-dark text-xl mb-2 flex items-center gap-2">选择需要导出的片段</h2>
+      <p class="text-sm text-gray m-0">
+        <span id="new-selected-count" class="bg-primary text-light rounded-full px-3 py-1 text-sm font-semibold inline-block">已选择 0 个片段</span>
+      </p>
     </div>
     
     <!-- 选择控制按钮 -->
-    <div class="selection-controls">
-      <button id="new-select-all-btn" class="btn select-all">
+    <div class="flex gap-2 items-center">
+      <button id="new-select-all-btn" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 min-w-[60px] bg-[#4cc9f0] text-white hover:bg-[#3ab8e3] hover:-translate-y-0.5">
         全选
       </button>
-      <button id="new-deselect-btn" class="btn select-all secondary">
+      <button id="new-deselect-btn" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 min-w-[60px] bg-[#6c757d] text-white hover:bg-[#5a6268] hover:-translate-y-0.5">
         取消选择
       </button>
     </div>
-    
-    <div id="thumbnail-list" class="thumbnail-container">
-      <!-- 缩略图将动态添加到这里 -->
-    </div>
   </div>
 
-  <!-- 右侧栏：大图预览区 -->
-  <div class="preview-main">
-    <div class="preview-main-header">
-      <div>
-        <h3 class="preview-main-title">图片预览</h3>
-        <p class="preview-current-info">当前显示: <span id="current-preview-info">-</span></p>
-      </div>
-      <div class="preview-export-buttons">
-        <button id="export-zip-btn" class="preview-export-btn zip" disabled>
-          📦 导出为 ZIP
-        </button>
-        <button id="export-pdf-btn" class="preview-export-btn pdf" disabled>
-          📄 导出为 PDF
-        </button>
+  <!-- 双栏布局主体 -->
+  <div class="preview-dual-layout">
+    <!-- 左侧栏：缩略图列表 -->
+    <div class="preview-sidebar-enhanced">
+      <div id="thumbnail-list" class="thumbnail-container-enhanced">
+        <!-- 缩略图将动态添加到这里 -->
+        <div class="empty-state">
+          <div class="empty-icon">📸</div>
+          <p>暂无图片片段</p>
+          <p class="empty-hint">请先上传图片并进行分割</p>
+        </div>
       </div>
     </div>
-    <div class="preview-image-area">
-      <div class="preview-image-wrapper">
-        <img 
-          id="preview-image" 
-          class="preview-main-image" 
-          src="" 
-          alt="预览图片"
-          style="display: none;"
-        />
-        <div id="preview-placeholder" class="preview-placeholder">
-          <div class="preview-placeholder-icon">🖼️</div>
-          <p class="preview-placeholder-text">选择左侧缩略图查看大图</p>
+
+    <!-- 右侧栏：大图预览区 -->
+    <div class="preview-main-enhanced">
+      <div class="preview-main-header-enhanced">
+        <div class="preview-main-title-section">
+          <h3 class="preview-main-title">图片预览</h3>
+          <p class="preview-current-info">当前显示: <span id="current-preview-info">-</span></p>
+        </div>
+        <div class="preview-export-buttons">
+          <button id="export-zip-btn" class="btn export-btn zip-btn" disabled>
+            📦 导出为 ZIP
+          </button>
+          <button id="export-pdf-btn" class="btn export-btn pdf-btn" disabled>
+            📄 导出为 PDF
+          </button>
+        </div>
+      </div>
+      <div class="preview-image-area-enhanced">
+        <div class="preview-image-wrapper-enhanced">
+          <img 
+            id="preview-image" 
+            class="preview-main-image-enhanced" 
+            src="" 
+            alt="预览图片"
+            style="display: none;"
+          />
+          <div id="preview-placeholder" class="preview-placeholder-enhanced">
+            <div class="preview-placeholder-icon">🖼️</div>
+            <p class="preview-placeholder-text">选择左侧缩略图查看大图</p>
+          </div>
         </div>
       </div>
     </div>
@@ -70,144 +76,180 @@
 </div>
 
 <style>
-/* task-2.4: 预览界面组件样式 - 作用域限定 */
-.fullscreen-preview {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: #f9fafb;
-  z-index: 1000;
-  display: flex;
-}
+/* task-3.6: 页面内预览界面组件样式 - 复用原有设计系统 */
 
-.preview-sidebar {
-  width: 33.333333%;
-  height: 100%;
-  background: white;
-  border-right: 1px solid #e5e7eb;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-}
-
-.preview-sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.preview-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #3a0ca3;
-  margin: 0;
-}
-
-.preview-close-btn {
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  background: #f3f4f6;
-  color: #374151;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+/* 主容器：强化卡片式设计 */
+.preview-section-enhanced {
+  margin: 20px 0 40px;
+  background: var(--light);
+  border-radius: 12px; /* 更大的圆角 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 更柔和的阴影 */
+  overflow: hidden;
+  border: 1px solid var(--light-gray);
+  min-height: 400px;
   transition: all 0.3s ease;
 }
 
-.preview-close-btn:hover {
-  background: #e5e7eb;
+/* 预览头部：强化卡片顶部设计 */
+.preview-header-enhanced {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  background: white;
+  border-bottom: 1px solid var(--light-gray);
+  flex-wrap: wrap;
+  gap: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.preview-title-section {
+  flex: 1;
+}
+
+.preview-title-section .section-title {
+  margin-bottom: 8px;
+  color: var(--primary-dark);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .preview-subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 5px;
+  color: var(--gray);
+  margin: 0;
 }
 
-/* 选择控制按钮样式 */
-.selection-controls {
-  padding: 15px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
+/* 选择控制：复用原有 .selection-controls，强化样式确保可见 */
+.preview-header-enhanced .selection-controls {
+  display: flex !important;
   gap: 10px;
-  background: #f8f9fa;
+  align-items: center;
+  visibility: visible !important;
 }
 
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* 确保选择按钮可见 */
+.preview-header-enhanced .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 16px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  min-width: 60px !important;
 }
 
-.select-all {
-  background: #4361ee;
-  color: white;
+.preview-header-enhanced .btn.select-all {
+  background: #4cc9f0 !important;
+  color: white !important;
 }
 
-.select-all:hover {
-  background: #3a0ca3;
+.preview-header-enhanced .btn.select-all:hover {
+  background: #3ab8e3 !important;
+  transform: translateY(-2px) !important;
 }
 
-.select-all.secondary {
-  background: #6c757d;
-  color: white;
+.preview-header-enhanced .btn.secondary {
+  background: #6c757d !important;
+  color: white !important;
 }
 
-.select-all.secondary:hover {
-  background: #5a6268;
+.preview-header-enhanced .btn.secondary:hover {
+  background: #5a6268 !important;
+  transform: translateY(-2px) !important;
 }
 
-/* 选择计数样式 */
-.selected-count {
-  background: #4361ee;
-  color: white;
-  border-radius: 16px;
-  padding: 4px 12px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  display: inline-block;
+/* 双栏布局：使用Flex实现 */
+.preview-dual-layout {
+  display: flex;
+  min-height: 600px;
+  background: #fafafa;
+  width: 100%;
+  overflow: hidden;
 }
 
-.thumbnail-container {
+.preview-sidebar-enhanced {
+  flex: 1;
+  min-width: 0; /* 防止内容溢出 */
+}
+
+.preview-main-enhanced {
+  flex: 2;
+  min-width: 0; /* 防止内容溢出 */
+}
+
+/* 左侧栏：缩略图区域 - 强化卡片效果 */
+.preview-sidebar-enhanced {
+  background: white;
+  border-right: 1px solid var(--light-gray);
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  padding: 15px;
+  overflow: hidden; /* 防止内容溢出 */
+}
+
+.thumbnail-container-enhanced {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  max-height: 600px; /* 限制高度，启用滚动 */
 }
 
+/* 空状态提示 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-hint {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 8px;
+}
+
+/* 缩略图项：复用并适配原有样式 */
 .thumbnail-item {
   display: flex;
   align-items: center;
   padding: 12px;
   margin-bottom: 12px;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--secondary);
+  border: 2px solid var(--light-gray);
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   position: relative;
+  min-height: 80px; /* 确保足够的高度 */
 }
 
 .thumbnail-item:hover {
   background: #f3f4f6;
   border-color: #d1d5db;
+  transform: translateY(-2px); /* 复用原有 hover 效果 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .thumbnail-item.selected {
   background: #dbeafe;
-  border-color: #4361ee;
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
-/* 复选框样式 */
+/* 复选框：原生CSS样式 */
 .thumbnail-checkbox {
   position: absolute;
   top: 8px;
@@ -215,8 +257,32 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #4361ee;
   z-index: 10;
+  appearance: none;
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.thumbnail-checkbox:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.thumbnail-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.thumbnail-checkbox:hover {
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
 }
 
 .thumbnail-img {
@@ -225,105 +291,133 @@
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; /* 防止图片被压缩 */
 }
 
 .thumbnail-info {
   margin-left: 12px;
   flex: 1;
+  min-width: 0; /* 允许文字截断 */
 }
 
 .thumbnail-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #111827;
+  color: var(--dark);
   margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .thumbnail-hint {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--gray);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.preview-main {
-  flex: 1;
-  height: 100%;
-  background: #f3f4f6;
+/* 右侧栏：大图预览区域 - 强化卡片效果 */
+.preview-main-enhanced {
+  background: white;
   display: flex;
   flex-direction: column;
+  min-height: 600px;
+  overflow: hidden; /* 防止内容溢出 */
 }
 
-.preview-main-header {
-  background: white;
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+.preview-main-header-enhanced {
+  background: var(--light);
+  padding: 20px 25px;
+  border-bottom: 1px solid var(--light-gray);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.preview-main-title-section {
+  flex: 1;
 }
 
 .preview-main-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 500;
-  color: #3a0ca3;
-  margin: 0;
+  color: var(--primary-dark);
+  margin: 0 0 4px 0;
 }
 
 .preview-current-info {
   font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 4px;
+  color: var(--gray);
+  margin: 0;
 }
 
 .preview-export-buttons {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
-.preview-export-btn {
-  padding: 10px 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0.6;
-  cursor: not-allowed;
+/* 导出按钮：强化样式确保可见 */
+.preview-export-buttons .btn {
+  min-width: 140px !important;
+  padding: 10px 20px !important;
+  font-size: 0.875rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
 }
 
-.preview-export-btn.zip {
-  background: #4361ee;
-  color: white;
+.preview-export-buttons .btn.zip-btn {
+  background: var(--primary) !important;
+  color: var(--light) !important;
 }
 
-.preview-export-btn.pdf {
-  background: #10b981;
-  color: white;
+.preview-export-buttons .btn.pdf-btn {
+  background: #10b981 !important;
+  color: var(--light) !important;
 }
 
-.preview-export-btn:not(:disabled):hover.zip {
-  background: #3a0ca3;
-  opacity: 1;
-  cursor: pointer;
+.preview-export-buttons .btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background: #9ca3af !important;
 }
 
-.preview-export-btn:not(:disabled):hover.pdf {
-  background: #059669;
-  opacity: 1;
-  cursor: pointer;
+.preview-export-buttons .btn:not(:disabled):hover.zip-btn {
+  background: var(--primary-dark) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3) !important;
 }
 
-.preview-image-area {
+.preview-export-buttons .btn:not(:disabled):hover.pdf-btn {
+  background: #059669 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* 图片显示区域 */
+.preview-image-area-enhanced {
   flex: 1;
   padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background: var(--light);
 }
 
-.preview-image-wrapper {
+.preview-image-wrapper-enhanced {
   max-width: 100%;
   max-height: 100%;
   display: flex;
@@ -331,48 +425,133 @@
   justify-content: center;
 }
 
-.preview-main-image {
+.preview-main-image-enhanced {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
-.preview-placeholder {
+.preview-placeholder-enhanced {
   text-align: center;
-  color: #9ca3af;
+  color: var(--gray);
 }
 
 .preview-placeholder-icon {
-  font-size: 4rem;
+  font-size: 3rem;
   margin-bottom: 16px;
+  opacity: 0.6;
 }
 
 .preview-placeholder-text {
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin: 0;
+  color: var(--gray);
 }
 
-/* 响应式设计 */
+/* 选择计数：复用原有 .selected-count 样式 */
+.selected-count {
+  background: var(--primary);
+  color: var(--light);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+/* 响应式设计：移动端优化 */
 @media (max-width: 768px) {
-  .fullscreen-preview {
-    flex-direction: column;
+  .preview-dual-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: auto;
   }
   
-  .preview-sidebar {
-    width: 100%;
-    height: 50%;
+  .preview-sidebar-enhanced {
+    border-right: none;
+    border-bottom: 1px solid var(--light-gray);
+    min-height: auto;
+    padding: 12px;
   }
   
-  .preview-main-header {
+  .thumbnail-container-enhanced {
+    max-height: 300px;
+    padding: 12px;
+  }
+  
+  .preview-main-enhanced {
+    min-height: 400px;
+  }
+  
+  .preview-main-header-enhanced {
     flex-direction: column;
-    gap: 12px;
     align-items: stretch;
+    gap: 12px;
+    padding: 15px;
   }
   
   .preview-export-buttons {
     justify-content: center;
+    gap: 8px;
   }
+  
+  .preview-export-buttons .btn {
+    flex: 1;
+    min-width: auto !important;
+    padding: 12px !important;
+    min-height: 48px; /* 增加点击区域 */
+  }
+  
+  .preview-header-enhanced {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .preview-title-section {
+    text-align: center;
+  }
+  
+  .selection-controls {
+    justify-content: center;
+  }
+  
+  .empty-state, .preview-placeholder-enhanced {
+    padding: 20px;
+  }
+}
+
+/* 小屏设备进一步优化 */
+@media (max-width: 480px) {
+  .preview-header-enhanced {
+    padding: 15px;
+  }
+  
+  .preview-main-header-enhanced {
+    padding: 15px;
+  }
+  
+  .thumbnail-container-enhanced {
+    padding: 15px;
+    max-height: 250px;
+  }
+  
+  .preview-image-area-enhanced {
+    padding: 15px;
+  }
+  
+  .preview-export-buttons .btn {
+    padding: 8px 16px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* 确保组件在页面中可见的调试样式 */
+.preview-section-enhanced:not(.hidden) {
+  display: block !important;
+  visibility: visible !important;
 }
 </style> 

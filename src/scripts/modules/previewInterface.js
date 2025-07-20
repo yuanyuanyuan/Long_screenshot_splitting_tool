@@ -189,6 +189,8 @@ export function initializeThumbnailInteraction() {
 
 /**
  * 关闭预览界面，返回主界面
+ * 注意：task-3.6后此函数已弃用，因为新布局不再需要关闭按钮
+ * 保留此函数仅为向后兼容
  */
 export function closePreviewInterface() {
   const newPreviewSection = document.getElementById('preview-section');
