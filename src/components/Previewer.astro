@@ -1,6 +1,7 @@
 ---
 // Previewer.astro - 预览界面组件
 // task-2.4: 实现大图预览与交互功能
+// 增强：整合原有的图片选择功能
 ---
 
 <!-- 全屏预览界面组件 -->
@@ -9,13 +10,26 @@
   <div class="preview-sidebar">
     <div class="preview-sidebar-header">
       <div>
-        <h2 class="preview-title">分割预览</h2>
-        <p class="preview-subtitle">点击缩略图查看大图</p>
+        <h2 class="preview-title">选择需要导出的片段</h2>
+        <p class="preview-subtitle">
+          <span id="new-selected-count" class="selected-count">已选择 0 个片段</span>
+        </p>
       </div>
       <button id="close-preview-btn" class="preview-close-btn" title="返回主界面">
         ✕ 返回
       </button>
     </div>
+    
+    <!-- 选择控制按钮 -->
+    <div class="selection-controls">
+      <button id="new-select-all-btn" class="btn select-all">
+        全选
+      </button>
+      <button id="new-deselect-btn" class="btn select-all secondary">
+        取消选择
+      </button>
+    </div>
+    
     <div id="thumbnail-list" class="thumbnail-container">
       <!-- 缩略图将动态添加到这里 -->
     </div>
@@ -30,10 +44,10 @@
       </div>
       <div class="preview-export-buttons">
         <button id="export-zip-btn" class="preview-export-btn zip" disabled>
-          导出为 ZIP
+          📦 导出为 ZIP
         </button>
         <button id="export-pdf-btn" class="preview-export-btn pdf" disabled>
-          导出为 PDF
+          📄 导出为 PDF
         </button>
       </div>
     </div>
@@ -115,6 +129,54 @@
   margin-top: 5px;
 }
 
+/* 选择控制按钮样式 */
+.selection-controls {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  gap: 10px;
+  background: #f8f9fa;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-all {
+  background: #4361ee;
+  color: white;
+}
+
+.select-all:hover {
+  background: #3a0ca3;
+}
+
+.select-all.secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.select-all.secondary:hover {
+  background: #5a6268;
+}
+
+/* 选择计数样式 */
+.selected-count {
+  background: #4361ee;
+  color: white;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
 .thumbnail-container {
   flex: 1;
   overflow-y: auto;
@@ -131,6 +193,7 @@
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .thumbnail-item:hover {
@@ -142,6 +205,18 @@
   background: #dbeafe;
   border-color: #4361ee;
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+/* 复选框样式 */
+.thumbnail-checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #4361ee;
+  z-index: 10;
 }
 
 .thumbnail-img {

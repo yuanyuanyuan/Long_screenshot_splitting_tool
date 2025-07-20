@@ -135,9 +135,11 @@ appState = {
 **文件位置:** `src/components/Previewer.astro`
 
 **组件职责:**
-- 提供分割后图片的交互式预览界面 ✅ (task-2.1, task-2.4)
+- 提供分割后图片的交互式预览界面 ✅ (task-2.1, task-2.4, task-2.5)
 - 支持左侧缩略图列表和右侧大图预览的双栏布局 ✅ (task-2.4)
-- 集成导出功能按钮（ZIP/PDF） ✅ (task-2.4)
+- 完整的图片选择功能：复选框、选择计数、批量操作 ✅ (task-2.5)
+- 集成导出功能按钮（ZIP/PDF），支持导出选中片段 ✅ (task-2.4, task-2.5)
+- 与原有数据结构(`selectedSlices`, `imageSlices`)完全集成 ✅ (task-2.5)
 - 响应式设计，适配不同屏幕尺寸 ✅ (task-2.4)
 - 实现事件委托和交互逻辑 ✅ (task-2.4)
 - 提供全屏覆盖模式和返回功能 ✅ (task-2.4)
@@ -169,15 +171,6 @@ appState = {
 </div>
 ```
 
-**进度条DOM结构:**
-```html
-<div id="progress-container" class="hidden">  <!-- 进度条容器，初始隐藏 -->
-  <div id="progress-bar">                     <!-- 核心进度条元素 -->
-  <span id="progress-text">                   <!-- 进度百分比显示 -->
-  <p id="progress-description">               <!-- 进度描述文字 -->
-</div>
-```
-
 **设计决策记录:**
 - **问题:** 需要一个专门的预览界面来展示分割结果，同时保持组件化架构
 - **决策:** 创建独立的 Astro 组件，使用作用域CSS实现全屏覆盖布局
@@ -190,41 +183,63 @@ appState = {
   - 优点：完全的样式隔离、可复用性强、维护成本低
   - 缺点：需要考虑组件间的通信机制
 
----
+**核心DOM结构 (v2.0 - 增强版):**
+```html
+<div id="preview-section" class="fullscreen-preview hidden">
+  <div class="preview-sidebar">
+    <div class="preview-sidebar-header">
+      <h2 class="preview-title">选择需要导出的片段</h2>
+      <span id="new-selected-count" class="selected-count">已选择 0 个片段</span>
+    </div>
+    <div class="selection-controls">                          <!-- 批量操作按钮 -->
+      <button id="new-select-all-btn">全选</button>
+      <button id="new-deselect-btn">取消选择</button>
+    </div>
+    <div id="thumbnail-list" class="thumbnail-container">
+      <!-- 动态生成的缩略图，每个包含复选框 -->
+      <div class="thumbnail-item" data-index="0">
+        <input type="checkbox" class="thumbnail-checkbox" checked>
+        <img class="thumbnail-img" src="...">
+        <div class="thumbnail-info">...</div>
+      </div>
+    </div>
+  </div>
+  <div class="preview-main"><!-- 右侧大图预览区 --></div>
+</div>
+```
 
-## 8. 变更历史
+**数据流架构:**
+```
+User Selection → thumbnail-checkbox → selectedSlices (Set) → Export Functions
+              ↗                    ↗
+Selection Controls             updateNewSelectedCount()
+(全选/取消选择)                     ↓
+                           UI State Update
+```
 
-### v1.0.0 (2025-01-19)
-- **[task-1.1]** 新增 `src/scripts/split.worker.js` 文件
-- **[task-1.1]** 定义 Web Worker 消息传递契约 v1.1
-- **[task-1.1]** 确立 Web Worker 架构设计模式
-- **[task-1.2]** 实现 Worker 消息监听器与参数验证
-- **[task-1.2]** 修复 Astro SSR 问题，确保脚本正确在客户端执行
-- **[task-1.2]** 建立主线程与 Worker 双向通信机制
-- **[task-1.3]** 实现 Worker 中的图片解码与 OffscreenCanvas 绘制逻辑
-- **[task-1.3]** 集成 `createImageBitmap` 高效图片解码API
-- **[task-1.3]** 建立 OffscreenCanvas 绘制与尺寸验证机制
-- **[task-1.3]** 添加资源管理与内存清理功能
-- **[task-1.4]** 实现图片切割循环与区域复制逻辑
-- **[task-1.4]** 集成 JPEG Blob 生成（质量 0.9）与 `convertToBlob` 工具函数
-- **[task-1.4]** 建立切片数据传输机制（chunk 消息）
-- **[task-1.4]** 完善进度上报系统（25%-95% 覆盖切割阶段）
-- **[task-1.5]** 实现完成消息发送机制（done 消息）
-- **[task-1.5]** 完善错误处理与异常上报系统
-- **[task-1.5]** 建立完整的进度跟踪（0%-100%）与完成通知流程
-- **[task-2.1]** 新增 `src/components/Previewer.astro` 预览界面组件
-- **[task-2.1]** 实现隐藏的双栏布局设计（缩略图列表+大图预览）
-- **[task-2.1]** 集成响应式 Tailwind CSS 样式和无障碍访问支持
-- **[task-2.1]** 预置导出按钮容器，为后续集成做准备
-- **[task-2.2]** 在主页面中添加进度条 UI 组件 (`#progress-container`)
-- **[task-2.2]** 实现核心进度条元素 (`#progress-bar`) 及相关显示组件
-- **[task-2.2]** 集成现代化视觉设计和平滑动画效果
-- **[task-2.2]** 建立处理进度的可视化反馈机制
-- **[task-2.3]** 在 `src/scripts/main.js` 中实现缩略图动态添加功能
-- **[task-2.3]** 创建 `addThumbnailToList()` 函数处理 Worker 发来的图片数据
-- **[task-2.3]** 集成 `URL.createObjectURL()` API 和 Tailwind CSS 响应式样式
-- **[task-2.3]** 建立缩略图与大图预览的交互基础，为 task-2.4 做准备
-- **[task-2.4]** 重新创建 `src/components/Previewer.astro` 独立组件
-- **[task-2.4]** 实现全屏覆盖双栏布局和事件委托机制
-- **[task-2.4]** 完善缩略图交互逻辑和大图预览功能
-- **[task-2.4]** 建立组件化开发架构，实现样式作用域隔离 
+**设计决策记录 (v2.0 更新):**
+- **问题:** 新预览界面缺少原有的图片选择功能，用户无法选择需要导出的片段
+- **决策:** 在保持双栏布局的基础上，整合原有预览界面的所有选择功能
+- **实现策略:** 
+  - 复用原有的 `selectedSlices` Set 数据结构，确保数据一致性
+  - 为每个缩略图添加复选框，支持独立选择
+  - 添加批量操作按钮（全选/取消选择）
+  - 实时更新选择计数显示
+  - 保持与导出功能的完整集成
+- **关键设计原则:**
+  - **数据统一性:** 所有选择操作都操作同一个 `selectedSlices` Set
+  - **状态同步:** UI状态与数据状态实时同步
+  - **用户体验:** 提供直观的视觉反馈和便捷的批量操作
+  - **向前兼容:** 与现有导出逻辑完全兼容，无需修改导出函数
+
+**待解决的设计问题 (发现于 task-2.5 后):**
+- **布局不一致问题:** 当前新预览界面使用全屏布局（`position: fixed`），与原有页面内布局不一致
+- **设计语言冲突:** 全屏覆盖模式打破了原有的卡片式设计连续性
+- **交互模式差异:** 需要专门的关闭按钮，而不是自然的页面流程
+- **响应式适配:** 全屏布局在移动端的表现需要改进
+
+**计划解决方案 (将在 task-3.5 中实施):**
+- 重构为页面内布局，保持双栏优势
+- 融入现有设计 token（颜色、圆角、阴影）
+- 移除全屏相关样式，使用网格布局
+- 改进移动端响应式表现 

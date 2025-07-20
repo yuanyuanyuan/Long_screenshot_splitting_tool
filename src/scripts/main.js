@@ -31,6 +31,15 @@ if (typeof document !== 'undefined') {
   const currentPreviewInfo = document.getElementById("current-preview-info");
   const closePreviewBtn = document.getElementById("close-preview-btn");
 
+  // task-2.5: 获取新预览界面的导出按钮
+  const newExportZipBtn = document.getElementById("export-zip-btn");
+  const newExportPdfBtn = document.getElementById("export-pdf-btn");
+
+  // 新增：获取新预览界面的选择控制元素
+  const newSelectedCount = document.getElementById("new-selected-count");
+  const newSelectAllBtn = document.getElementById("new-select-all-btn");
+  const newDeselectBtn = document.getElementById("new-deselect-btn");
+
   // 事件监听器
   uploadBtn.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", handleFileSelect);
@@ -49,9 +58,27 @@ if (typeof document !== 'undefined') {
     closePreviewBtn.addEventListener("click", closePreviewInterface);
   }
 
+  // task-2.5: 添加新预览界面导出按钮事件监听器
+  if (newExportZipBtn) {
+    newExportZipBtn.addEventListener("click", exportAsZip);
+  }
+  
+  if (newExportPdfBtn) {
+    newExportPdfBtn.addEventListener("click", exportAsPdf);
+  }
+
+  // 新增：添加新预览界面的选择控制按钮事件监听器
+  if (newSelectAllBtn) {
+    newSelectAllBtn.addEventListener("click", selectAllSlicesInNewInterface);
+  }
+  
+  if (newDeselectBtn) {
+    newDeselectBtn.addEventListener("click", deselectAllSlicesInNewInterface);
+  }
+
   // task-2.3: 实现缩略图动态添加函数
   /**
-   * 添加缩略图到预览列表
+   * 添加缩略图到预览列表（增强版：支持选择功能）
    * @param {Object} chunkData - Worker 发来的 chunk 数据
    * @param {Blob} chunkData.blob - 图片切片的 Blob 对象
    * @param {number} chunkData.index - 切片的索引（从0开始）
@@ -73,6 +100,22 @@ if (typeof document !== 'undefined') {
     thumbnailItem.dataset.index = index;
     thumbnailItem.dataset.imageUrl = imageUrl;
 
+    // 创建复选框
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'thumbnail-checkbox';
+    checkbox.checked = true; // 默认选中
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        selectedSlices.add(index);
+        thumbnailItem.classList.add('selected');
+      } else {
+        selectedSlices.delete(index);
+        thumbnailItem.classList.remove('selected');
+      }
+      updateNewSelectedCount();
+    });
+
     // 创建缩略图图片
     const img = document.createElement('img');
     img.src = imageUrl;
@@ -88,13 +131,21 @@ if (typeof document !== 'undefined') {
     `;
 
     // 组装缩略图项
+    thumbnailItem.appendChild(checkbox);
     thumbnailItem.appendChild(img);
     thumbnailItem.appendChild(textInfo);
 
     // 将缩略图添加到列表中
     thumbnailList.appendChild(thumbnailItem);
 
+    // 默认选中这个切片
+    selectedSlices.add(index);
+    thumbnailItem.classList.add('selected');
+
     console.log(`[task-2.3] 成功添加缩略图 ${index + 1} 到列表`);
+    
+    // 更新选择计数
+    updateNewSelectedCount();
     
     // task-2.4: 如果这是第一个缩略图，自动选中并显示大图
     if (index === 0) {
@@ -218,6 +269,68 @@ if (typeof document !== 'undefined') {
       newPreviewSection.classList.add('hidden');
       console.log('[task-2.4] 预览界面已关闭，返回主界面');
     }
+  }
+
+  // task-2.5: 导出按钮状态管理函数
+  /**
+   * 启用或禁用新预览界面的导出按钮
+   * @param {boolean} enabled - 是否启用按钮
+   */
+  function toggleNewExportButtons(enabled) {
+    if (newExportZipBtn) {
+      newExportZipBtn.disabled = !enabled;
+      console.log(`[task-2.5] ZIP导出按钮已${enabled ? '启用' : '禁用'}`);
+    }
+    
+    if (newExportPdfBtn) {
+      newExportPdfBtn.disabled = !enabled;
+      console.log(`[task-2.5] PDF导出按钮已${enabled ? '启用' : '禁用'}`);
+    }
+  }
+
+  // 新增：新预览界面的选择管理函数
+  /**
+   * 更新新预览界面的选择计数显示
+   */
+  function updateNewSelectedCount() {
+    if (newSelectedCount) {
+      newSelectedCount.textContent = `已选择 ${selectedSlices.size} 个片段`;
+    }
+  }
+
+  /**
+   * 新预览界面：全选所有片段
+   */
+  function selectAllSlicesInNewInterface() {
+    document.querySelectorAll('.thumbnail-item').forEach((item) => {
+      const index = parseInt(item.dataset.index);
+      const checkbox = item.querySelector('.thumbnail-checkbox');
+      
+      if (checkbox && !isNaN(index)) {
+        checkbox.checked = true;
+        selectedSlices.add(index);
+        item.classList.add('selected');
+      }
+    });
+    updateNewSelectedCount();
+    console.log('[新预览界面] 已全选所有片段');
+  }
+
+  /**
+   * 新预览界面：取消所有选择
+   */
+  function deselectAllSlicesInNewInterface() {
+    document.querySelectorAll('.thumbnail-item').forEach((item) => {
+      const checkbox = item.querySelector('.thumbnail-checkbox');
+      
+      if (checkbox) {
+        checkbox.checked = false;
+        item.classList.remove('selected');
+      }
+    });
+    selectedSlices.clear();
+    updateNewSelectedCount();
+    console.log('[新预览界面] 已取消所有选择');
   }
 
   // 当语言切换时，刷新UI
@@ -647,6 +760,45 @@ if (typeof document !== 'undefined') {
   // 暴露测试入口
   window.showPreviewAndTest = showPreviewAndTest;
   window.testThumbnailInteraction = testThumbnailInteraction;
+
+  // task-2.5: 添加导出按钮测试函数
+  /**
+   * 测试导出按钮功能
+   */
+  function testExportButtons() {
+    console.log('[task-2.5] 开始测试导出按钮功能...');
+    
+    // 首先显示预览界面
+    showPreviewAndTest();
+    
+    // 延迟启用导出按钮以模拟处理完成
+    setTimeout(() => {
+      console.log('[task-2.5] 模拟图片处理完成，启用导出按钮...');
+      toggleNewExportButtons(true);
+      
+      // 检查按钮状态
+      if (newExportZipBtn && newExportPdfBtn) {
+        console.log(`[task-2.5] ZIP按钮状态: ${newExportZipBtn.disabled ? '禁用' : '启用'}`);
+        console.log(`[task-2.5] PDF按钮状态: ${newExportPdfBtn.disabled ? '禁用' : '启用'}`);
+        console.log('[task-2.5] 测试提示: 现在可以点击导出按钮测试导出功能');
+      } else {
+        console.error('[task-2.5] 导出按钮未找到');
+      }
+    }, 2000);
+  }
+
+  // 暴露导出按钮测试函数
+  window.testExportButtons = testExportButtons;
+
+  // task-2.5: 暴露导出函数和状态管理函数到全局作用域，便于测试
+  window.exportAsZip = exportAsZip;
+  window.exportAsPdf = exportAsPdf;
+  window.toggleNewExportButtons = toggleNewExportButtons;
+
+  // 新增：暴露新预览界面的选择管理函数
+  window.selectAllSlicesInNewInterface = selectAllSlicesInNewInterface;
+  window.deselectAllSlicesInNewInterface = deselectAllSlicesInNewInterface;
+  window.updateNewSelectedCount = updateNewSelectedCount;
 
   });
 }
