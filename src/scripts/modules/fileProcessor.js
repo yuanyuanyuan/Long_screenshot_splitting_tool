@@ -56,7 +56,7 @@ export function handleDrop(e, appState) {
  * @param {Object} appState - 应用状态对象
  */
 export function loadImage(file, appState) {
-  if (file.size > 10 * 1024 * 1024) {
+  if (file.size > 50 * 1024 * 1024) {
     alert(window.i18n.t("js.alert.fileTooLarge"));
     return;
   }

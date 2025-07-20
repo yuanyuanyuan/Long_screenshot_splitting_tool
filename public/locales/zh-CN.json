@@ -24,7 +24,7 @@
   "buttons.exportPdf": "📄 下载PDF文档",
   "footer.copyright": "© 2023 长截图分割工具 | 所有处理均在浏览器中完成，保护您的隐私安全。",
   "footer.nextFeatures": "下一阶段：加入<span class=\"feature-highlight\">OCR文字识别</span>和<span class=\"feature-highlight\">智能排版</span>功能。",
-  "js.alert.fileTooLarge": "文件大小不能超过10MB",
+  "js.alert.fileTooLarge": "文件大小不能超过50MB",
   "js.alert.invalidSliceHeight": "请输入有效的分割高度（100-5000像素）",
   "js.alert.noSlicesSelected": "请至少选择一个片段",
   "js.preview.alt": "分割片段 {index}",

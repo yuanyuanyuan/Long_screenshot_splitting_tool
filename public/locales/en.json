@@ -24,7 +24,7 @@
   "buttons.exportPdf": "📄 Download PDF",
   "footer.copyright": "© 2023 Long Screenshot Splicer | All processing is done in your browser to protect your privacy.",
   "footer.nextFeatures": "Next Stage: Adding <span class=\"feature-highlight\">OCR Text Recognition</span> and <span class=\"feature-highlight\">Smart Typesetting</span> features.",
-  "js.alert.fileTooLarge": "File size cannot exceed 10MB",
+  "js.alert.fileTooLarge": "File size cannot exceed 50MB",
   "js.alert.invalidSliceHeight": "Please enter a valid split height (100-5000 pixels)",
   "js.alert.noSlicesSelected": "Please select at least one slice",
   "js.preview.alt": "Slice {index}",
