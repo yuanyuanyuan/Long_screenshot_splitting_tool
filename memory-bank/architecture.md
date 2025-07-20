@@ -113,20 +113,38 @@ src/
 
 ## 6. 状态管理
 
-### 6.1 应用状态结构
+### 6.1 应用状态结构 (v2.0 - 统一状态管理)
 
 ```javascript
 appState = {
-  blobs: [],        // 存储所有切片的 Blob 对象
-  objectUrls: []    // 存储用于预览的临时 URL
+  // Worker 相关状态
+  worker: null,           // Web Worker 实例
+  blobs: [],             // 存储 Worker 生成的切片 Blob 对象
+  objectUrls: [],        // 存储临时 Object URL，用于内存管理
+  
+  // 现有状态（保持向后兼容）
+  originalImage: null,    // 原始图片对象
+  imageSlices: [],       // 保留现有的图片数据结构
+  selectedSlices: new Set(), // 用户选择的切片索引
+  
+  // 处理状态
+  isProcessing: false,   // 是否正在处理中
+  
+  // 元数据
+  splitHeight: 1200,     // 分割高度
+  fileName: "分割结果"    // 导出文件名
 }
 ```
 
-### 6.2 资源管理
+**设计决策:** 采用渐进式集成策略，保持原有变量引用以确保向后兼容性。
 
-- **Object URL 清理:** 在新操作开始前释放之前的 URL
-- **内存管理:** 及时清空 blobs 数组避免内存泄漏
-- **错误恢复:** 异常情况下的资源清理机制
+### 6.2 资源管理 (v2.0 - 增强版)
+
+- **Object URL 清理:** 通过 `cleanupPreviousSession()` 自动释放所有临时 URL ✅ (task-3.1)
+- **内存管理:** 统一清空 `blobs`、`objectUrls`、`imageSlices` 数组避免内存泄漏 ✅ (task-3.1)
+- **Worker 生命周期:** 自动终止现有 Worker 实例，防止资源泄漏 ✅ (task-3.1)
+- **错误恢复:** 完整的 try-catch 错误处理和状态重置机制 ✅ (task-3.1)
+- **调试支持:** 全局暴露状态快照函数，便于开发调试 ✅ (task-3.1)
 
 ## 7. UI 组件架构
 
