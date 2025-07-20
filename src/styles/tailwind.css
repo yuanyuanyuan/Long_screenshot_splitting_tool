@@ -2,6 +2,7 @@
 
 /* Custom theme configuration for Tailwind CSS v4 */
 @theme {
+  /* Colors */
   --color-primary: #4361ee;
   --color-primary-dark: #3730a3;
   --color-secondary: #f8f9fa;
@@ -9,7 +10,11 @@
   --color-light-gray: #e9ecef;
   --color-gray: #6c757d;
   --color-dark: #212529;
+  
+  /* Border radius */
   --radius-default: 8px;
+  
+  /* Box shadows */
   --shadow-default: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
