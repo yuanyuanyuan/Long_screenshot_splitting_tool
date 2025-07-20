@@ -1,7 +1,8 @@
 # 项目架构文档 (Architecture Document)
 
-**版本:** 1.0.0
-**最后更新:** 2025-01-19
+
+**版本:** 1.1.0
+**最后更新:** 2025-01-19 (task-1.1 完成后更新)
 
 ---
 
@@ -37,13 +38,18 @@ src/
 ├── scripts/
 │   ├── main.js              # 主线程逻辑
 │   ├── i18n.js             # 国际化支持
-│   └── split.worker.js     # 图片分割 Worker ✅
+│   ├── modules/
+│   │   └── fileProcessor.js # 文件处理模块 ✅ (task-1.1 更新)
+│   └── split.worker.js     # 图片分割 Worker (源文件)
 ├── components/
 │   ├── Feedback.astro      # 反馈组件
 │   └── Previewer.astro     # 预览组件 ✅ [新增]
 ├── layouts/                # 页面布局
 ├── pages/                  # 页面文件
 └── styles/                 # 样式文件
+
+public/
+└── split.worker.js         # 部署用 Worker 文件 ✅ (task-1.1 新增)
 ```
 
 ## 4. Web Worker 架构设计
@@ -70,12 +76,30 @@ src/
 { type: 'error', message: string }
 ```
 
+## 4. Web Worker 架构设计
 ### 4.2 Worker 职责
 
-- **图片解码:** 使用 `createImageBitmap()` 高效解码 ✅ (task-1.3)
-- **Canvas 绘制:** 在 `OffscreenCanvas` 上进行渲染操作 ✅ (task-1.3)
-- **图片切割:** 按指定高度分割图片 ✅ (task-1.4)
-- **Blob 生成:** 将切片转换为 Blob 对象 ✅ (task-1.4)
+- **图片解码:** 使用 `createImageBitmap()` 高效解码 ✅ (已实现)
+- **Canvas 绘制:** 在 `OffscreenCanvas` 上进行渲染操作 ✅ (已实现)
+- **图片切割:** 按指定高度分割图片 ✅ (已实现)
+- **Blob 生成:** 将切片转换为 Blob 对象 ✅ (已实现)
+- **路径管理:** GitHub Pages 兼容的资源路径 ✅ (task-1.1)
+
+### 4.3 Worker 部署架构 (v1.1 - task-1.1 更新)
+
+**开发环境:**
+- 源文件位置: `src/scripts/split.worker.js`
+- 用于开发和调试
+
+**生产环境:**
+- 部署文件位置: `public/split.worker.js`
+- 访问路径: `/Long_screenshot_splitting_tool/split.worker.js`
+- 自动复制到 `dist/` 目录进行部署
+
+**路径解析策略:**
+- 使用绝对路径确保 GitHub Pages 兼容性
+- 包含 base 路径避免 404 错误
+- 支持本地开发和生产部署的一致性
 - **进度上报:** 实时报告处理进度 ✅ (task-1.3, task-1.4)
 - **错误处理:** 捕获并报告处理异常 ✅ (task-1.3, task-1.5)
 - **完成通知:** 发送处理完成的信号消息 ✅ (task-1.5)
@@ -260,4 +284,4 @@ Selection Controls             updateNewSelectedCount()
 - 重构为页面内布局，保持双栏优势
 - 融入现有设计 token（颜色、圆角、阴影）
 - 移除全屏相关样式，使用网格布局
-- 改进移动端响应式表现 
+- 改进移动端响应式表现

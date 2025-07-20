@@ -1,7 +1,5 @@
 ---
 description: The core philosophy of the Vibe Coding system. This is the foundational mindset required before any work begins.
-globs: ["philosophy.mdc"]
-alwaysApply: true
 ---
 
 # Vibe Coding 权威实践手册：思维奠基

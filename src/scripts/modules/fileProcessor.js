@@ -115,8 +115,8 @@ export function processImage(appState) {
 
   // 3. 实例化 Worker 并发送初始化消息
   try {
-    // 创建新的 Worker 实例
-    appState.worker = new Worker('/src/scripts/split.worker.js');
+    // 创建新的 Worker 实例 - 使用相对路径确保 GitHub Pages 兼容性
+    appState.worker = new Worker('/Long_screenshot_splitting_tool/split.worker.js');
     console.log('[FileProcessor] Worker 实例已创建');
 
     // 设置 Worker 消息监听器
@@ -318,4 +318,4 @@ function handleProcessingError(errorMessage, appState) {
   });
   
   console.log('[FileProcessor] 错误处理完成');
-} 
+}
