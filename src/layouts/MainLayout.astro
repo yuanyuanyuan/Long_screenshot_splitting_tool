@@ -22,9 +22,8 @@ const { title } = Astro.props;
     <meta property="og:url" content="https://your-domain.com" />
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen">
     <div class="max-w-6xl mx-auto px-4 py-8 relative">
@@ -81,6 +80,11 @@ const { title } = Astro.props;
     
     <!-- Client-side scripts -->
     <script src={`${import.meta.env.BASE_URL}i18n.js`}></script>
-    <script src={`${import.meta.env.BASE_URL}main-modular.js`} type="module"></script>
+    <!-- 模块脚本 -->
+    <script src={`${import.meta.env.BASE_URL}scripts/modules/appState.js`}></script>
+    <script src={`${import.meta.env.BASE_URL}scripts/modules/previewInterface.js`}></script>
+    <script src={`${import.meta.env.BASE_URL}scripts/modules/fileProcessor.js`}></script>
+    <script src={`${import.meta.env.BASE_URL}scripts/modules/exportManager.js`}></script>
+    <script src={`${import.meta.env.BASE_URL}main-modular.js`}></script>
   </body>
 </html>
