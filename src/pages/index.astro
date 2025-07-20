@@ -6,41 +6,52 @@ import Previewer from '../components/Previewer.astro';
     <!-- task-2.4: 预览界面组件 -->
     <Previewer />
     
-    <div class="app-container">
-        <div class="step-indicator">
-          <div class="step active">
-            <div class="step-number">1</div>
-            <div class="step-text" data-i18n="steps.1">上传图片</div>
+    <div class="flex flex-col p-8">
+        <div class="flex justify-center mb-10 relative">
+          <!-- Progress line -->
+          <div class="absolute top-5 left-1/2 transform -translate-x-1/2 w-4/5 h-0.5 bg-gray-300 z-10"></div>
+          
+          <div class="flex flex-col items-center px-8 relative z-20">
+            <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mb-2.5 transition-all duration-300 bg-primary-dark transform scale-110">
+              1
+            </div>
+            <div class="text-sm text-center text-primary-dark font-medium bg-white px-2 py-0.5 rounded-full" data-i18n="steps.1">上传图片</div>
           </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <div class="step-text" data-i18n="steps.2">分割设置</div>
+          <div class="flex flex-col items-center px-8 relative z-20">
+            <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mb-2.5 transition-all duration-300">
+              2
+            </div>
+            <div class="text-sm text-center text-primary-dark font-medium bg-white px-2 py-0.5 rounded-full" data-i18n="steps.2">分割设置</div>
           </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <div class="step-text" data-i18n="steps.3">选择片段</div>
+          <div class="flex flex-col items-center px-8 relative z-20">
+            <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mb-2.5 transition-all duration-300">
+              3
+            </div>
+            <div class="text-sm text-center text-primary-dark font-medium bg-white px-2 py-0.5 rounded-full" data-i18n="steps.3">选择片段</div>
           </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <div class="step-text" data-i18n="steps.4">导出结果</div>
+          <div class="flex flex-col items-center px-8 relative z-20">
+            <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mb-2.5 transition-all duration-300">
+              4
+            </div>
+            <div class="text-sm text-center text-primary-dark font-medium bg-white px-2 py-0.5 rounded-full" data-i18n="steps.4">导出结果</div>
           </div>
         </div>
 
-        <div class="upload-section" id="dropZone">
-          <div class="upload-icon">📱</div>
-          <h2 class="upload-text" data-i18n="upload.title">上传长截图</h2>
-          <p class="upload-hint" data-i18n="upload.hint">
+        <div class="bg-secondary border-2 border-dashed border-primary rounded-xl p-10 text-center mb-8 transition-all duration-300 cursor-pointer relative overflow-hidden hover:bg-blue-50 hover:-translate-y-1 hover:border-primary-dark" id="dropZone">
+          <div class="text-6xl text-primary mb-5 transition-all duration-300">📱</div>
+          <h2 class="text-xl mb-4 text-primary-dark font-medium" data-i18n="upload.title">上传长截图</h2>
+          <p class="text-gray mb-5 text-sm" data-i18n="upload.hint">
             支持 JPG、PNG 格式 | 最大尺寸 10MB
           </p>
-          <button class="btn" id="uploadBtn">
+          <button class="bg-primary text-white border-none py-3.5 px-8 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1 hover:shadow-xl active:translate-y-0 relative overflow-hidden z-10" id="uploadBtn">
             <span data-i18n="upload.button">选择文件</span>
           </button>
           <input type="file" id="fileInput" accept="image/*" hidden />
         </div>
 
-        <div class="controls hidden" id="controls">
-          <div class="control-group">
-            <label for="sliceHeight" data-i18n="controls.sliceHeight"
+        <div class="flex flex-wrap gap-5 mb-6 items-center bg-secondary p-6 rounded-xl hidden" id="controls">
+          <div class="flex flex-col flex-1 min-w-[200px]">
+            <label for="sliceHeight" class="font-semibold mb-2.5 text-primary-dark text-sm flex items-center gap-2" data-i18n="controls.sliceHeight"
               >📏 分割高度 (像素)</label
             >
             <input
@@ -49,11 +60,12 @@ import Previewer from '../components/Previewer.astro';
               min="100"
               max="5000"
               value="1200"
+              class="py-3.5 px-4 border border-gray-300 rounded-lg text-base transition-all duration-300 w-full focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20"
             />
           </div>
 
-          <div class="control-group">
-            <label for="fileName" data-i18n="controls.fileName"
+          <div class="flex flex-col flex-1 min-w-[200px]">
+            <label for="fileName" class="font-semibold mb-2.5 text-primary-dark text-sm flex items-center gap-2" data-i18n="controls.fileName"
               >📝 输出文件名</label
             >
             <input
@@ -62,16 +74,17 @@ import Previewer from '../components/Previewer.astro';
               data-i18n="js.fileName.default"
               data-i18n-attr="value"
               value="分割结果"
+              class="py-3.5 px-4 border border-gray-300 rounded-lg text-base transition-all duration-300 w-full focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20"
             />
           </div>
 
-          <div class="control-group">
-            <label data-i18n="controls.actions">⚙️ 操作</label>
-            <div style="display: flex; gap: 10px">
-              <button class="btn" id="processBtn">
+          <div class="flex flex-col flex-1 min-w-[200px]">
+            <label class="font-semibold mb-2.5 text-primary-dark text-sm flex items-center gap-2" data-i18n="controls.actions">⚙️ 操作</label>
+            <div class="flex gap-2.5">
+              <button class="bg-primary text-white border-none py-3.5 px-8 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1 hover:shadow-xl active:translate-y-0 relative overflow-hidden z-10" id="processBtn">
                 <span data-i18n="buttons.process">开始分割</span>
               </button>
-              <button class="btn secondary" id="resetBtn">
+              <button class="bg-gray-100 text-gray-700 border border-gray-300 py-3.5 px-8 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-200 hover:text-gray-900" id="resetBtn">
                 <span data-i18n="buttons.reset">重新上传</span>
               </button>
             </div>
@@ -101,24 +114,24 @@ import Previewer from '../components/Previewer.astro';
           </div>
         </div>
 
-        <div class="preview-section hidden" id="previewSection">
-          <div class="preview-header">
-            <h2 class="section-title" data-i18n="preview.title">
+        <div class="mb-8 hidden" id="previewSection">
+          <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+            <h2 class="text-xl mb-5 text-primary-dark flex items-center gap-2.5" data-i18n="preview.title">
               选择需要导出的片段
             </h2>
-            <div class="selection-controls">
-              <div class="selected-count" id="selectedCount">
+            <div class="flex gap-2.5 items-center">
+              <div class="bg-accent text-white rounded-full py-1.5 px-4 font-semibold text-sm" id="selectedCount">
                 已选择 0 个片段
               </div>
               <button
-                class="btn select-all"
+                class="bg-accent text-white border-none py-2.5 px-5 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1 hover:shadow-xl active:translate-y-0 relative overflow-hidden z-10"
                 id="selectAllBtn"
                 data-i18n="buttons.selectAll"
               >
                 全选
               </button>
               <button
-                class="btn select-all secondary"
+                class="bg-accent text-white border-none py-2.5 px-5 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1 hover:shadow-xl active:translate-y-0 relative overflow-hidden z-10 bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 hover:text-gray-900"
                 id="deselectBtn"
                 data-i18n="buttons.deselectAll"
               >
@@ -126,17 +139,17 @@ import Previewer from '../components/Previewer.astro';
               </button>
             </div>
           </div>
-          <div class="preview-container" id="previewContainer">
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5" id="previewContainer">
             <!-- 分割预览将通过JS动态生成 -->
           </div>
 
-          <div class="output-actions">
-            <h2 class="section-title" data-i18n="export.title">导出选定内容</h2>
-            <div class="action-buttons">
-              <button class="btn export-btn" id="exportZipBtn">
+          <div class="flex flex-wrap gap-5 justify-center py-8 border-t border-light-gray mt-5">
+            <h2 class="text-xl mb-5 text-primary-dark flex items-center gap-2.5 w-full text-center" data-i18n="export.title">导出选定内容</h2>
+            <div class="flex gap-5 flex-wrap justify-center">
+              <button class="bg-primary text-white border-none py-3.5 px-8 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1 hover:shadow-xl active:translate-y-0 relative overflow-hidden z-10 min-w-[220px]" id="exportZipBtn">
                 <span data-i18n="buttons.exportZip">📦 下载ZIP压缩包</span>
               </button>
-              <button class="btn export-btn" id="exportPdfBtn">
+              <button class="bg-primary text-white border-none py-3.5 px-8 rounded-full text-base font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg hover:-translate-y-1 hover:shadow-xl active:translate-y-0 relative overflow-hidden z-10 min-w-[220px]" id="exportPdfBtn">
                 <span data-i18n="buttons.exportPdf">📄 下载PDF文档</span>
               </button>
             </div>

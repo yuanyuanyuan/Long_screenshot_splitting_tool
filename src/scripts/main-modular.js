@@ -145,13 +145,13 @@ if (typeof document !== 'undefined') {
     // 兼容性函数 - 用于支持原有的Canvas模式预览（如果需要）
     function createPreview(imageData, index, width, height) {
       const previewItem = document.createElement("div");
-      previewItem.className = "preview-item";
+      previewItem.className = "thumbnail-item";
       previewItem.dataset.index = index;
 
       // 创建复选框
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.className = "preview-checkbox";
+      checkbox.className = "thumbnail-checkbox";
       checkbox.checked = selectedSlices.has(index);
       checkbox.addEventListener("change", () => {
         if (checkbox.checked) {
@@ -165,7 +165,7 @@ if (typeof document !== 'undefined') {
 
       const img = document.createElement("img");
       img.src = imageData;
-      img.className = "preview-img";
+      img.className = "thumbnail-img";
       img.alt = window.i18n.t("js.preview.alt", { index: index + 1 });
       img.addEventListener("click", () => {
         checkbox.checked = !checkbox.checked;
@@ -173,11 +173,11 @@ if (typeof document !== 'undefined') {
       });
 
       const infoDiv = document.createElement("div");
-      infoDiv.className = "preview-info";
+      infoDiv.className = "thumbnail-info";
       infoDiv.innerHTML = `
-        <div><strong>${window.i18n.t("js.preview.header", { index: index + 1 })}</strong></div>
-        <div>${window.i18n.t("js.preview.dimensions", { width: width, height: height })}</div>
-        <div>${window.i18n.t("js.preview.size", { size: Math.round(imageData.length / 1024) })}</div>
+        <div class="thumbnail-label"><strong>${window.i18n.t("js.preview.header", { index: index + 1 })}</strong></div>
+        <div class="thumbnail-hint">${window.i18n.t("js.preview.dimensions", { width: width, height: height })}</div>
+        <div class="thumbnail-hint">${window.i18n.t("js.preview.size", { size: Math.round(imageData.length / 1024) })}</div>
       `;
 
       previewItem.appendChild(checkbox);
@@ -197,7 +197,7 @@ if (typeof document !== 'undefined') {
       });
 
       // 恢复之前的选择状态
-      document.querySelectorAll(".preview-checkbox").forEach((checkbox) => {
+      document.querySelectorAll(".thumbnail-checkbox").forEach((checkbox) => {
         const index = parseInt(checkbox.parentElement.dataset.index);
         const isSelected = selectedSlices.has(index);
         checkbox.checked = isSelected;
@@ -217,7 +217,7 @@ if (typeof document !== 'undefined') {
     // 全选所有片段（兼容性函数）
     function selectAllSlices() {
       selectedSlices.clear();
-      document.querySelectorAll(".preview-checkbox").forEach((checkbox) => {
+      document.querySelectorAll(".thumbnail-checkbox").forEach((checkbox) => {
         checkbox.checked = true;
         const index = parseInt(checkbox.parentElement.dataset.index);
         selectedSlices.add(index);
@@ -229,7 +229,7 @@ if (typeof document !== 'undefined') {
     // 取消所有选择（兼容性函数）
     function deselectAllSlices() {
       selectedSlices.clear();
-      document.querySelectorAll(".preview-checkbox").forEach((checkbox) => {
+      document.querySelectorAll(".thumbnail-checkbox").forEach((checkbox) => {
         checkbox.checked = false;
         checkbox.parentElement.classList.remove("selected");
       });
@@ -314,4 +314,4 @@ if (typeof document !== 'undefined') {
     exposeTestFunctions();
     
   });
-} 
+}

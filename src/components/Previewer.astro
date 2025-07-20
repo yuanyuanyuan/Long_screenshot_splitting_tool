@@ -5,69 +5,69 @@ import '../styles/tailwind.css'
 ---
 
 <!-- 页面内预览界面组件 -->
-<div id="preview-section" class="hidden my-8 mb-10 bg-light rounded-xl shadow-md border border-light-gray min-h-[400px] transition-all duration-300">
+<div id="preview-section" class="hidden my-8 mb-10 bg-gray-50 rounded-xl shadow-md border border-gray-200 min-h-[400px] transition-all duration-300">
   <!-- 预览头部 -->
-  <div class="flex justify-between items-center p-5 px-6 bg-white border-b border-light-gray flex-wrap gap-4 shadow-sm">
+  <div class="flex justify-between items-center p-5 px-6 bg-white border-b border-gray-200 flex-wrap gap-4 shadow-sm">
     <div class="flex-1">
-      <h2 class="text-primary-dark text-xl mb-2 flex items-center gap-2">选择需要导出的片段</h2>
-      <p class="text-sm text-gray m-0">
-        <span id="new-selected-count" class="bg-primary text-light rounded-full px-3 py-1 text-sm font-semibold inline-block">已选择 0 个片段</span>
+      <h2 class="text-blue-800 text-xl mb-2 flex items-center gap-2">选择需要导出的片段</h2>
+      <p class="text-sm text-gray-600 m-0">
+        <span id="new-selected-count" class="bg-blue-600 text-white rounded-full px-3 py-1 text-sm font-semibold inline-block">已选择 0 个片段</span>
       </p>
     </div>
     
     <!-- 选择控制按钮 -->
     <div class="flex gap-2 items-center">
-      <button id="new-select-all-btn" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 min-w-[60px] bg-[#4cc9f0] text-white hover:bg-[#3ab8e3] hover:-translate-y-0.5">
+      <button id="new-select-all-btn" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 min-w-[60px] bg-sky-400 text-white hover:bg-sky-500 hover:-translate-y-0.5">
         全选
       </button>
-      <button id="new-deselect-btn" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 min-w-[60px] bg-[#6c757d] text-white hover:bg-[#5a6268] hover:-translate-y-0.5">
+      <button id="new-deselect-btn" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg cursor-pointer transition-all duration-300 min-w-[60px] bg-gray-500 text-white hover:bg-gray-600 hover:-translate-y-0.5">
         取消选择
       </button>
     </div>
   </div>
 
   <!-- 双栏布局主体 -->
-  <div class="preview-dual-layout">
+  <div class="flex min-h-[600px] bg-gray-50 w-full overflow-hidden">
     <!-- 左侧栏：缩略图列表 -->
-    <div class="preview-sidebar-enhanced">
-      <div id="thumbnail-list" class="thumbnail-container-enhanced">
+    <div class="flex-1 min-w-0 bg-white border-r border-gray-200 flex flex-col min-h-[600px] p-4 overflow-hidden">
+      <div id="thumbnail-list" class="flex-1 overflow-y-auto p-5 max-h-[600px]">
         <!-- 缩略图将动态添加到这里 -->
-        <div class="empty-state">
-          <div class="empty-icon">📸</div>
+        <div class="text-center py-10 px-5 text-gray-600">
+          <div class="text-5xl mb-4 opacity-60">📸</div>
           <p>暂无图片片段</p>
-          <p class="empty-hint">请先上传图片并进行分割</p>
+          <p class="text-sm opacity-80 mt-2">请先上传图片并进行分割</p>
         </div>
       </div>
     </div>
 
     <!-- 右侧栏：大图预览区 -->
-    <div class="preview-main-enhanced">
-      <div class="preview-main-header-enhanced">
-        <div class="preview-main-title-section">
-          <h3 class="preview-main-title">图片预览</h3>
-          <p class="preview-current-info">当前显示: <span id="current-preview-info">-</span></p>
+    <div class="flex-2 min-w-0 bg-white flex flex-col min-h-[600px] overflow-hidden">
+      <div class="bg-gray-50 p-5 px-6 border-b border-gray-200 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex-1">
+          <h3 class="text-lg font-medium text-blue-800 mb-1">图片预览</h3>
+          <p class="text-sm text-gray-600 m-0">当前显示: <span id="current-preview-info">-</span></p>
         </div>
-        <div class="preview-export-buttons">
-          <button id="export-zip-btn" class="btn export-btn zip-btn" disabled>
+        <div class="flex gap-3 items-center">
+          <button class="inline-flex items-center justify-center gap-2 min-w-[140px] px-5 py-2.5 text-sm rounded-lg font-semibold border-none cursor-pointer transition-all duration-300 bg-blue-600 text-white hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-400" id="export-zip-btn" disabled>
             📦 导出为 ZIP
           </button>
-          <button id="export-pdf-btn" class="btn export-btn pdf-btn" disabled>
+          <button class="inline-flex items-center justify-center gap-2 min-w-[140px] px-5 py-2.5 text-sm rounded-lg font-semibold border-none cursor-pointer transition-all duration-300 bg-emerald-500 text-white hover:bg-emerald-600 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-400" id="export-pdf-btn" disabled>
             📄 导出为 PDF
           </button>
         </div>
       </div>
-      <div class="preview-image-area-enhanced">
-        <div class="preview-image-wrapper-enhanced">
+      <div class="flex-1 p-5 flex items-center justify-center overflow-hidden bg-gray-50">
+        <div class="max-w-full max-h-full flex items-center justify-center">
           <img 
             id="preview-image" 
-            class="preview-main-image-enhanced" 
+            class="max-w-full max-h-full object-contain rounded-lg shadow-md" 
             src="" 
             alt="预览图片"
             style="display: none;"
           />
-          <div id="preview-placeholder" class="preview-placeholder-enhanced">
-            <div class="preview-placeholder-icon">🖼️</div>
-            <p class="preview-placeholder-text">选择左侧缩略图查看大图</p>
+          <div id="preview-placeholder" class="text-center text-gray-600">
+            <div class="text-5xl mb-4 opacity-60">🖼️</div>
+            <p class="text-base m-0 text-gray-600">选择左侧缩略图查看大图</p>
           </div>
         </div>
       </div>
@@ -76,482 +76,118 @@ import '../styles/tailwind.css'
 </div>
 
 <style>
-/* task-3.6: 页面内预览界面组件样式 - 复用原有设计系统 */
+@reference "tailwindcss";
 
-/* 主容器：强化卡片式设计 */
-.preview-section-enhanced {
-  margin: 20px 0 40px;
-  background: var(--light);
-  border-radius: 12px; /* 更大的圆角 */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 更柔和的阴影 */
-  overflow: hidden;
-  border: 1px solid var(--light-gray);
-  min-height: 400px;
-  transition: all 0.3s ease;
-}
-
-/* 预览头部：强化卡片顶部设计 */
-.preview-header-enhanced {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 25px;
-  background: white;
-  border-bottom: 1px solid var(--light-gray);
-  flex-wrap: wrap;
-  gap: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.preview-title-section {
-  flex: 1;
-}
-
-.preview-title-section .section-title {
-  margin-bottom: 8px;
-  color: var(--primary-dark);
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.preview-subtitle {
-  font-size: 0.875rem;
-  color: var(--gray);
-  margin: 0;
-}
-
-/* 选择控制：复用原有 .selection-controls，强化样式确保可见 */
-.preview-header-enhanced .selection-controls {
-  display: flex !important;
-  gap: 10px;
-  align-items: center;
-  visibility: visible !important;
-}
-
-/* 确保选择按钮可见 */
-.preview-header-enhanced .btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 8px 16px !important;
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-  border-radius: 8px !important;
-  border: none !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  min-width: 60px !important;
-}
-
-.preview-header-enhanced .btn.select-all {
-  background: #4cc9f0 !important;
-  color: white !important;
-}
-
-.preview-header-enhanced .btn.select-all:hover {
-  background: #3ab8e3 !important;
-  transform: translateY(-2px) !important;
-}
-
-.preview-header-enhanced .btn.secondary {
-  background: #6c757d !important;
-  color: white !important;
-}
-
-.preview-header-enhanced .btn.secondary:hover {
-  background: #5a6268 !important;
-  transform: translateY(-2px) !important;
-}
-
-/* 双栏布局：使用Flex实现 */
-.preview-dual-layout {
-  display: flex;
-  min-height: 600px;
-  background: #fafafa;
-  width: 100%;
-  overflow: hidden;
-}
-
-.preview-sidebar-enhanced {
-  flex: 1;
-  min-width: 0; /* 防止内容溢出 */
-}
-
-.preview-main-enhanced {
-  flex: 2;
-  min-width: 0; /* 防止内容溢出 */
-}
-
-/* 左侧栏：缩略图区域 - 强化卡片效果 */
-.preview-sidebar-enhanced {
-  background: white;
-  border-right: 1px solid var(--light-gray);
-  display: flex;
-  flex-direction: column;
-  min-height: 600px;
-  padding: 15px;
-  overflow: hidden; /* 防止内容溢出 */
-}
-
-.thumbnail-container-enhanced {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  max-height: 600px; /* 限制高度，启用滚动 */
-}
-
-/* 空状态提示 */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--gray);
-}
-
-.empty-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.6;
-}
-
-.empty-hint {
-  font-size: 0.85rem;
-  opacity: 0.8;
-  margin-top: 8px;
-}
-
-/* 缩略图项：复用并适配原有样式 */
+/* 缩略图项样式 - 保留必要的自定义样式 */
 .thumbnail-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  margin-bottom: 12px;
-  background: var(--secondary);
-  border: 2px solid var(--light-gray);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: var(--transition);
-  position: relative;
-  min-height: 80px; /* 确保足够的高度 */
+  @apply flex items-center p-3 mb-3 bg-gray-100 border-2 border-gray-200 rounded-lg cursor-pointer transition-all duration-300 relative min-h-[80px];
 }
 
 .thumbnail-item:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  transform: translateY(-2px); /* 复用原有 hover 效果 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  @apply bg-gray-100 border-gray-300 -translate-y-0.5 shadow-md;
 }
 
 .thumbnail-item.selected {
-  background: #dbeafe;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+  @apply bg-blue-50 border-blue-600 shadow-lg;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* 复选框：原生CSS样式 */
+/* 复选框样式 */
 .thumbnail-checkbox {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  z-index: 10;
-  appearance: none;
-  background: white;
-  border: 2px solid var(--primary);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  @apply absolute top-2 right-2 w-5 h-5 cursor-pointer z-10 appearance-none bg-white border-2 border-blue-600 rounded flex items-center justify-center transition-all duration-200;
 }
 
 .thumbnail-checkbox:checked {
-  background: var(--primary);
-  border-color: var(--primary);
+  @apply bg-blue-600 border-blue-600;
 }
 
 .thumbnail-checkbox:checked::after {
   content: '✓';
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
+  @apply text-white text-sm font-bold;
 }
 
 .thumbnail-checkbox:hover {
-  border-color: var(--primary-dark);
-  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+  @apply border-blue-700;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .thumbnail-img {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0; /* 防止图片被压缩 */
+  @apply w-16 h-16 object-cover rounded-lg shadow-sm flex-shrink-0;
 }
 
 .thumbnail-info {
-  margin-left: 12px;
-  flex: 1;
-  min-width: 0; /* 允许文字截断 */
+  @apply ml-3 flex-1 min-w-0;
 }
 
 .thumbnail-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--dark);
-  margin: 0 0 4px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @apply text-sm font-medium text-gray-900 m-0 mb-1 whitespace-nowrap overflow-hidden text-ellipsis;
 }
 
 .thumbnail-hint {
-  font-size: 0.75rem;
-  color: var(--gray);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @apply text-xs text-gray-600 m-0 whitespace-nowrap overflow-hidden text-ellipsis;
 }
 
-/* 右侧栏：大图预览区域 - 强化卡片效果 */
-.preview-main-enhanced {
-  background: white;
-  display: flex;
-  flex-direction: column;
-  min-height: 600px;
-  overflow: hidden; /* 防止内容溢出 */
+/* Flex-2 utility class */
+.flex-2 {
+  flex: 2;
 }
 
-.preview-main-header-enhanced {
-  background: var(--light);
-  padding: 20px 25px;
-  border-bottom: 1px solid var(--light-gray);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 15px;
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  #preview-section .grid {
+    @apply grid-cols-1;
+  }
+  
+  #preview-section .border-r {
+    @apply border-r-0 border-b;
+  }
+  
+  #preview-section .lg\:flex-row {
+    @apply flex-col;
+  }
+  
+  #preview-section .lg\:justify-between {
+    @apply justify-start;
+  }
+  
+  #preview-section .lg\:items-center {
+    @apply items-stretch;
+  }
 }
 
-.preview-main-title-section {
-  flex: 1;
-}
-
-.preview-main-title {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--primary-dark);
-  margin: 0 0 4px 0;
-}
-
-.preview-current-info {
-  font-size: 0.875rem;
-  color: var(--gray);
-  margin: 0;
-}
-
-.preview-export-buttons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* 导出按钮：强化样式确保可见 */
-.preview-export-buttons .btn {
-  min-width: 140px !important;
-  padding: 10px 20px !important;
-  font-size: 0.875rem !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  border: none !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-}
-
-.preview-export-buttons .btn.zip-btn {
-  background: var(--primary) !important;
-  color: var(--light) !important;
-}
-
-.preview-export-buttons .btn.pdf-btn {
-  background: #10b981 !important;
-  color: var(--light) !important;
-}
-
-.preview-export-buttons .btn:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed !important;
-  background: #9ca3af !important;
-}
-
-.preview-export-buttons .btn:not(:disabled):hover.zip-btn {
-  background: var(--primary-dark) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3) !important;
-}
-
-.preview-export-buttons .btn:not(:disabled):hover.pdf-btn {
-  background: #059669 !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
-}
-
-/* 图片显示区域 */
-.preview-image-area-enhanced {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: var(--light);
-}
-
-.preview-image-wrapper-enhanced {
-  max-width: 100%;
-  max-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.preview-main-image-enhanced {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-}
-
-.preview-placeholder-enhanced {
-  text-align: center;
-  color: var(--gray);
-}
-
-.preview-placeholder-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.6;
-}
-
-.preview-placeholder-text {
-  font-size: 1rem;
-  margin: 0;
-  color: var(--gray);
-}
-
-/* 选择计数：复用原有 .selected-count 样式 */
-.selected-count {
-  background: var(--primary);
-  color: var(--light);
-  border-radius: 16px;
-  padding: 4px 12px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  display: inline-block;
-}
-
-/* 响应式设计：移动端优化 */
 @media (max-width: 768px) {
-  .preview-dual-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    min-height: auto;
+  #preview-section .flex-wrap {
+    @apply flex-col items-stretch;
   }
   
-  .preview-sidebar-enhanced {
-    border-right: none;
-    border-bottom: 1px solid var(--light-gray);
-    min-height: auto;
-    padding: 12px;
+  #preview-section .gap-3 {
+    @apply gap-2;
   }
   
-  .thumbnail-container-enhanced {
-    max-height: 300px;
-    padding: 12px;
+  #preview-section .min-w-\[140px\] {
+    @apply min-w-0 flex-1;
   }
   
-  .preview-main-enhanced {
-    min-height: 400px;
+  #preview-section .px-5 {
+    @apply px-4;
   }
   
-  .preview-main-header-enhanced {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 15px;
-  }
-  
-  .preview-export-buttons {
-    justify-content: center;
-    gap: 8px;
-  }
-  
-  .preview-export-buttons .btn {
-    flex: 1;
-    min-width: auto !important;
-    padding: 12px !important;
-    min-height: 48px; /* 增加点击区域 */
-  }
-  
-  .preview-header-enhanced {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-    padding: 15px;
-  }
-  
-  .preview-title-section {
-    text-align: center;
-  }
-  
-  .selection-controls {
-    justify-content: center;
-  }
-  
-  .empty-state, .preview-placeholder-enhanced {
-    padding: 20px;
+  #preview-section .max-h-\[600px\] {
+    @apply max-h-[300px];
   }
 }
 
-/* 小屏设备进一步优化 */
 @media (max-width: 480px) {
-  .preview-header-enhanced {
-    padding: 15px;
+  #preview-section .p-5 {
+    @apply p-4;
   }
   
-  .preview-main-header-enhanced {
-    padding: 15px;
+  #preview-section .px-6 {
+    @apply px-4;
   }
   
-  .thumbnail-container-enhanced {
-    padding: 15px;
-    max-height: 250px;
-  }
-  
-  .preview-image-area-enhanced {
-    padding: 15px;
-  }
-  
-  .preview-export-buttons .btn {
-    padding: 8px 16px !important;
-    font-size: 0.8rem !important;
+  #preview-section .text-sm {
+    @apply text-xs;
   }
 }
-
-/* 确保组件在页面中可见的调试样式 */
-.preview-section-enhanced:not(.hidden) {
-  display: block !important;
-  visibility: visible !important;
-}
-</style> 
+</style>
