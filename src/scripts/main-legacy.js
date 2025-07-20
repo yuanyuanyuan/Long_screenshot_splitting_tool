@@ -529,10 +529,36 @@ if (typeof document !== 'undefined') {
       appState.worker = new Worker('/src/scripts/split.worker.js');
       console.log('[task-3.2] Worker 实例已创建');
 
-      // 设置 Worker 消息监听器 (在 task-3.3 中完整实现)
+      // task-3.3: 完整实现 Worker 消息监听器
       appState.worker.onmessage = function(event) {
-        console.log('[task-3.2] 收到 Worker 消息:', event.data);
-        // TODO: task-3.3 将在这里实现完整的消息处理逻辑
+        const { type, progress, blob, index, message } = event.data;
+        
+        console.log(`[task-3.3] 收到 Worker 消息: ${type}`, event.data);
+        
+        switch (type) {
+          case 'progress':
+            // 更新进度条宽度样式
+            updateProgressBar(progress);
+            break;
+            
+          case 'chunk':
+            // 将 blob 存入 appState.blobs，创建缩略图并存储 URL
+            handleChunkMessage(blob, index);
+            break;
+            
+          case 'done':
+            // 隐藏进度条，显示预览界面，启用导出按钮
+            handleProcessingComplete();
+            break;
+            
+          case 'error':
+            // 隐藏进度条，显示错误信息
+            handleProcessingError(message);
+            break;
+            
+          default:
+            console.warn('[task-3.3] 未知的 Worker 消息类型:', type);
+        }
       };
 
       // 设置 Worker 错误监听器
@@ -683,72 +709,179 @@ if (typeof document !== 'undefined') {
     updateSelectedCount();
   }
 
-  // 导出为ZIP
+  // task-3.4: 重构导出为ZIP，使用 Worker 生成的 Blob 数据
   function exportAsZip() {
     if (selectedSlices.size === 0) {
       alert(window.i18n.t("js.alert.noSlicesSelected"));
       return;
     }
 
+    // 检查是否有 Worker 生成的 Blob 数据
+    if (appState.blobs.length === 0) {
+      console.warn('[task-3.4] 没有可用的 Blob 数据，可能需要先处理图片');
+      alert('请先处理图片后再导出');
+      return;
+    }
+
+    console.log('[task-3.4] 开始ZIP导出，选中片段数:', selectedSlices.size);
+    console.log('[task-3.4] 可用Blob数量:', appState.blobs.length);
+
     const zip = new JSZip();
     const folder = zip.folder("screenshot_slices");
 
-    imageSlices.forEach((slice, index) => {
-      if (selectedSlices.has(index)) {
-        const base64Data = slice.data.split(",")[1];
-        folder.file(`slice_${index + 1}.jpg`, base64Data, { base64: true });
+    // 使用 appState.blobs 中的数据
+    const exportPromises = [];
+    
+    appState.blobs.forEach((blob, index) => {
+      if (selectedSlices.has(index) && blob) {
+        console.log(`[task-3.4] 添加切片 ${index + 1} 到ZIP, Blob大小: ${blob.size} bytes`);
+        
+        // 将 Blob 转换为 ArrayBuffer 然后添加到 ZIP
+        const promise = blob.arrayBuffer().then(arrayBuffer => {
+          folder.file(`slice_${index + 1}.jpg`, arrayBuffer);
+          return `slice_${index + 1}.jpg`;
+        });
+        
+        exportPromises.push(promise);
       }
     });
 
-    zip.generateAsync({ type: "blob" }).then((content) => {
-      saveAs(content, `${fileNameInput.value || "screenshot_slices"}.zip`);
+    // 等待所有文件添加完成，然后生成ZIP
+    Promise.all(exportPromises).then(fileNames => {
+      console.log('[task-3.4] 所有文件已添加到ZIP:', fileNames);
+      
+      return zip.generateAsync({ type: "blob" });
+    }).then((content) => {
+      const fileName = `${appState.fileName || fileNameInput.value || "screenshot_slices"}.zip`;
+      saveAs(content, fileName);
+      
+      console.log(`[task-3.4] ZIP导出成功: ${fileName}, 包含 ${exportPromises.length} 个文件`);
+    }).catch(error => {
+      console.error('[task-3.4] ZIP导出失败:', error);
+      alert(`ZIP导出失败: ${error.message}`);
     });
   }
 
-  // 导出为PDF
+  // task-3.4: 重构导出为PDF，使用 Worker 生成的 Blob 数据
   function exportAsPdf() {
     if (selectedSlices.size === 0) {
       alert(window.i18n.t("js.alert.noSlicesSelected"));
       return;
     }
 
+    // 检查是否有 Worker 生成的 Blob 数据
+    if (appState.blobs.length === 0) {
+      console.warn('[task-3.4] 没有可用的 Blob 数据，可能需要先处理图片');
+      alert('请先处理图片后再导出');
+      return;
+    }
+
+    console.log('[task-3.4] 开始PDF导出，选中片段数:', selectedSlices.size);
+    console.log('[task-3.4] 可用Blob数量:', appState.blobs.length);
+
     const { jsPDF } = window.jspdf;
-    const selectedSlicesArray = imageSlices.filter((slice, index) =>
-      selectedSlices.has(index)
-    );
-
-    if (selectedSlicesArray.length === 0) return;
-
-    const doc = new jsPDF({
-      orientation:
-        selectedSlicesArray[0].width > selectedSlicesArray[0].height
-          ? "l"
-          : "p",
-      unit: "px",
-      format: [selectedSlicesArray[0].width, selectedSlicesArray[0].height],
+    
+    // 收集选中的 Blob 数据并转换为 Object URLs
+    const selectedBlobsWithIndex = [];
+    appState.blobs.forEach((blob, index) => {
+      if (selectedSlices.has(index) && blob) {
+        selectedBlobsWithIndex.push({ blob, index });
+      }
     });
 
-    selectedSlicesArray.forEach((slice, index) => {
-      if (index > 0) doc.addPage();
+    if (selectedBlobsWithIndex.length === 0) {
+      console.warn('[task-3.4] 没有选中的有效 Blob 数据');
+      return;
+    }
 
-      // 计算缩放比例以适合PDF页面
-      const pdfWidth = doc.internal.pageSize.getWidth();
-      const pdfHeight = doc.internal.pageSize.getHeight();
+    // 先创建第一个图片来确定PDF页面尺寸
+    const firstBlob = selectedBlobsWithIndex[0].blob;
+    const firstImageUrl = URL.createObjectURL(firstBlob);
+    
+    const firstImg = new Image();
+    firstImg.onload = function() {
+      console.log(`[task-3.4] 第一个图片加载完成，尺寸: ${firstImg.width} x ${firstImg.height}`);
+      
+      // 创建PDF文档
+      const doc = new jsPDF({
+        orientation: firstImg.width > firstImg.height ? "l" : "p",
+        unit: "px", 
+        format: [firstImg.width, firstImg.height],
+      });
 
-      const widthRatio = pdfWidth / slice.width;
-      const heightRatio = pdfHeight / slice.height;
-      const ratio = Math.min(widthRatio, heightRatio);
+      console.log('[task-3.4] PDF文档已创建，开始添加图片...');
 
-      const scaledWidth = slice.width * ratio;
-      const scaledHeight = slice.height * ratio;
+      // 处理所有选中的图片
+      let processedCount = 0;
+      const totalCount = selectedBlobsWithIndex.length;
 
-      const x = (pdfWidth - scaledWidth) / 2;
-      const y = (pdfHeight - scaledHeight) / 2;
+      selectedBlobsWithIndex.forEach((item, docIndex) => {
+        const { blob, index } = item;
+        const imageUrl = URL.createObjectURL(blob);
+        
+        const img = new Image();
+        img.onload = function() {
+          console.log(`[task-3.4] 处理图片 ${index + 1}/${totalCount}，尺寸: ${img.width} x ${img.height}`);
+          
+          if (docIndex > 0) {
+            doc.addPage([img.width, img.height], img.width > img.height ? "l" : "p");
+          }
 
-      doc.addImage(slice.data, "JPEG", x, y, scaledWidth, scaledHeight);
-    });
+          // 计算缩放比例以适合PDF页面
+          const pdfWidth = doc.internal.pageSize.getWidth();
+          const pdfHeight = doc.internal.pageSize.getHeight();
 
-    doc.save(`${fileNameInput.value || "screenshot"}.pdf`);
+          const widthRatio = pdfWidth / img.width;
+          const heightRatio = pdfHeight / img.height;
+          const ratio = Math.min(widthRatio, heightRatio);
+
+          const scaledWidth = img.width * ratio;
+          const scaledHeight = img.height * ratio;
+
+          const x = (pdfWidth - scaledWidth) / 2;
+          const y = (pdfHeight - scaledHeight) / 2;
+
+          // 将 Blob URL 直接作为图片源添加到PDF
+          doc.addImage(imageUrl, "JPEG", x, y, scaledWidth, scaledHeight);
+          
+          // 释放 Object URL
+          URL.revokeObjectURL(imageUrl);
+          
+          processedCount++;
+          
+          // 所有图片处理完成后保存PDF
+          if (processedCount === totalCount) {
+            const fileName = `${appState.fileName || fileNameInput.value || "screenshot"}.pdf`;
+            doc.save(fileName);
+            
+            console.log(`[task-3.4] PDF导出成功: ${fileName}, 包含 ${totalCount} 页`);
+          }
+        };
+        
+        img.onerror = function() {
+          console.error(`[task-3.4] 图片 ${index + 1} 加载失败`);
+          URL.revokeObjectURL(imageUrl);
+          
+          processedCount++;
+          if (processedCount === totalCount) {
+            alert('PDF导出过程中某些图片加载失败');
+          }
+        };
+        
+        img.src = imageUrl;
+      });
+      
+      // 释放第一个图片的 Object URL
+      URL.revokeObjectURL(firstImageUrl);
+    };
+    
+    firstImg.onerror = function() {
+      console.error('[task-3.4] 第一个图片加载失败');
+      URL.revokeObjectURL(firstImageUrl);
+      alert('PDF导出失败：无法加载图片');
+    };
+    
+    firstImg.src = firstImageUrl;
   }
 
   // 重置应用
@@ -1036,6 +1169,355 @@ if (typeof document !== 'undefined') {
 
   // 暴露第二次上传测试函数
   window.testSecondUpload = testSecondUpload;
+
+  // task-3.3: Worker 消息处理函数
+  
+  /**
+   * 更新进度条宽度样式
+   * @param {number} progress - 进度百分比 (0-100)
+   */
+  function updateProgressBar(progress) {
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+    const progressDescription = document.getElementById("progress-description");
+    
+    if (progressBar) {
+      progressBar.style.width = `${progress}%`;
+      console.log(`[task-3.3] 进度条更新至 ${progress}%`);
+    }
+    
+    if (progressText) {
+      progressText.textContent = `${progress}%`;
+    }
+    
+    if (progressDescription) {
+      if (progress === 0) {
+        progressDescription.textContent = "开始处理图片...";
+      } else if (progress <= 25) {
+        progressDescription.textContent = "正在解码图片...";
+      } else if (progress < 95) {
+        progressDescription.textContent = "正在分割图片...";
+      } else if (progress < 100) {
+        progressDescription.textContent = "即将完成...";
+      } else {
+        progressDescription.textContent = "处理完成！";
+      }
+    }
+  }
+
+  /**
+   * 处理切片消息：存储 blob 并创建缩略图
+   * @param {Blob} blob - 图片切片的 Blob 对象
+   * @param {number} index - 切片索引
+   */
+  function handleChunkMessage(blob, index) {
+    // 将 blob 存入 appState.blobs
+    appState.blobs[index] = blob;
+    
+    // 创建 Object URL 并存储
+    const imageUrl = URL.createObjectURL(blob);
+    appState.objectUrls[index] = imageUrl;
+    
+    // 调用 task-2.3 的函数创建缩略图
+    addThumbnailToList({ blob, index });
+    
+    console.log(`[task-3.3] 处理切片 ${index + 1}，Blob存储完成，缩略图已添加`);
+  }
+
+  /**
+   * 处理处理完成消息：隐藏进度条，显示预览界面，启用导出按钮
+   */
+  function handleProcessingComplete() {
+    console.log('[task-3.3] 图片处理完成，更新UI...');
+    
+    // 1. 隐藏进度条
+    const progressContainer = document.getElementById("progress-container");
+    if (progressContainer) {
+      progressContainer.classList.add("hidden");
+      console.log('[task-3.3] 进度条已隐藏');
+    }
+    
+    // 2. 显示预览界面 (#preview-section)
+    const newPreviewSection = document.getElementById('preview-section');
+    if (newPreviewSection) {
+      newPreviewSection.classList.remove('hidden');
+      console.log('[task-3.3] 新预览界面已显示');
+    }
+    
+    // 3. 启用导出按钮（新预览界面的按钮）
+    toggleNewExportButtons(true);
+    
+    // 4. 更新应用状态
+    updateAppState({
+      isProcessing: false
+    });
+    
+    console.log('[task-3.3] UI更新完成，用户可以预览和导出');
+  }
+
+  /**
+   * 处理错误消息：隐藏进度条，显示错误信息
+   * @param {string} errorMessage - 错误信息
+   */
+  function handleProcessingError(errorMessage) {
+    console.error('[task-3.3] Worker 处理错误:', errorMessage);
+    
+    // 1. 隐藏进度条
+    const progressContainer = document.getElementById("progress-container");
+    if (progressContainer) {
+      progressContainer.classList.add("hidden");
+      console.log('[task-3.3] 进度条已隐藏（由于错误）');
+    }
+    
+    // 2. 显示错误信息
+    alert(`图片处理失败: ${errorMessage}`);
+    
+    // 3. 更新应用状态
+    updateAppState({
+      isProcessing: false
+    });
+    
+    console.log('[task-3.3] 错误处理完成');
+  }
+
+  // task-3.3: 验证测试函数
+  
+  /**
+   * 测试完整的 Worker 消息与 UI 连接流程
+   */
+  function testTask33() {
+    console.log('[task-3.3 测试] 开始测试完整的 Worker 消息与 UI 连接流程...');
+    
+    // 创建测试图片
+    const testCanvas = document.createElement('canvas');
+    testCanvas.width = 600;
+    testCanvas.height = 1200;
+    const testCtx = testCanvas.getContext('2d');
+    
+    // 绘制测试图片（上下两种颜色）
+    testCtx.fillStyle = '#FF6B6B';
+    testCtx.fillRect(0, 0, 600, 600);
+    testCtx.fillStyle = '#4ECDC4';
+    testCtx.fillRect(0, 600, 600, 600);
+    
+    // 添加文字标识
+    testCtx.fillStyle = 'white';
+    testCtx.font = '48px Arial';
+    testCtx.textAlign = 'center';
+    testCtx.fillText('测试图片 TOP', 300, 300);
+    testCtx.fillText('测试图片 BOTTOM', 300, 900);
+    
+    const testImg = new Image();
+    testImg.width = 600;
+    testImg.height = 1200;
+    testImg.src = testCanvas.toDataURL();
+    
+    testImg.onload = () => {
+      console.log('[task-3.3 测试] 测试图片创建完成，开始处理...');
+      
+      // 设置测试参数
+      originalImage = testImg;
+      appState.originalImage = testImg;
+      
+      if (sliceHeightInput) {
+        sliceHeightInput.value = '400'; // 这样会产生3个切片
+      }
+      
+      // 确保缩略图列表为空
+      if (thumbnailList) {
+        thumbnailList.innerHTML = '';
+      }
+      
+      // 确保预览界面隐藏
+      const newPreviewSection = document.getElementById('preview-section');
+      if (newPreviewSection) {
+        newPreviewSection.classList.add('hidden');
+      }
+      
+      console.log('[task-3.3 测试] 调用 processImage() 开始完整流程测试...');
+      
+      // 记录开始时间用于性能测试
+      const startTime = Date.now();
+      window.testStartTime = startTime;
+      
+      // 开始处理
+      processImage();
+      
+      console.log('[task-3.3 测试] processImage() 已调用，请观察以下流程:');
+      console.log('📊 1. 进度条应该显示并逐步更新');
+      console.log('🖼️ 2. 缩略图应该逐个添加到左侧列表');
+      console.log('👁️ 3. 完成后预览界面应该显示');
+      console.log('🔘 4. 导出按钮应该被启用');
+    };
+  }
+
+  /**
+   * 验证完整流程的各个阶段
+   */
+  function verifyTask33Completion() {
+    console.log('[task-3.3 验证] 开始验证完整流程各个阶段...');
+    
+    const progressContainer = document.getElementById("progress-container");
+    const newPreviewSection = document.getElementById('preview-section');
+    const newExportZipBtn = document.getElementById("export-zip-btn");
+    const newExportPdfBtn = document.getElementById("export-pdf-btn");
+    
+    // 验证UI状态
+    const progressHidden = progressContainer && progressContainer.classList.contains('hidden');
+    const previewVisible = newPreviewSection && !newPreviewSection.classList.contains('hidden');
+    const zipBtnEnabled = newExportZipBtn && !newExportZipBtn.disabled;
+    const pdfBtnEnabled = newExportPdfBtn && !newExportPdfBtn.disabled;
+    
+    // 验证数据状态
+    const blobsCount = appState.blobs.length;
+    const urlsCount = appState.objectUrls.length;
+    const thumbnailsCount = thumbnailList ? thumbnailList.children.length : 0;
+    
+    console.log('[task-3.3 验证] UI状态检查:');
+    console.log(`✅ 进度条已隐藏: ${progressHidden ? '是' : '否'}`);
+    console.log(`✅ 预览界面已显示: ${previewVisible ? '是' : '否'}`);
+    console.log(`✅ ZIP导出按钮已启用: ${zipBtnEnabled ? '是' : '否'}`);
+    console.log(`✅ PDF导出按钮已启用: ${pdfBtnEnabled ? '是' : '否'}`);
+    
+    console.log('[task-3.3 验证] 数据状态检查:');
+    console.log(`✅ Blobs 数量: ${blobsCount}`);
+    console.log(`✅ Object URLs 数量: ${urlsCount}`);
+    console.log(`✅ 缩略图数量: ${thumbnailsCount}`);
+    
+    // 性能统计
+    if (window.testStartTime) {
+      const processingTime = Date.now() - window.testStartTime;
+      console.log(`⏱️ 总处理时间: ${processingTime}ms`);
+    }
+    
+    // 综合验证
+    const allPassed = progressHidden && previewVisible && zipBtnEnabled && pdfBtnEnabled && 
+                     blobsCount > 0 && urlsCount > 0 && thumbnailsCount > 0;
+    
+    if (allPassed) {
+      console.log('🎉 [task-3.3] 完整流程验证通过！进度条、缩略图、预览界面按预期工作');
+    } else {
+      console.warn('⚠️ [task-3.3] 某些验证项目未通过，请检查实现');
+    }
+    
+    return allPassed;
+  }
+
+  // 暴露测试函数
+  window.testTask33 = testTask33;
+  window.verifyTask33Completion = verifyTask33Completion;
+
+  // task-3.4: 验证测试函数
+  
+  /**
+   * 测试导出功能是否正确使用 Worker 生成的 Blob 数据
+   */
+  function testTask34() {
+    console.log('[task-3.4 测试] 开始测试导出功能...');
+    
+    // 检查是否有数据可供导出
+    if (appState.blobs.length === 0) {
+      console.warn('[task-3.4 测试] 没有可用的 Blob 数据，先运行完整流程...');
+      
+      // 运行完整流程生成数据
+      testTask33();
+      
+      // 延迟执行导出测试
+      setTimeout(() => {
+        console.log('[task-3.4 测试] 流程完成，现在测试导出功能...');
+        executeExportTests();
+      }, 3000);
+    } else {
+      executeExportTests();
+    }
+  }
+
+  /**
+   * 执行导出测试
+   */
+  function executeExportTests() {
+    console.log('[task-3.4 测试] 执行导出功能测试...');
+    
+    // 验证导出前的状态
+    console.log('[task-3.4 测试] 导出前状态检查:');
+    console.log(`- 可用 Blobs: ${appState.blobs.length}`);
+    console.log(`- 选中切片: ${selectedSlices.size}`);
+    console.log(`- 选中的切片索引:`, Array.from(selectedSlices));
+    
+    // 确保有选中的切片
+    if (selectedSlices.size === 0) {
+      console.log('[task-3.4 测试] 没有选中的切片，自动选中所有切片...');
+      appState.blobs.forEach((blob, index) => {
+        if (blob) {
+          selectedSlices.add(index);
+        }
+      });
+      console.log(`[task-3.4 测试] 已选中 ${selectedSlices.size} 个切片`);
+    }
+    
+    // 验证导出按钮状态
+    const zipBtn = document.getElementById("export-zip-btn");
+    const pdfBtn = document.getElementById("export-pdf-btn");
+    
+    console.log('[task-3.4 测试] 导出按钮状态:');
+    console.log(`- ZIP按钮启用: ${zipBtn && !zipBtn.disabled ? '是' : '否'}`);
+    console.log(`- PDF按钮启用: ${pdfBtn && !pdfBtn.disabled ? '是' : '否'}`);
+    
+    // 提供测试指导
+    console.log('[task-3.4 测试] 现在可以测试导出功能:');
+    console.log('1. 点击 ZIP 导出按钮测试 ZIP 导出');
+    console.log('2. 点击 PDF 导出按钮测试 PDF 导出');
+    console.log('3. 或者在控制台运行:');
+    console.log('   - window.testZipExport() // 程序化测试ZIP导出');
+    console.log('   - window.testPdfExport() // 程序化测试PDF导出');
+    
+    return {
+      blobsCount: appState.blobs.length,
+      selectedCount: selectedSlices.size,
+      zipEnabled: zipBtn && !zipBtn.disabled,
+      pdfEnabled: pdfBtn && !pdfBtn.disabled
+    };
+  }
+
+  /**
+   * 程序化测试ZIP导出
+   */
+  function testZipExport() {
+    console.log('[task-3.4 ZIP测试] 开始程序化ZIP导出测试...');
+    
+    if (appState.blobs.length === 0 || selectedSlices.size === 0) {
+      console.warn('[task-3.4 ZIP测试] 需要先有处理过的数据和选中的切片');
+      return false;
+    }
+    
+    console.log('[task-3.4 ZIP测试] 调用 exportAsZip()...');
+    exportAsZip();
+    
+    return true;
+  }
+
+  /**
+   * 程序化测试PDF导出
+   */
+  function testPdfExport() {
+    console.log('[task-3.4 PDF测试] 开始程序化PDF导出测试...');
+    
+    if (appState.blobs.length === 0 || selectedSlices.size === 0) {
+      console.warn('[task-3.4 PDF测试] 需要先有处理过的数据和选中的切片');
+      return false;
+    }
+    
+    console.log('[task-3.4 PDF测试] 调用 exportAsPdf()...');
+    exportAsPdf();
+    
+    return true;
+  }
+
+  // 暴露导出测试函数
+  window.testTask34 = testTask34;
+  window.executeExportTests = executeExportTests;
+  window.testZipExport = testZipExport;
+  window.testPdfExport = testPdfExport;
 
   // task-2.4: 更新测试入口 - 显示正确的预览界面并测试交互功能
   function showPreviewAndTest() {
