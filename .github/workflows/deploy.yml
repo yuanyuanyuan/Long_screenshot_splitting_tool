@@ -59,31 +59,24 @@ jobs:
     - name: 构建所有组件
       run: pnpm run build:full
       
-    - name: 多目标部署构建
+    - name: 准备部署目录
       run: |
-        # 使用多目标部署脚本进行构建和部署准备
-        node tools/build-scripts/multi-target-deploy.js --target all --mode both --dry-run
+        # 创建部署目录
+        mkdir -p deploy
         
-        # 将构建结果复制到部署目录
-        if [ -d "dist/deploy" ]; then
-          cp -r dist/deploy/* deploy/ || mkdir -p deploy
-          if [ -d "dist/deploy" ]; then
-            cp -r dist/deploy/* deploy/
-          fi
+        # 复制SPA版本到主目录
+        if [ -d "packages/screenshot-splitter/dist" ]; then
+          cp -r packages/screenshot-splitter/dist/* deploy/
         else
-          mkdir -p deploy
-          echo "警告: 多目标部署脚本未生成预期的输出目录"
-          
-          # 回退到原有逻辑
-          if [ -d "packages/screenshot-splitter/dist" ]; then
-            cp -r packages/screenshot-splitter/dist/* deploy/
-          fi
-          
-          mkdir -p deploy/components
-          if [ -d "packages/screenshot-splitter/dist-single" ]; then
-            mkdir -p deploy/components/screenshot-splitter
-            cp -r packages/screenshot-splitter/dist-single/* deploy/components/screenshot-splitter/
-          fi
+          echo "警告: SPA构建目录不存在"
+        fi
+        
+        # 复制单文件版本到components目录
+        mkdir -p deploy/components/screenshot-splitter
+        if [ -d "packages/screenshot-splitter/dist-single" ]; then
+          cp -r packages/screenshot-splitter/dist-single/* deploy/components/screenshot-splitter/
+        else
+          echo "警告: 单文件构建目录不存在"
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
