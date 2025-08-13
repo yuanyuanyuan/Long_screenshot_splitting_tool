@@ -145,6 +145,12 @@ export function ImagePreview({
   const { t } = useI18n();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   
+  // 图片缩放状态
+  const [scale, setScale] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  
   // 使用响应式布局hook
   const {
     layoutMode,
@@ -368,7 +374,47 @@ export function ImagePreview({
     }
   }, [isMobile, imageSlices.length]);
 
-  // 重复的键盘导航代码已移除，统一使用上面的 handleKeyNavigation 函数
+  // 图片缩放处理函数
+  const handleZoomIn = useCallback(() => {
+    setScale(prev => Math.min(prev + 0.25, 3));
+    console.log('[ImagePreview] 放大图片，缩放比例:', Math.min(scale + 0.25, 3));
+  }, [scale]);
+
+  const handleZoomOut = useCallback(() => {
+    setScale(prev => Math.max(prev - 0.25, 0.5));
+    console.log('[ImagePreview] 缩小图片，缩放比例:', Math.max(scale - 0.25, 0.5));
+  }, [scale]);
+
+  const handleResetZoom = useCallback(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+    console.log('[ImagePreview] 重置图片缩放');
+  }, []);
+
+  // 拖动处理函数
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (scale > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX, y: e.clientY });
+      console.log('[ImagePreview] 开始拖动图片');
+    }
+  }, [scale]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isDragging) {
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      setPosition(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  }, [isDragging, dragStart]);
+
+  const handleMouseUp = useCallback(() => {
+    if (isDragging) {
+      setIsDragging(false);
+      console.log('[ImagePreview] 结束拖动图片');
+    }
+  }, [isDragging]);
 
   // 调试：组件渲染时输出props
   console.log('[ImagePreview] 组件渲染，props:', {
@@ -414,31 +460,26 @@ export function ImagePreview({
   console.log('[ImagePreview] 组件正常渲染 - 切片数量:', imageSlices.length);
 
   return (
-    <div className={responsiveClasses.container}>
+    <div className="w-full max-w-full">
       {/* 预览头部 */}
       <div className={cn(
-        styleMapping['preview-header'],
-        isMobile ? 'flex-col gap-3' : 'flex-row items-center gap-4'
+        styleMapping['preview-header']
       )}>
         <div className="flex flex-col gap-2">
-          <h2 className={cn(
-            "font-bold text-gray-800",
-            isMobile ? "text-lg" : "text-xl"
-          )}>{t('preview.title') || '选择需要导出的片段'}</h2>
-          <span className="text-sm text-gray-600">
+          <h2 className="text-xl lg:text-2xl font-bold text-gray-800">
+            {t('preview.title') || '选择需要导出的片段'}
+          </h2>
+          <span className="text-sm lg:text-base text-gray-600 font-medium">
             {t('preview.selectedCount') || `已选择 ${selectedSlices.size} 个片段`}
           </span>
         </div>
         
-        <div className={cn(
-          styleMapping['selection-controls'],
-          isMobile ? 'w-full justify-center' : ''
-        )}>
+        {/* 显著放大的全选/取消按钮 */}
+        <div className={styleMapping['selection-controls']}>
           <button 
             className={cn(
               styleMapping['btn'], 
               styleMapping['btn-primary'],
-              responsiveClasses.button,
               isMobile ? 'flex-1' : ''
             )}
             onClick={onSelectAll}
@@ -450,7 +491,6 @@ export function ImagePreview({
             className={cn(
               styleMapping['btn'], 
               styleMapping['btn-secondary'],
-              responsiveClasses.button,
               isMobile ? 'flex-1' : ''
             )}
             onClick={onDeselectAll}
@@ -470,25 +510,36 @@ export function ImagePreview({
         </div>
       )}
 
-      <div className={responsiveClasses.container}>
-        {/* 左侧缩略图列表 */}
-        <div className={responsiveClasses.sidebar}>
-          <div className={responsiveClasses.thumbnailList}>
+      <div className={styleMapping['preview-content']}>
+        {/* 左侧缩略图选择栏 */}
+        <div className={styleMapping['thumbnail-sidebar']}>
+          <div className={styleMapping['thumbnail-list']}>
             {imageSlices.map((slice) => (
               <div
                 key={slice.index}
                 className={cn(
-                  responsiveClasses.thumbnailItem,
-                  selectedSlices.has(slice.index) ? styleMapping['thumbnail-item-selected'] : ''
+                  styleMapping['thumbnail-item'],
+                  selectedSlices.has(slice.index) ? styleMapping['thumbnail-item-selected'] : '',
+                  selectedImageIndex === slice.index ? styleMapping['thumbnail-item-active'] : ''
                 )}
                 data-index={slice.index}
               >
-                <input
-                  type="checkbox"
-                  className={styleMapping['thumbnail-checkbox']}
-                  checked={selectedSlices.has(slice.index)}
-                  onChange={() => handleCheckboxChange(slice.index)}
-                />
+                {/* 图片序号 */}
+                <div className={styleMapping['thumbnail-number']}>
+                  #{slice.index + 1}
+                </div>
+                
+                {/* 醒目的选择按钮 */}
+                <button
+                  className={cn(
+                    styleMapping['thumbnail-select-btn'],
+                    selectedSlices.has(slice.index) ? styleMapping['thumbnail-select-btn-selected'] : ''
+                  )}
+                  onClick={() => handleCheckboxChange(slice.index)}
+                  aria-label={`选择切片 ${slice.index + 1}`}
+                >
+                  {selectedSlices.has(slice.index) ? '✓' : '+'}
+                </button>
                 
                 <img
                   src={slice.url}
@@ -500,13 +551,13 @@ export function ImagePreview({
                 
                 <div className={styleMapping['thumbnail-info']}>
                   <div className={styleMapping['thumbnail-label']}>
-                    {t('preview.sliceLabel') || `切片 ${slice.index + 1}`}
+                    切片 {slice.index + 1}
                   </div>
                   <div className={styleMapping['thumbnail-hint']}>
-                    {t('preview.dimensions') || `${slice.width} × ${slice.height}`}
+                    {slice.width} × {slice.height}
                   </div>
                   <div className={styleMapping['thumbnail-hint']}>
-                    {t('preview.size') || `${Math.round(slice.blob.size / 1024)} KB`}
+                    {Math.round(slice.blob.size / 1024)} KB
                   </div>
                 </div>
               </div>
@@ -514,8 +565,8 @@ export function ImagePreview({
           </div>
         </div>
 
-        {/* 右侧大图预览 */}
-        <div className={responsiveClasses.main}>
+        {/* 右侧大图预览区 */}
+        <div className={styleMapping['preview-main']}>
           {imageSlices.length > 0 && imageSlices[selectedImageIndex] ? (
             <div className={responsiveClasses.imageContainer}>
               {/* 显示加载状态 */}
@@ -570,20 +621,82 @@ export function ImagePreview({
                   )}
                 </div>
               ) : (
-                <img
-                  src={imageSlices[selectedImageIndex].url}
-                  alt={t('preview.largeImageAlt') || `切片 ${imageSlices[selectedImageIndex].index + 1} 预览`}
-                  className={styleMapping['preview-image']}
-                  onError={() => {
-                    console.error('[ImagePreview] 大图加载失败:', imageSlices[selectedImageIndex].url);
-                  }}
-                />
+                <>
+                  <div 
+                    className="relative overflow-hidden w-full max-w-full"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                  >
+                    <img
+                      src={imageSlices[selectedImageIndex].url}
+                      alt={t('preview.largeImageAlt') || `切片 ${imageSlices[selectedImageIndex].index + 1} 预览`}
+                      className="max-w-full max-h-[50vh] md:max-h-[60vh] rounded-lg shadow-md mx-auto object-contain"
+                      style={{
+                        transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                        transition: isDragging ? 'none' : 'transform 0.2s',
+                        cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+                        transformOrigin: 'center'
+                      }}
+                      onError={() => {
+                        console.error('[ImagePreview] 大图加载失败:', imageSlices[selectedImageIndex].url);
+                      }}
+                    />
+                  </div>
+                  
+                  {/* 缩放控件 */}
+                  <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                    <button
+                      className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                      onClick={handleZoomOut}
+                      disabled={scale <= 0.5}
+                      title={t('preview.zoomOut') || '缩小'}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                      </svg>
+                    </button>
+                    
+                    <button
+                      className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                      onClick={handleResetZoom}
+                      title={t('preview.resetZoom') || '重置缩放'}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0z" />
+                        <path d="M12 8v4l3 3" />
+                      </svg>
+                    </button>
+                    
+                    <button
+                      className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                      onClick={handleZoomIn}
+                      disabled={scale >= 3}
+                      title={t('preview.zoomIn') || '放大'}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                      </svg>
+                    </button>
+                    
+                    <span className="text-sm text-gray-600 ml-2">{Math.round(scale * 100)}%</span>
+                  </div>
+                </>
               )}
               
-              <div className={styleMapping['preview-info']}>
+              <div className="mt-4 text-center w-full">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   {t('preview.currentSlice') || `切片 ${imageSlices[selectedImageIndex].index + 1}`}
                 </h3>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="text-gray-600">{t('preview.dimensions') || `${imageSlices[selectedImageIndex].width} × ${imageSlices[selectedImageIndex].height}`}</span>
+                  <span className="text-gray-600">|</span>
+                  <span className="text-gray-600">{t('preview.size') || `${Math.round(imageSlices[selectedImageIndex].blob.size / 1024)} KB`}</span>
+                </div>
                 <p className="text-gray-600 mb-2">{t('preview.clickToSelect') || '点击左侧缩略图选择其他片段'}</p>
                 <p className={styleMapping['keyboard-hint']}>
                   使用键盘 ↑↓ 键快速切换图片
@@ -612,4 +725,4 @@ export function ImagePreview({
       </div>
     </div>
   );
-};
+}

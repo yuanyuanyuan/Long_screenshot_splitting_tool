@@ -8,8 +8,6 @@ import { ExportControls } from './components/ExportControls';
 import { exportToPDF } from './utils/pdfExporter';
 import { exportToZIP } from './utils/zipExporter';
 import type { ImageSlice } from './types';
-import './App.css';
-import './components/Components.css';
 
 function App() {
   const { state, actions, getStateSnapshot } = useAppState();
@@ -122,26 +120,28 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <header>
-        <h1>{t('header.title')}</h1>
-        <p>{t('header.subtitle')}</p>
-        
-        <div className="language-switcher">
-          <label htmlFor="language-select">{t('lang.current')}: </label>
-          <select 
-            id="language-select" 
-            value={currentLanguage} 
-            onChange={handleLanguageChange}
-          >
-            <option value="zh-CN">{t('lang.switcher.zh-CN')}</option>
-            <option value="en">{t('lang.switcher.en')}</option>
-          </select>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <div className="app-container">
+        <header className="text-center py-8 mb-8">
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">{t('header.title')}</h1>
+          <p className="text-lg text-gray-600 mb-6">{t('header.subtitle')}</p>
+          
+          <div className="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm">
+            <label htmlFor="language-select" className="text-sm font-medium text-gray-700">{t('lang.current')}: </label>
+            <select 
+              id="language-select" 
+              value={currentLanguage} 
+              onChange={handleLanguageChange}
+              className="bg-transparent border-none text-sm font-medium text-blue-600 focus:outline-none cursor-pointer"
+            >
+              <option value="zh-CN">{t('lang.switcher.zh-CN')}</option>
+              <option value="en">{t('lang.switcher.en')}</option>
+            </select>
+          </div>
+        </header>
 
-      <main>
-        <section className="upload-section">
+        <main>
+        <section className="mb-8">
           <FileUploader
             onFileSelect={handleFileSelect}
             isProcessing={isProcessing}
@@ -156,8 +156,8 @@ function App() {
           return state.imageSlices.length > 0;
         })() && (
           <>
-            <section className="preview-section">
-              <h2 style={{color: 'red', fontSize: '20px', margin: '20px 0'}}>🎯 预览界面已渲染 - 切片数量: {state.imageSlices.length}</h2>
+            <section className="mb-8">
+              <h2 className="text-xl font-bold text-red-600 mb-4 text-center">🎯 预览界面已渲染 - 切片数量: {state.imageSlices.length}</h2>
               <ImagePreview
                 imageSlices={state.imageSlices}
                 selectedSlices={state.selectedSlices}
@@ -167,7 +167,7 @@ function App() {
               />
             </section>
 
-            <section className="export-section">
+            <section className="mb-8">
               <ExportControls
                 selectedSlices={state.selectedSlices}
                 imageSlices={state.imageSlices}
@@ -179,10 +179,10 @@ function App() {
           </>
         )}
 
-        <section className="debug-section">
+        <section className="bg-white rounded-lg shadow-sm p-6">
           <details open>
-            <summary>调试信息</summary>
-            <div style={{margin: '10px 0'}}>
+            <summary className="text-lg font-semibold text-gray-800 cursor-pointer mb-4">调试信息</summary>
+            <div className="flex gap-3 mb-4">
               <button 
                 onClick={() => {
                   console.log('=== 手动调试检查 ===');
@@ -193,7 +193,7 @@ function App() {
                   console.log('选中切片:', Array.from(state.selectedSlices));
                   alert(`调试信息已输出到控制台\n切片数量: ${state.imageSlices.length}\n是否应显示预览: ${state.imageSlices.length > 0}`);
                 }}
-                style={{padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginRight: '10px'}}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 🔍 手动检查状态
               </button>
@@ -202,26 +202,29 @@ function App() {
                   setForceRender(prev => prev + 1);
                   console.log('[App] 强制重新渲染:', forceRender + 1);
                 }}
-                style={{padding: '10px', backgroundColor: '#ff6b6b', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
               >
                 🔄 强制刷新 ({forceRender})
               </button>
             </div>
-            <div style={{backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '5px', marginBottom: '10px'}}>
-               <strong>实时状态:</strong><br/>
-               切片数量: {state.imageSlices.length}<br/>
-               是否处理中: {isProcessing ? '是' : '否'}<br/>
-               处理进度: {progress}%<br/>
-               选中切片数: {state.selectedSlices.size}<br/>
-               应显示预览界面: {state.imageSlices.length > 0 ? '是' : '否'}<br/>
-               <strong style={{color: 'red'}}>直接状态检查:</strong><br/>
-               state对象: {JSON.stringify({imageSlicesLength: state.imageSlices.length, hasImageSlices: state.imageSlices.length > 0})}<br/>
-               快照对象: {JSON.stringify(getStateSnapshot())}
+            <div className="bg-gray-50 p-4 rounded-lg mb-4 text-sm">
+               <div className="font-semibold text-gray-800 mb-2">实时状态:</div>
+               <div className="space-y-1 text-gray-700">
+                 <div>切片数量: {state.imageSlices.length}</div>
+                 <div>是否处理中: {isProcessing ? '是' : '否'}</div>
+                 <div>处理进度: {progress}%</div>
+                 <div>选中切片数: {state.selectedSlices.size}</div>
+                 <div>应显示预览界面: {state.imageSlices.length > 0 ? '是' : '否'}</div>
+                 <div className="font-semibold text-red-600 mt-2">直接状态检查:</div>
+                 <div>state对象: {JSON.stringify({imageSlicesLength: state.imageSlices.length, hasImageSlices: state.imageSlices.length > 0})}</div>
+                 <div>快照对象: {JSON.stringify(getStateSnapshot())}</div>
+               </div>
              </div>
-            <pre>{JSON.stringify(getStateSnapshot(), null, 2)}</pre>
+            <pre className="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-auto max-h-64">{JSON.stringify(getStateSnapshot(), null, 2)}</pre>
           </details>
         </section>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

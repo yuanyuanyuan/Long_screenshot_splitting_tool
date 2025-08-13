@@ -180,13 +180,13 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
     const strategy = layoutStrategy;
     
     return {
-      container: `flex ${strategy.containerDirection === 'column' ? 'flex-col' : 'flex-row'} gap-6 p-6 bg-white rounded-lg shadow-sm`,
-      sidebar: `${strategy.containerDirection === 'column' ? 'w-full' : 'w-1/3 xl:w-1/4'} flex-shrink-0 ${strategy.containerDirection === 'column' ? 'order-first' : ''} ${isMobile ? 'overscroll-contain scroll-smooth' : ''}`,
-      main: `flex-1 flex flex-col items-center justify-center min-h-[400px] ${isMobile ? 'touch-manipulation select-none' : ''}`,
-      thumbnailList: `${strategy.thumbnailDisplay === 'horizontal' ? 'flex gap-3 overflow-x-auto pb-2' : 'space-y-3'} max-h-96 ${strategy.thumbnailDisplay === 'vertical' ? 'lg:max-h-[600px] overflow-y-auto' : ''} ${isMobile ? 'overflow-y-auto overscroll-contain scroll-smooth' : ''}`,
-      thumbnailItem: `thumbnail-item ${strategy.compactMode ? 'p-3' : 'p-4'} ${isMobile ? 'min-h-[60px] touch-manipulation' : ''}`,
-      button: `btn ${strategy.compactMode ? 'px-4 py-2 text-sm' : 'px-6 py-3 text-base'} ${isMobile ? 'min-h-[44px] touch-manipulation' : ''}`,
-      imageContainer: `preview-image-container ${isMobile ? 'touch-manipulation select-none' : ''}`
+      container: `flex ${strategy.containerDirection === 'column' ? 'flex-col' : 'flex-row'} gap-4 md:gap-6 p-4 md:p-6 bg-white rounded-lg shadow-sm w-full`,
+      sidebar: `${strategy.containerDirection === 'column' ? 'w-full' : 'w-full md:w-1/3 xl:w-1/4'} flex-shrink-0 ${strategy.containerDirection === 'column' ? 'order-first' : ''} ${isMobile ? 'overscroll-contain scroll-smooth' : ''}`,
+      main: `flex-1 flex flex-col items-center justify-center min-h-[300px] md:min-h-[400px] ${isMobile ? 'touch-manipulation select-none w-full' : ''}`,
+      thumbnailList: `${strategy.thumbnailDisplay === 'horizontal' ? 'flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory' : 'space-y-3'} ${strategy.thumbnailDisplay === 'vertical' ? 'max-h-96 lg:max-h-[600px] overflow-y-auto' : ''} ${isMobile ? 'overscroll-contain scroll-smooth -mx-4 px-4' : ''}`,
+      thumbnailItem: `${strategy.compactMode ? 'p-2 md:p-3' : 'p-3 md:p-4'} ${isMobile ? 'min-h-[60px] touch-manipulation snap-start flex-shrink-0' : ''} border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer relative flex items-center gap-3`,
+      button: `${strategy.compactMode ? 'px-3 py-1.5 text-sm' : 'px-4 py-2 text-base'} ${isMobile ? 'min-h-[44px] touch-manipulation' : ''} rounded-md font-medium transition-colors duration-200`,
+      imageContainer: `w-full flex flex-col items-center justify-center ${isMobile ? 'touch-manipulation select-none' : ''}`
     };
   }, [layoutStrategy, isMobile]);
 
