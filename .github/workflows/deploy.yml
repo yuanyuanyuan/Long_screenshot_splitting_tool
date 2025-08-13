@@ -90,7 +90,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         
-        # 创建组件索引页面
+    - name: 创建组件索引页面
+      run: |
         cat > deploy/components/index.html << 'EOF'
         <!DOCTYPE html>
         <html lang="zh-CN">
@@ -227,7 +228,9 @@ jobs:
         </body>
         </html>
         EOF
-        
+
+    - name: 创建主页面
+      run: |
         # 创建主页面，如果不存在index.html
         if [ ! -f "deploy/index.html" ]; then
           cat > deploy/index.html << 'EOF'
@@ -305,8 +308,9 @@ jobs:
         </html>
         EOF
         fi
-        
-        # 显示部署目录结构
+
+    - name: 显示部署目录结构
+      run: |
         echo "部署目录结构："
         find deploy -type f | head -20
         
