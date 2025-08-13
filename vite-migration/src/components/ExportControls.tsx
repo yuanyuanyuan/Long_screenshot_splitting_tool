@@ -1,4 +1,3 @@
-import React from 'react';
 import type { ImageSlice } from '../types';
 import { useI18n } from '../hooks/useI18n';
 import { cn } from '../utils/styleMapping';

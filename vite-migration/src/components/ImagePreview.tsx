@@ -3,6 +3,8 @@ import type { ImageSlice } from '../types';
 import { useI18n } from '../hooks/useI18n';
 import { styleMapping, cn } from '../utils/styleMapping';
 import { useResponsiveLayout } from '../hooks/useResponsiveLayout';
+import { formatImageSliceInfo } from '../utils/textFormatter';
+import { TextDisplayConfig, useTextDisplayConfig } from './TextDisplayConfig';
 
 interface ImagePreviewProps {
   imageSlices: ImageSlice[];
@@ -10,6 +12,8 @@ interface ImagePreviewProps {
   onToggleSelection: (index: number) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
+  /** 是否显示文字显示配置面板 */
+  showTextDisplayConfig?: boolean;
 }
 
 // 图片错误处理自定义hook
@@ -140,7 +144,8 @@ export function ImagePreview({
   selectedSlices,
   onToggleSelection,
   onSelectAll,
-  onDeselectAll
+  onDeselectAll,
+  showTextDisplayConfig = false
 }: ImagePreviewProps) {
   const { t } = useI18n();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
@@ -151,13 +156,14 @@ export function ImagePreview({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
   
+  // 文字显示配置状态
+  const { options: textDisplayOptions, updateOptions: updateTextDisplayOptions } = useTextDisplayConfig();
+  const [showConfigPanel, setShowConfigPanel] = useState(false);
+  
   // 使用响应式布局hook
   const {
-    layoutMode,
     layoutStrategy,
     isMobile,
-    isTablet,
-    isDesktop,
     getResponsiveClasses
   } = useResponsiveLayout();
   
@@ -172,7 +178,6 @@ export function ImagePreview({
   
   // 触摸手势状态
   const [touchStart, setTouchStart] = useState<{ x: number; y: number; time: number } | null>(null);
-  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number; time: number } | null>(null);
   const touchThreshold = 50; // 最小滑动距离
   const timeThreshold = 500; // 最大滑动时间（毫秒）
 
@@ -185,7 +190,6 @@ export function ImagePreview({
       y: touch.clientY,
       time: Date.now()
     });
-    setTouchEnd(null);
   }, []);
 
   const handleTouchMove = useCallback((event: Event) => {
@@ -206,7 +210,6 @@ export function ImagePreview({
       y: touch.clientY,
       time: Date.now()
     };
-    setTouchEnd(touchEndData);
     
     // 计算滑动距离和时间
     const deltaX = touchEndData.x - touchStart.x;
@@ -237,7 +240,6 @@ export function ImagePreview({
     
     // 重置触摸状态
     setTouchStart(null);
-    setTouchEnd(null);
   }, [touchStart, touchThreshold, timeThreshold, imageSlices.length]);
 
   // 键盘导航处理函数 - 统一的键盘事件处理
@@ -448,16 +450,22 @@ export function ImagePreview({
   }, [onToggleSelection]);
 
   if (imageSlices.length === 0) {
-    console.log('[ImagePreview] 组件返回null - 没有图片切片');
+    if (textDisplayOptions.showDebugInfo) {
+      console.log('[ImagePreview] 组件返回null - 没有图片切片');
+    }
     return (
       <div style={{padding: '20px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '5px', margin: '20px 0'}}>
         <h3 style={{color: '#856404'}}>⚠️ ImagePreview组件: 没有图片切片数据</h3>
-        <p>imageSlices.length = {imageSlices.length}</p>
+        {textDisplayOptions.showDebugInfo && (
+          <p>imageSlices.length = {imageSlices.length}</p>
+        )}
       </div>
     );
   }
 
-  console.log('[ImagePreview] 组件正常渲染 - 切片数量:', imageSlices.length);
+  if (textDisplayOptions.showDebugInfo) {
+    console.log('[ImagePreview] 组件正常渲染 - 切片数量:', imageSlices.length);
+  }
 
   return (
     <div className="w-full max-w-full">
@@ -474,35 +482,100 @@ export function ImagePreview({
           </span>
         </div>
         
-        {/* 显著放大的全选/取消按钮 */}
-        <div className={styleMapping['selection-controls']}>
-          <button 
-            className={cn(
-              styleMapping['btn'], 
-              styleMapping['btn-primary'],
-              isMobile ? 'flex-1' : ''
-            )}
-            onClick={onSelectAll}
-            disabled={imageSlices.length === 0}
-          >
-            {t('preview.selectAll') || '全选'}
-          </button>
-          <button 
-            className={cn(
-              styleMapping['btn'], 
-              styleMapping['btn-secondary'],
-              isMobile ? 'flex-1' : ''
-            )}
-            onClick={onDeselectAll}
-            disabled={selectedSlices.size === 0}
-          >
-            {t('preview.deselectAll') || '取消选择'}
-          </button>
+        {/* 控制按钮组 */}
+        <div className="flex flex-col gap-3">
+          {/* 显著放大的全选/取消按钮 */}
+          <div className={styleMapping['selection-controls']}>
+            <button 
+              className={cn(
+                styleMapping['btn'], 
+                styleMapping['btn-primary'],
+                isMobile ? 'flex-1' : ''
+              )}
+              onClick={onSelectAll}
+              disabled={imageSlices.length === 0}
+            >
+              {t('preview.selectAll') || '全选'}
+            </button>
+            <button 
+              className={cn(
+                styleMapping['btn'], 
+                styleMapping['btn-secondary'],
+                isMobile ? 'flex-1' : ''
+              )}
+              onClick={onDeselectAll}
+              disabled={selectedSlices.size === 0}
+            >
+              {t('preview.deselectAll') || '取消选择'}
+            </button>
+          </div>
+
+          {/* 文字显示配置按钮 */}
+          {showTextDisplayConfig && (
+            <div className="flex items-center gap-2">
+              <button
+                className={cn(
+                  'px-3 py-2 text-sm rounded-lg border transition-colors',
+                  showConfigPanel 
+                    ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                )}
+                onClick={() => setShowConfigPanel(!showConfigPanel)}
+                title="文字显示设置"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="inline mr-1">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
+                </svg>
+                显示设置
+              </button>
+              
+              {/* 快速模式切换按钮 */}
+              <div className="flex items-center gap-1">
+                <button
+                  className={cn(
+                    'px-2 py-1 text-xs rounded-full transition-colors',
+                    !textDisplayOptions.showDebugInfo && !textDisplayOptions.showPreloadStatus && !textDisplayOptions.showKeyboardHints
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  )}
+                  onClick={() => updateTextDisplayOptions({
+                    ...textDisplayOptions,
+                    showDebugInfo: false,
+                    showPreloadStatus: false,
+                    showKeyboardHints: false,
+                    showFullText: false
+                  })}
+                  title="简洁模式"
+                >
+                  简洁
+                </button>
+                <button
+                  className={cn(
+                    'px-2 py-1 text-xs rounded-full transition-colors',
+                    textDisplayOptions.showDebugInfo
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  )}
+                  onClick={() => updateTextDisplayOptions({
+                    ...textDisplayOptions,
+                    showDebugInfo: true,
+                    showPreloadStatus: true,
+                    showKeyboardHints: true,
+                    showFullText: true
+                  })}
+                  title="详细模式"
+                >
+                  详细
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 键盘导航提示 - 根据布局策略显示/隐藏 */}
-      {layoutStrategy.showKeyboardHints && (
+      {/* 键盘导航提示 - 根据布局策略和文字显示配置显示/隐藏 */}
+      {layoutStrategy.showKeyboardHints && textDisplayOptions.showKeyboardHints && (
         <div className={styleMapping['keyboard-navigation-hint']}>
           <span className={styleMapping['hint-text']}>
             💡 键盘快捷键：↑↓←→ 切换图片 | 空格键切换选择 | Enter确认选择 | Home/End跳转首尾 | Ctrl+A全选 | Esc取消选择 | Ctrl+I反选
@@ -524,10 +597,12 @@ export function ImagePreview({
                 )}
                 data-index={slice.index}
               >
-                {/* 图片序号 */}
-                <div className={styleMapping['thumbnail-number']}>
-                  #{slice.index + 1}
-                </div>
+                {/* 图片序号 - 根据配置显示/隐藏 */}
+                {textDisplayOptions.showThumbnailNumber && (
+                  <div className={styleMapping['thumbnail-number']}>
+                    #{slice.index + 1}
+                  </div>
+                )}
                 
                 {/* 醒目的选择按钮 */}
                 <button
@@ -550,15 +625,28 @@ export function ImagePreview({
                 />
                 
                 <div className={styleMapping['thumbnail-info']}>
-                  <div className={styleMapping['thumbnail-label']}>
-                    切片 {slice.index + 1}
-                  </div>
-                  <div className={styleMapping['thumbnail-hint']}>
-                    {slice.width} × {slice.height}
-                  </div>
-                  <div className={styleMapping['thumbnail-hint']}>
-                    {Math.round(slice.blob.size / 1024)} KB
-                  </div>
+                  {(() => {
+                    const formattedInfo = formatImageSliceInfo(slice);
+                    return (
+                      <>
+                        {textDisplayOptions.showSliceTitle && (
+                          <div className={styleMapping['thumbnail-label']}>
+                            {formattedInfo.title}
+                          </div>
+                        )}
+                        {textDisplayOptions.showDimensions && (
+                          <div className={styleMapping['thumbnail-hint']}>
+                            {formattedInfo.dimensions}
+                          </div>
+                        )}
+                        {textDisplayOptions.showFileSize && (
+                          <div className={styleMapping['thumbnail-hint']}>
+                            {formattedInfo.fileSize}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
@@ -689,23 +777,52 @@ export function ImagePreview({
               )}
               
               <div className="mt-4 text-center w-full">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {t('preview.currentSlice') || `切片 ${imageSlices[selectedImageIndex].index + 1}`}
-                </h3>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  <span className="text-gray-600">{t('preview.dimensions') || `${imageSlices[selectedImageIndex].width} × ${imageSlices[selectedImageIndex].height}`}</span>
-                  <span className="text-gray-600">|</span>
-                  <span className="text-gray-600">{t('preview.size') || `${Math.round(imageSlices[selectedImageIndex].blob.size / 1024)} KB`}</span>
-                </div>
-                <p className="text-gray-600 mb-2">{t('preview.clickToSelect') || '点击左侧缩略图选择其他片段'}</p>
-                <p className={styleMapping['keyboard-hint']}>
-                  使用键盘 ↑↓ 键快速切换图片
-                </p>
-                {loadingImages.size > 0 && (
-                  <p className={styleMapping['preload-status']}>
-                    正在预加载 {loadingImages.size} 张图片...
-                  </p>
-                )}
+                {(() => {
+                  const formattedInfo = formatImageSliceInfo(imageSlices[selectedImageIndex]);
+                  return (
+                    <>
+                      {textDisplayOptions.showSliceTitle && (
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                          {t('preview.currentSlice') || formattedInfo.title}
+                        </h3>
+                      )}
+                      
+                      {(textDisplayOptions.showDimensions || textDisplayOptions.showFileSize) && (
+                        <div className="flex flex-wrap justify-center items-center gap-2 mb-2">
+                          {textDisplayOptions.showDimensions && (
+                            <span className="text-gray-600">{formattedInfo.dimensions}</span>
+                          )}
+                          {textDisplayOptions.showDimensions && textDisplayOptions.showFileSize && (
+                            <span className="text-gray-600">|</span>
+                          )}
+                          {textDisplayOptions.showFileSize && (
+                            <span className="text-gray-600">{formattedInfo.fileSize}</span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {textDisplayOptions.showFullText && (
+                        <div className="text-sm text-gray-500 mb-2">
+                          {formattedInfo.fullText}
+                        </div>
+                      )}
+                      
+                      <p className="text-gray-600 mb-2">{t('preview.clickToSelect') || '点击左侧缩略图选择其他片段'}</p>
+                      
+                      {textDisplayOptions.showKeyboardHints && (
+                        <p className={styleMapping['keyboard-hint']}>
+                          使用键盘 ↑↓ 键快速切换图片
+                        </p>
+                      )}
+                      
+                      {textDisplayOptions.showPreloadStatus && loadingImages.size > 0 && (
+                        <p className={styleMapping['preload-status']}>
+                          正在预加载 {loadingImages.size} 张图片...
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           ) : (
@@ -723,6 +840,19 @@ export function ImagePreview({
           )}
         </div>
       </div>
+
+      {/* 文字显示配置面板 */}
+      {showTextDisplayConfig && showConfigPanel && (
+        <div className="mt-4">
+          <TextDisplayConfig
+            options={textDisplayOptions}
+            onChange={updateTextDisplayOptions}
+            compact={isMobile}
+            showPresets={true}
+            className="max-w-4xl mx-auto"
+          />
+        </div>
+      )}
     </div>
   );
 }
