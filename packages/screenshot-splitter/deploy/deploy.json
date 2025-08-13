@@ -1,0 +1,71 @@
+{
+  "name": "screenshot-splitter",
+  "displayName": "长截图分割工具",
+  "version": "1.0.0",
+  "buildTime": "2025-08-13T12:25:34.925Z",
+  "build": {
+    "spa": {
+      "path": "packages/screenshot-splitter/dist",
+      "entry": "index.html",
+      "assets": "assets/"
+    },
+    "single": {
+      "path": "packages/screenshot-splitter/dist-single",
+      "entry": "index.html"
+    }
+  },
+  "deploy": {
+    "githubPages": {
+      "enabled": true,
+      "branch": "gh-pages",
+      "folder": "dist",
+      "customDomain": null
+    },
+    "paths": {
+      "spa": "/",
+      "single": "/components/screenshot-splitter/",
+      "standalone": "/screenshot-splitter/"
+    }
+  },
+  "features": {
+    "i18n": [
+      "zh-CN",
+      "en"
+    ],
+    "capabilities": [
+      "image-upload",
+      "auto-split-detection",
+      "manual-adjustment",
+      "batch-processing",
+      "preview-export",
+      "drag-drop-support",
+      "responsive-design"
+    ],
+    "techStack": {
+      "framework": "React",
+      "language": "TypeScript",
+      "bundler": "Vite",
+      "styling": "CSS Modules",
+      "testing": "Vitest"
+    }
+  },
+  "meta": {
+    "author": "CodeBuddy",
+    "license": "MIT",
+    "repository": "https://github.com/your-username/dual-build-monorepo-system",
+    "homepage": "https://your-username.github.io/dual-build-monorepo-system",
+    "keywords": [
+      "screenshot",
+      "image-processing",
+      "react",
+      "typescript",
+      "vite"
+    ],
+    "seo": {
+      "title": "长截图分割工具 - 智能图片处理",
+      "description": "免费在线长截图分割工具，支持自动检测分割点、手动调整、批量处理，无需上传到服务器，保护隐私安全",
+      "keywords": "长截图分割,图片处理,在线工具,免费,隐私安全",
+      "ogImage": "/og-image.png"
+    }
+  }
+}

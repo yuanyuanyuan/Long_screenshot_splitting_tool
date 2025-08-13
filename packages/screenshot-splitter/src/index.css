@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: #1f2937;
+  background-color: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* 移除默认按钮样式，避免与Tailwind冲突 */
+@layer base {
+  a {
+    font-weight: 500;
+    color: #0ea5e9;
+    text-decoration: inherit;
+  }
+  
+  a:hover {
+    color: #0284c7;
+  }
+  
+  h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  button {
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+  }
+}
+
+/* 自定义组件样式 */
+@layer components {
+  .app-container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .app-container {
+      padding: 1.5rem;
+    }
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+  }
+}

@@ -60,7 +60,7 @@ if (typeof document !== 'undefined') {
     // 为了向后兼容，保持原有变量的引用
     let originalImage = appState.originalImage;
     let imageSlices = appState.imageSlices;
-    let selectedSlices = appState.selectedSlices;
+    const selectedSlices = appState.selectedSlices;
 
     // DOM元素引用
     const domElements = {
