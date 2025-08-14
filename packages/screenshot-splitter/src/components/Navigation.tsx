@@ -1,104 +1,262 @@
 /**
- * 导航组件 - 提供路由导航和面包屑功能
+ * 导航组件 - 性能优化版本
+ * 使用React.memo、useCallback等优化技术减少不必要的重渲染
  */
 
-import React from 'react';
-import { useRouter } from '../hooks/useRouter';
+import React, { memo, useCallback, useMemo } from 'react';
+import { useNavigationState } from '../hooks/useNavigationState';
+import { usePerformanceMonitor } from '../utils/navigationPerformanceMonitor';
 import './Navigation.css';
 
+// 导航项接口
 interface NavigationItem {
   path: string;
   name: string;
   icon?: string;
   disabled?: boolean;
+  active?: boolean;
 }
 
+// 导航组件Props接口
 interface NavigationProps {
-  items?: NavigationItem[];
-  showBreadcrumb?: boolean;
+  appState: any;
+  currentPath: string;
+  onNavigate: (path: string) => void;
   className?: string;
+  showProgress?: boolean;
+  showTooltips?: boolean;
 }
 
-// 默认导航项
-const defaultNavigationItems: NavigationItem[] = [
-  { path: '/', name: '首页', icon: '🏠' },
-  { path: '/upload', name: '上传', icon: '📤' },
-  { path: '/split', name: '分割', icon: '✂️' },
-  { path: '/export', name: '导出', icon: '💾' }
-];
+// 单个导航按钮组件 - 使用memo优化
+const NavigationButton = memo<{
+  item: NavigationItem;
+  onNavigate: (path: string) => void;
+  showTooltips?: boolean;
+}>(({ item, onNavigate, showTooltips = true }) => {
+  // 性能监控
+  const performanceMonitor = usePerformanceMonitor('NavigationButton');
 
-export const Navigation: React.FC<NavigationProps> = ({
-  items = defaultNavigationItems,
-  showBreadcrumb = true,
-  className = ''
-}) => {
-  const { currentPath, push, isActive } = useRouter();
-
-  const handleNavClick = (path: string, disabled?: boolean) => {
-    if (!disabled) {
-      push(path);
+  // 优化点击处理函数，使用useCallback避免重新创建
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (item.disabled) {
+      return;
     }
-  };
 
-  // 生成面包屑
-  const generateBreadcrumb = () => {
-    const pathSegments = currentPath.split('/').filter(Boolean);
-    const breadcrumbItems = [{ path: '/', name: '首页' }];
+    // 记录交互性能
+    performanceMonitor.recordInteraction('button-click', item.path);
+    
+    onNavigate(item.path);
+  }, [item.disabled, item.path, onNavigate, performanceMonitor]);
 
-    let currentBreadcrumbPath = '';
-    pathSegments.forEach(segment => {
-      currentBreadcrumbPath += `/${segment}`;
-      const item = items.find(item => item.path === currentBreadcrumbPath);
-      if (item) {
-        breadcrumbItems.push({
-          path: currentBreadcrumbPath,
-          name: item.name
-        });
-      }
-    });
+  // 优化键盘处理函数
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick(e as any);
+    }
+  }, [handleClick]);
 
-    return breadcrumbItems;
-  };
+  // 计算按钮类名，使用useMemo优化
+  const buttonClassName = useMemo(() => {
+    const classes = ['nav-button'];
+    
+    if (item.active) classes.push('active');
+    if (item.disabled) classes.push('disabled');
+    
+    return classes.join(' ');
+  }, [item.active, item.disabled]);
+
+  // 计算按钮状态文本，用于无障碍访问
+  const ariaLabel = useMemo(() => {
+    let label = item.name;
+    if (item.active) label += ' (当前页面)';
+    if (item.disabled) label += ' (不可用)';
+    return label;
+  }, [item.name, item.active, item.disabled]);
 
   return (
-    <nav className={`navigation ${className}`}>
-      {/* 面包屑导航 */}
-      {showBreadcrumb && (
-        <div className="breadcrumb">
-          {generateBreadcrumb().map((item, index, array) => (
-            <React.Fragment key={item.path}>
-              <button
-                className={`breadcrumb-item ${isActive(item.path) ? 'active' : ''}`}
-                onClick={() => handleNavClick(item.path)}
-                disabled={isActive(item.path)}
-              >
-                {item.name}
-              </button>
-              {index < array.length - 1 && (
-                <span className="breadcrumb-separator">›</span>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+    <button
+      className={buttonClassName}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      disabled={item.disabled}
+      aria-label={ariaLabel}
+      title={showTooltips ? ariaLabel : undefined}
+      tabIndex={item.disabled ? -1 : 0}
+    >
+      {item.icon && <span className="nav-icon" aria-hidden="true">{item.icon}</span>}
+      <span className="nav-text">{item.name}</span>
+    </button>
+  );
+});
+
+NavigationButton.displayName = 'NavigationButton';
+
+// 进度条组件 - 使用memo优化
+const ProgressBar = memo<{
+  percentage: number;
+  totalSteps: number;
+  completedSteps: number;
+}>(({ percentage, totalSteps, completedSteps }) => {
+  const progressStyle = useMemo(() => ({
+    width: `${percentage}%`
+  }), [percentage]);
+
+  return (
+    <div className="nav-progress" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}>
+      <div className="nav-progress-bar" style={progressStyle} />
+      <span className="nav-progress-text" aria-live="polite">
+        {completedSteps}/{totalSteps} 步骤完成 ({percentage}%)
+      </span>
+    </div>
+  );
+});
+
+ProgressBar.displayName = 'ProgressBar';
+
+// 主导航组件 - 使用memo优化
+const Navigation = memo<NavigationProps>(({
+  appState,
+  currentPath,
+  onNavigate,
+  className = '',
+  showProgress = true,
+  showTooltips = true
+}) => {
+  // 性能监控
+  const performanceMonitor = usePerformanceMonitor('Navigation');
+
+  // 使用优化的导航状态Hook
+  const {
+    navigationItems,
+    navigationMetrics,
+    canGoNext,
+    canGoPrevious,
+    getNextAvailableStep,
+    getPreviousAvailableStep
+  } = useNavigationState(appState, currentPath);
+
+  // 优化导航处理函数，使用useCallback
+  const handleNavigate = useCallback((path: string) => {
+    performanceMonitor.recordInteraction('navigation', path);
+    onNavigate(path);
+  }, [onNavigate, performanceMonitor]);
+
+  // 快捷导航函数
+  const handleNext = useCallback(() => {
+    const nextStep = getNextAvailableStep();
+    if (nextStep) {
+      handleNavigate(nextStep);
+    }
+  }, [getNextAvailableStep, handleNavigate]);
+
+  const handlePrevious = useCallback(() => {
+    const prevStep = getPreviousAvailableStep();
+    if (prevStep) {
+      handleNavigate(prevStep);
+    }
+  }, [getPreviousAvailableStep, handleNavigate]);
+
+  // 键盘快捷键处理
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (canGoPrevious) handlePrevious();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (canGoNext) handleNext();
+          break;
+      }
+    }
+  }, [canGoNext, canGoPrevious, handleNext, handlePrevious]);
+
+  // 计算容器类名
+  const containerClassName = useMemo(() => {
+    const classes = ['navigation-container'];
+    if (className) classes.push(className);
+    return classes.join(' ');
+  }, [className]);
+
+  // 渲染导航按钮列表，使用useMemo优化
+  const navigationButtons = useMemo(() => {
+    return navigationItems.map((item) => (
+      <NavigationButton
+        key={item.path}
+        item={item}
+        onNavigate={handleNavigate}
+        showTooltips={showTooltips}
+      />
+    ));
+  }, [navigationItems, handleNavigate, showTooltips]);
+
+  return (
+    <nav 
+      className={containerClassName}
+      onKeyDown={handleKeyDown}
+      role="navigation"
+      aria-label="主导航"
+    >
+      {/* 进度条 */}
+      {showProgress && (
+        <ProgressBar
+          percentage={navigationMetrics.progressPercentage}
+          totalSteps={navigationMetrics.totalSteps}
+          completedSteps={navigationMetrics.completedSteps}
+        />
       )}
 
-      {/* 主导航 */}
-      <div className="nav-items">
-        {items.map(item => (
-          <button
-            key={item.path}
-            className={`nav-item ${isActive(item.path) ? 'active' : ''} ${item.disabled ? 'disabled' : ''}`}
-            onClick={() => handleNavClick(item.path, item.disabled)}
-            disabled={item.disabled}
-            title={item.name}
-          >
-            {item.icon && <span className="nav-icon">{item.icon}</span>}
-            <span className="nav-text">{item.name}</span>
-          </button>
-        ))}
+      {/* 导航按钮组 */}
+      <div className="nav-buttons" role="group" aria-label="导航按钮">
+        {navigationButtons}
       </div>
+
+      {/* 快捷导航按钮 */}
+      <div className="nav-shortcuts" role="group" aria-label="快捷导航">
+        <button
+          className="nav-shortcut prev"
+          onClick={handlePrevious}
+          disabled={!canGoPrevious}
+          aria-label="上一步"
+          title={showTooltips ? "上一步 (Ctrl+←)" : undefined}
+        >
+          ← 上一步
+        </button>
+        
+        <button
+          className="nav-shortcut next"
+          onClick={handleNext}
+          disabled={!canGoNext}
+          aria-label="下一步"
+          title={showTooltips ? "下一步 (Ctrl+→)" : undefined}
+        >
+          下一步 →
+        </button>
+      </div>
+
+      {/* 调试信息（仅开发环境） */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="nav-debug" style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+          当前步骤: {navigationMetrics.currentStepIndex + 1}/{navigationMetrics.totalSteps}
+          {' | '}
+          进度: {navigationMetrics.progressPercentage}%
+        </div>
+      )}
     </nav>
   );
-};
+});
 
+Navigation.displayName = 'Navigation';
+
+// 导出优化的组件
 export default Navigation;
+
+// 导出子组件供测试使用
+export { NavigationButton, ProgressBar };
+
+// 导出类型
+export type { NavigationProps, NavigationItem };

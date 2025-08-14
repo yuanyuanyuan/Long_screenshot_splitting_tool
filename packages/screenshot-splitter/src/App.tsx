@@ -3,13 +3,21 @@ import { useAppState } from './hooks/useAppState';
 import { useImageProcessor } from './hooks/useImageProcessor';
 import { useI18n } from './hooks/useI18n';
 import { useRouter } from './hooks/useRouter';
+import { useNavigationState } from './hooks/useNavigationState';
 import { FileUploader } from './components/FileUploader';
 import { ImagePreview } from './components/ImagePreview';
 import { ExportControls } from './components/ExportControls';
-import { Navigation } from './components/Navigation';
+import Navigation from './components/Navigation';
 import DebugInfoControl from './components/DebugInfoControl';
 import { exportToPDF } from './utils/pdfExporter';
 import { exportToZIP } from './utils/zipExporter';
+import { 
+  navigationErrorHandler, 
+  validateNavigation, 
+  handleProcessingError,
+  type NavigationError,
+  type RecoveryStrategy 
+} from './utils/navigationErrorHandler';
 
 function App() {
   const { state, actions, getStateSnapshot } = useAppState();
@@ -18,6 +26,9 @@ function App() {
   const { currentPath, push } = useRouter();
   const [isExporting, setIsExporting] = useState(false);
   const [forceRender, setForceRender] = useState(0);
+  const [isStateValidated, setIsStateValidated] = useState(false);
+  const [navigationError, setNavigationError] = useState<NavigationError | null>(null);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   
   // 调试控制状态
   const [debugControlVisible, setDebugControlVisible] = useState(false);
@@ -67,13 +78,92 @@ function App() {
     debugLog('[App] 选中切片变化:', Array.from(state.selectedSlices));
   }, [state.selectedSlices, shouldShowDebugInfo]);
 
+  // 页面刷新状态恢复逻辑（集成错误处理）
+  useEffect(() => {
+    const validateAndRecoverState = () => {
+      debugLog('[App] 开始状态验证和恢复...');
+      
+      // 使用导航错误处理器验证状态
+      const error = validateNavigation(currentPath, state);
+      
+      if (error) {
+        debugLog('[App] 发现导航错误:', error);
+        
+        // 处理导航错误并获取恢复策略
+        const strategy = navigationErrorHandler.handleNavigationError(error);
+        
+        debugLog('[App] 执行恢复策略:', strategy);
+        
+        // 设置错误状态
+        setNavigationError(error);
+        
+        // 显示错误消息（如果需要）
+        if (strategy.showMessage) {
+          setShowErrorMessage(true);
+          // 3秒后自动隐藏错误消息
+          setTimeout(() => setShowErrorMessage(false), 3000);
+        }
+        
+        // 清除状态（如果需要）
+        if (strategy.clearState) {
+          debugLog('[App] 清除应用状态');
+          actions.cleanupSession();
+        }
+        
+        // 重定向到恢复路径
+        push(strategy.redirectTo);
+        return;
+      }
+      
+      debugLog('[App] 状态验证完成，路径一致');
+      setIsStateValidated(true);
+    };
+
+    // 延迟执行状态验证，确保所有状态都已初始化
+    const timer = setTimeout(validateAndRecoverState, 100);
+    
+    return () => clearTimeout(timer);
+  }, [currentPath, state, push, debugLog, actions]);
+
+  // 防止在状态验证完成前渲染内容
+  if (!isStateValidated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">{t('app.loading') || '正在加载...'}</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleFileSelect = async (file: File) => {
     try {
       await processImage(file);
     } catch (error) {
-      // 错误信息始终显示，不受调试控制影响
+      // 使用导航错误处理器处理处理错误
       console.error('[App] 图片处理失败:', error);
-      alert('图片处理失败，请重试');
+      
+      const strategy = handleProcessingError(
+        currentPath, 
+        error as Error, 
+        state
+      );
+      
+      // 设置错误状态
+      setNavigationError(navigationErrorHandler.getLastError());
+      setShowErrorMessage(true);
+      
+      // 执行恢复策略
+      if (strategy.clearState) {
+        actions.cleanupSession();
+      }
+      
+      // 延迟重定向，让用户看到错误消息
+      setTimeout(() => {
+        push(strategy.redirectTo);
+        setShowErrorMessage(false);
+      }, 2000);
     }
   };
 
@@ -151,16 +241,33 @@ function App() {
         );
         
       case '/split':
-        if (state.imageSlices.length === 0) {
+        // 增强状态验证：检查是否有原始图片和切片
+        if (!state.originalImage || state.imageSlices.length === 0) {
           return (
-            <div className="text-center py-12">
-              <p className="text-gray-600 mb-4">{t('split.noImage') || '请先上传图片'}</p>
-              <button
-                onClick={() => push('/upload')}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {t('split.goUpload') || '去上传'}
-              </button>
+            <div className="text-center py-12 bg-white rounded-lg shadow-sm mx-4">
+              <div className="max-w-md mx-auto">
+                <div className="text-6xl mb-4">📤</div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  {t('split.validation.title') || '需要先上传图片'}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {t('split.validation.message') || '要使用分割功能，请先上传一张长截图。系统会自动将其分割成多个部分。'}
+                </p>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => push('/upload')}
+                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    {t('split.validation.goUpload') || '📤 去上传图片'}
+                  </button>
+                  <button
+                    onClick={() => push('/')}
+                    className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    {t('split.validation.goHome') || '🏠 返回首页'}
+                  </button>
+                </div>
+              </div>
             </div>
           );
         }
@@ -178,19 +285,73 @@ function App() {
         );
         
       case '/export':
-        if (state.selectedSlices.size === 0) {
+        // 增强状态验证：检查完整的导出前置条件
+        if (!state.originalImage || state.imageSlices.length === 0) {
           return (
-            <div className="text-center py-12">
-              <p className="text-gray-600 mb-4">{t('export.noSelection') || '请先选择要导出的图片'}</p>
-              <button
-                onClick={() => push('/split')}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {t('export.goSplit') || '去选择'}
-              </button>
+            <div className="text-center py-12 bg-white rounded-lg shadow-sm mx-4">
+              <div className="max-w-md mx-auto">
+                <div className="text-6xl mb-4">📤</div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  {t('export.validation.noImage.title') || '需要先上传图片'}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {t('export.validation.noImage.message') || '要导出图片，请先上传一张长截图并完成分割。'}
+                </p>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => push('/upload')}
+                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    {t('export.validation.noImage.goUpload') || '📤 去上传图片'}
+                  </button>
+                  <button
+                    onClick={() => push('/')}
+                    className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    {t('export.validation.goHome') || '🏠 返回首页'}
+                  </button>
+                </div>
+              </div>
             </div>
           );
         }
+        
+        if (state.selectedSlices.size === 0) {
+          return (
+            <div className="text-center py-12 bg-white rounded-lg shadow-sm mx-4">
+              <div className="max-w-md mx-auto">
+                <div className="text-6xl mb-4">✂️</div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  {t('export.validation.noSelection.title') || '需要选择要导出的图片'}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {t('export.validation.noSelection.message') || '请先在分割页面选择要导出的图片切片，然后再进行导出操作。'}
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center text-blue-800 text-sm">
+                    <span className="mr-2">💡</span>
+                    <span>{t('export.validation.noSelection.tip') || `当前有 ${state.imageSlices.length} 个切片可供选择`}</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => push('/split')}
+                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    {t('export.validation.noSelection.goSplit') || '✂️ 去选择图片'}
+                  </button>
+                  <button
+                    onClick={() => push('/')}
+                    className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    {t('export.validation.goHome') || '🏠 返回首页'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        
         return (
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('export.title') || '导出结果'}</h2>
@@ -270,9 +431,45 @@ function App() {
         </header>
 
         {/* 导航组件 */}
-        <Navigation />
+        <Navigation
+          appState={state}
+          currentPath={currentPath}
+          onNavigate={(path: string) => {
+            push(path);
+          }}
+        />
 
         <main>
+          {/* 错误消息提示 */}
+          {showErrorMessage && navigationError && (
+            <div className="fixed top-4 right-4 z-50 max-w-md">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <span className="text-red-400 text-xl">⚠️</span>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      {t('navigation.error.title') || '导航错误'}
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      <p>{t(navigationError.message) || navigationError.message}</p>
+                    </div>
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        className="text-sm bg-red-100 text-red-800 rounded px-2 py-1 hover:bg-red-200 transition-colors"
+                        onClick={() => setShowErrorMessage(false)}
+                      >
+                        {t('navigation.error.dismiss') || '关闭'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {renderContent()}
 
           {/* 调试信息面板 - 仅在开发环境或用户明确启用时显示 */}

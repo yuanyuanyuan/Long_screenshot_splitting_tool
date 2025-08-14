@@ -62,3 +62,64 @@ export interface I18nHookReturn {
   isLoading: boolean;
   supportedLanguages: readonly string[];
 }
+
+// 导航相关类型定义
+
+export interface NavigationItem {
+  path: string;
+  name: string;
+  icon?: string;
+  disabled?: boolean;
+  active?: boolean;
+  tooltip?: string;
+  badge?: number;
+}
+
+export interface NavigationState {
+  currentStep: string;
+  availableSteps: string[];
+  completedSteps: string[];
+  blockedSteps: string[];
+}
+
+export interface NavigationMetrics {
+  totalSteps: number;
+  completedSteps: number;
+  currentStepIndex: number;
+  progressPercentage: number;
+}
+
+export interface NavigationProps {
+  items?: NavigationItem[];
+  showBreadcrumb?: boolean;
+  className?: string;
+  appState: AppState;
+  onNavigate?: NavigationCallback;
+  onStateChange?: NavigationStateChangeCallback;
+  enableValidation?: boolean;
+  debounceMs?: number;
+}
+
+export type NavigationCallback = (path: string, navigationState: NavigationState) => boolean | void;
+export type NavigationStateChangeCallback = (state: NavigationState, error?: NavigationError) => void;
+
+export interface NavigationError {
+  type: 'INVALID_STATE' | 'MISSING_PREREQUISITES' | 'PROCESSING_ERROR' | 'UNKNOWN_ERROR';
+  message: string;
+  prerequisite?: string;
+  suggestedPath?: string;
+}
+
+export interface NavigationContext {
+  currentPath: string;
+  appState: AppState;
+  previousPath?: string;
+}
+
+export interface NavigationActionResult {
+  action: 'redirect' | 'show_warning' | 'show_error' | 'log_error';
+  path?: string;
+  message: string;
+  allowRetry?: boolean;
+  suggestedPath?: string;
+}
