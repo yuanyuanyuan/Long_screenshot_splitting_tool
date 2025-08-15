@@ -69,7 +69,7 @@ vi.mock('../FileUploader', () => ({
 }));
 
 vi.mock('../ImagePreview', () => ({
-  ImagePreview: ({ slices, onSelectionChange }: any) => (
+  ImagePreview: ({ slices }: any) => (
     <div data-testid="image-preview">
       <div>图片预览</div>
       {slices && slices.length > 0 && (

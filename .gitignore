@@ -116,6 +116,8 @@ coverage
 # Monorepo specific
 packages/*/dist/
 packages/*/dist-single/
+packages/**/dist/
+packages/**/dist-single/
 packages/*/build/
 apps/*/dist/
 apps/*/build/
@@ -123,3 +125,4 @@ tools/*/dist/
 tools/*/build/
 
 .codebuddy
+packages/screenshot-splitter/dist-single/index.html

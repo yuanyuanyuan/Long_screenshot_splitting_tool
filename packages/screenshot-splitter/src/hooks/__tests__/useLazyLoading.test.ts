@@ -10,7 +10,7 @@ mockIntersectionObserver.mockReturnValue({
   disconnect: vi.fn(),
 });
 
-// @ts-ignore
+// @ts-expect-error
 window.IntersectionObserver = mockIntersectionObserver;
 
 describe('useLazyLoading', () => {
@@ -65,7 +65,7 @@ describe('useLazyLoading', () => {
     const mockElement = document.createElement('div');
 
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       result.current.ref.current = mockElement;
     });
 
@@ -99,6 +99,16 @@ describe('useLazyLoading', () => {
     } as IntersectionObserverEntry;
 
     act(() => {
+      // @ts-expect-error
+      result.current.ref.current = mockElement;
+    });
+
+    const mockEntry = {
+      isIntersecting: true,
+      target: mockElement,
+    } as IntersectionObserverEntry;
+
+    act(() => {
       intersectionCallback([mockEntry], {} as IntersectionObserver);
     });
 
@@ -122,7 +132,7 @@ describe('useLazyLoading', () => {
     const mockElement = document.createElement('div');
 
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       result.current.ref.current = mockElement;
     });
 
@@ -154,7 +164,7 @@ describe('useLazyLoading', () => {
     const mockElement = document.createElement('div');
 
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       result.current.ref.current = mockElement;
     });
 
@@ -186,18 +196,8 @@ describe('useLazyLoading', () => {
     const mockElement = document.createElement('div');
 
     act(() => {
-      // @ts-ignore
+      // @ts-expect-error
       result.current.ref.current = mockElement;
-    });
-
-    // Element becomes visible
-    let mockEntry = {
-      isIntersecting: true,
-      target: mockElement,
-    } as IntersectionObserverEntry;
-
-    act(() => {
-      intersectionCallback([mockEntry], {} as IntersectionObserver);
     });
 
     expect(result.current.isVisible).toBe(true);
@@ -227,7 +227,7 @@ describe('useLazyLoading', () => {
 
   it('should handle missing IntersectionObserver gracefully', () => {
     const originalIntersectionObserver = window.IntersectionObserver;
-    // @ts-ignore
+    // @ts-expect-error
     delete window.IntersectionObserver;
 
     const { result } = renderHook(() => useLazyLoading());

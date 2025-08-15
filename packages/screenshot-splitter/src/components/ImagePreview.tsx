@@ -69,7 +69,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       console.log('🎯 ImagePreview渲染状态:', {
-        hasOriginalImage: !!originalImage,
+        hasOriginalImage: Boolean(originalImage),
         slicesCount: slices?.length || 0,
         slicesData: slices?.map(s => ({ hasUrl: !!s.url, hasBlob: !!s.blob })) || [],
         selectedSlicesCount: selectedSlices?.length || 0

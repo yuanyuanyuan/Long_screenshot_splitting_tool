@@ -266,12 +266,12 @@ export const generateHreflangMapping = (pageType: PageType): Record<string, stri
 /**
  * 生成结构化数据元数据
  * @param pageType 页面类型
- * @param language 语言
+ * @param _language 语言（未使用，但保留参数以保持API兼容性）
  * @returns 包含结构化数据的元数据
  */
 export const generateStructuredDataMetadata = (
   pageType: PageType,
-  language: Language = 'zh-CN'
+  _language: Language = 'zh-CN'
 ): { structuredData: any } => {
   const baseStructuredData = {
     '@context': 'https://schema.org',

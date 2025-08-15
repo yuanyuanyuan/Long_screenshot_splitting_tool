@@ -187,21 +187,26 @@ export class StructuredDataGenerator {
 
     types.forEach(type => {
       switch (type) {
-        case 'webApp':
+        case 'webApp': {
           results.push(this.generateWebApplication(page, language, context));
           break;
-        case 'softwareApp':
+        }
+        case 'softwareApp': {
           results.push(this.generateSoftwareApplication(language, context));
           break;
-        case 'breadcrumb':
+        }
+        case 'breadcrumb': {
           results.push(this.generateBreadcrumb(page, language));
           break;
-        case 'faq':
+        }
+        case 'faq': {
           results.push(this.generateFAQ(language));
           break;
-        case 'howTo':
+        }
+        case 'howTo': {
           results.push(this.generateHowTo(language));
           break;
+        }
       }
     });
 
@@ -273,33 +278,37 @@ export class StructuredDataGenerator {
     // 根据类型检查特定字段
     switch (data['@type']) {
       case 'WebApplication':
-      case 'SoftwareApplication':
+      case 'SoftwareApplication': {
         const app = data as WebApplicationSchema | SoftwareApplicationSchema;
         if (!app.name) errors.push('缺少name字段');
         if (!app.description) errors.push('缺少description字段');
         if (!app.offers) errors.push('缺少offers字段');
         break;
+      }
       
-      case 'BreadcrumbList':
+      case 'BreadcrumbList': {
         const breadcrumb = data as BreadcrumbSchema;
         if (!breadcrumb.itemListElement || breadcrumb.itemListElement.length === 0) {
           errors.push('面包屑导航必须包含至少一个项目');
         }
         break;
+      }
       
-      case 'FAQPage':
+      case 'FAQPage': {
         const faq = data as FAQSchema;
         if (!faq.mainEntity || faq.mainEntity.length === 0) {
           errors.push('FAQ页面必须包含至少一个问题');
         }
         break;
+      }
       
-      case 'HowTo':
+      case 'HowTo': {
         const howTo = data as HowToSchema;
         if (!howTo.step || howTo.step.length === 0) {
           errors.push('HowTo必须包含至少一个步骤');
         }
         break;
+      }
     }
 
     // 检查URL格式

@@ -111,14 +111,18 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
   const applyDebugLevel = useCallback((levelId: string) => {
     const level = DEBUG_LEVELS.find(l => l.id === levelId);
     if (level) {
-      // 直接应用级别选项，不合并当前配置
-      updateConfig(level.options);
+      // 合并当前配置和级别选项，确保所有必需字段都有值
+      const mergedOptions: TextDisplayOptions = {
+        ...config,
+        ...level.options
+      };
+      updateConfig(mergedOptions);
       setCurrentLevel(levelId);
       if (compact) {
         setIsExpanded(false);
       }
     }
-  }, [updateConfig, compact]);
+  }, [updateConfig, compact, config]);
 
   // 快速切换常用选项
   const toggleQuickOption = useCallback((optionKey: keyof TextDisplayOptions) => {
