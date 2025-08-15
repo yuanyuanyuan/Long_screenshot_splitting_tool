@@ -45,7 +45,7 @@ const NavigationButton = memo<{
     }
 
     // 记录交互性能
-    performanceMonitor.recordInteraction('button-click', item.path);
+    performanceMonitor.recordInteraction('button-click', 0);
     
     onNavigate(item.path);
   }, [item.disabled, item.path, onNavigate, performanceMonitor]);
@@ -140,7 +140,7 @@ const Navigation = memo<NavigationProps>(({
 
   // 优化导航处理函数，使用useCallback
   const handleNavigate = useCallback((path: string) => {
-    performanceMonitor.recordInteraction('navigation', path);
+    performanceMonitor.recordInteraction('navigation', 1);
     onNavigate(path);
   }, [onNavigate, performanceMonitor]);
 

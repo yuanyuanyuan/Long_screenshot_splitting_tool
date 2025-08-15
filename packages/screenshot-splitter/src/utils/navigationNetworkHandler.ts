@@ -3,7 +3,7 @@
  * 处理网络错误和导航失败的情况
  */
 
-import { NavigationErrorHandler, NavigationError } from './navigationErrorHandler';
+import { NavigationError, NavigationErrorType } from './navigationErrorHandler';
 
 // 网络错误类型
 export enum NetworkErrorType {
@@ -59,14 +59,12 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
  * 导航网络处理器类
  */
 export class NavigationNetworkHandler {
-  private errorHandler: NavigationErrorHandler;
   private retryConfig: RetryConfig;
   private networkState: NetworkState;
   private retryAttempts: Map<string, number> = new Map();
   private pendingRequests: Map<string, AbortController> = new Map();
 
   constructor(retryConfig: Partial<RetryConfig> = {}) {
-    this.errorHandler = new NavigationErrorHandler();
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
     this.networkState = this.getNetworkState();
     
@@ -230,14 +228,14 @@ export class NavigationNetworkHandler {
     context: any = {}
   ): NetworkError {
     return {
-      type: 'NETWORK_ERROR',
+      type: NavigationErrorType.NAVIGATION_FAILED,
       networkType,
       message,
-      context,
+      currentPath: context.currentPath || '',
       timestamp: Date.now(),
       retryCount: this.retryAttempts.get(context.requestId) || 0,
       maxRetries: this.retryConfig.maxRetries
-    };
+    } as NetworkError;
   }
 
   /**

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { 
   PerformanceMonitor, 
   getPerformanceMonitor, 
@@ -8,7 +8,6 @@ import {
   type CoreWebVitalsMetric
 } from '../utils/analytics/performanceMonitor';
 import { 
-  useLazyLoading, 
   useBatchLazyLoading, 
   useLazyImage,
   useLazyLoadingPerformance,
@@ -214,7 +213,6 @@ export const PerformanceOptimizer: React.FC<{
     showMetrics = process.env.NODE_ENV === 'development',
     showDebugInfo = process.env.NODE_ENV === 'development',
     performanceConfig = {},
-    lazyLoadingConfig = {},
     thresholds = {}
   } = config;
 
@@ -338,7 +336,6 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
     enablePerformanceMonitoring = true,
     enableLazyLoading = true,
     performanceConfig = {},
-    lazyLoadingConfig = {}
   } = config;
 
   // 性能监控
@@ -553,7 +550,6 @@ export interface BatchLazyLoaderProps {
 export const BatchLazyLoader: React.FC<BatchLazyLoaderProps> = ({
   items,
   renderItem,
-  batchSize = 5,
   className,
   style
 }) => {

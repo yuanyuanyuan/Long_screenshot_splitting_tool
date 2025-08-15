@@ -235,7 +235,7 @@ export const StructuredDataDebug: React.FC<StructuredDataDebugProps> = ({
         <ul>
           {structuredData.map((data, index) => (
             <li key={index}>
-              {index + 1}. {data['@type']} - {(data as any).name || '未命名'}
+              {index + 1}. {data['@type']} - {(data as any).name || 'Unnamed'}
             </li>
           ))}
         </ul>
@@ -253,7 +253,8 @@ export const StructuredDataDebug: React.FC<StructuredDataDebugProps> = ({
         </div>
       )}
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .structured-data-debug {
           background: #f5f5f5;
           border: 1px solid #ddd;
@@ -342,7 +343,8 @@ export const StructuredDataDebug: React.FC<StructuredDataDebugProps> = ({
           padding: 8px;
           border-radius: 4px;
         }
-      `}</style>
+        `
+      }} />
     </div>
   );
 };
@@ -389,7 +391,8 @@ export const StructuredDataIndicator: React.FC<StructuredDataIndicatorProps> = (
         </span>
       )}
       
-      <style>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .structured-data-indicator {
           position: fixed;
           bottom: 20px;
@@ -412,7 +415,8 @@ export const StructuredDataIndicator: React.FC<StructuredDataIndicatorProps> = (
         .status {
           font-size: 14px;
         }
-      `}</style>
+        `
+      }} />
     </div>
   );
 };

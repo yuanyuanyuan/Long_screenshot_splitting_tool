@@ -6,7 +6,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { FileUploader } from './FileUploader';
 import { ImagePreview } from './ImagePreview';
-import { ImagePreviewWrapper } from './ImagePreviewWrapper';
 import { ExportControls } from './ExportControls';
 import { useImageProcessor } from '../hooks/useImageProcessor';
 import { useAppState } from '../hooks/useAppState';

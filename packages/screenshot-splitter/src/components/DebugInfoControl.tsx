@@ -5,6 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { useTextDisplayConfig, type TextDisplayOptions } from './TextDisplayConfig';
+import { useI18nContext } from '../hooks/useI18nContext';
 
 export interface DebugInfoControlProps {
   /** 是否显示控制面板 */
@@ -21,8 +22,8 @@ export interface DebugInfoControlProps {
 
 export interface DebugLevel {
   id: string;
-  name: string;
-  description: string;
+  nameKey: string;
+  descriptionKey: string;
   options: Partial<TextDisplayOptions>;
 }
 
@@ -30,8 +31,8 @@ export interface DebugLevel {
 export const DEBUG_LEVELS: DebugLevel[] = [
   {
     id: 'none',
-    name: '无调试信息',
-    description: '隐藏所有调试信息，仅显示核心内容',
+    nameKey: 'debug.level.none',
+    descriptionKey: 'debug.level.none.description',
     options: {
       showSliceTitle: false,
       showDimensions: false,
@@ -40,8 +41,8 @@ export const DEBUG_LEVELS: DebugLevel[] = [
   },
   {
     id: 'minimal',
-    name: '最小调试',
-    description: '仅显示基本的切片信息',
+    nameKey: 'debug.level.minimal',
+    descriptionKey: 'debug.level.minimal.description',
     options: {
       showSliceTitle: true,
       showDimensions: true,
@@ -50,8 +51,8 @@ export const DEBUG_LEVELS: DebugLevel[] = [
   },
   {
     id: 'standard',
-    name: '标准调试',
-    description: '显示常用的调试信息',
+    nameKey: 'debug.level.standard',
+    descriptionKey: 'debug.level.standard.description',
     options: {
       showSliceTitle: true,
       showDimensions: true,
@@ -60,8 +61,8 @@ export const DEBUG_LEVELS: DebugLevel[] = [
   },
   {
     id: 'detailed',
-    name: '详细调试',
-    description: '显示所有可用的调试信息',
+    nameKey: 'debug.level.detailed',
+    descriptionKey: 'debug.level.detailed.description',
     options: {
       showSliceTitle: true,
       showDimensions: true,
@@ -80,6 +81,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
   className = '',
   onVisibilityChange
 }) => {
+  const { t } = useI18nContext();
   const { options: config, updateOptions: updateConfig } = useTextDisplayConfig();
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentLevel, setCurrentLevel] = useState<string>(() => {
@@ -109,15 +111,14 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
   const applyDebugLevel = useCallback((levelId: string) => {
     const level = DEBUG_LEVELS.find(l => l.id === levelId);
     if (level) {
-      // 合并当前配置和新的选项
-      const newConfig = { ...config, ...level.options };
-      updateConfig(newConfig);
+      // 直接应用级别选项，不合并当前配置
+      updateConfig(level.options);
       setCurrentLevel(levelId);
       if (compact) {
         setIsExpanded(false);
       }
     }
-  }, [updateConfig, compact, config]);
+  }, [updateConfig, compact]);
 
   // 快速切换常用选项
   const toggleQuickOption = useCallback((optionKey: keyof TextDisplayOptions) => {
@@ -135,7 +136,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
       <button
         className="debug-control-toggle"
         onClick={toggleVisibility}
-        title="显示调试控制面板"
+        title={t('debug.control.show')}
       >
         🐛
       </button>
@@ -148,13 +149,13 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
   return (
     <div className={`debug-info-control ${positionClass} ${compactClass} ${className}`}>
       <div className="debug-control-header">
-        <h4>调试信息控制</h4>
+        <h4>{t('debug.control.title')}</h4>
         <div className="debug-control-actions">
           {!compact && (
             <button
               className="debug-control-expand"
               onClick={toggleExpanded}
-              title={isExpanded ? '收起详细设置' : '展开详细设置'}
+              title={isExpanded ? t('debug.control.collapse') : t('debug.control.expand')}
             >
               {isExpanded ? '▲' : '▼'}
             </button>
@@ -162,7 +163,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
           <button
             className="debug-control-close"
             onClick={toggleVisibility}
-            title="隐藏控制面板"
+            title={t('debug.control.hide')}
           >
             ✕
           </button>
@@ -172,7 +173,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
       <div className="debug-control-content">
         {/* 调试级别选择 */}
         <div className="debug-level-selector">
-          <label>调试级别:</label>
+          <label>{t('debug.level.label')}</label>
           <select
             value={currentLevel}
             onChange={(e) => applyDebugLevel(e.target.value)}
@@ -180,11 +181,11 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
           >
             {DEBUG_LEVELS.map(level => (
               <option key={level.id} value={level.id}>
-                {level.name}
+                {t(level.nameKey)}
               </option>
             ))}
             {currentLevel === 'custom' && (
-              <option value="custom">自定义</option>
+              <option value="custom">{t('debug.level.custom')}</option>
             )}
           </select>
         </div>
@@ -192,14 +193,14 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
         {/* 当前级别描述 */}
         {currentLevel !== 'custom' && (
           <div className="debug-level-description">
-            {DEBUG_LEVELS.find(l => l.id === currentLevel)?.description}
+            {t(DEBUG_LEVELS.find(l => l.id === currentLevel)?.descriptionKey || '')}
           </div>
         )}
 
         {/* 快速切换选项 */}
         {!compact && (
           <div className="debug-quick-toggles">
-            <h5>快速切换:</h5>
+            <h5>{t('debug.quickToggle.title')}</h5>
             <div className="debug-toggle-grid">
               <label className="debug-toggle-item">
                 <input
@@ -207,7 +208,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
                   checked={config.showSliceTitle}
                   onChange={() => toggleQuickOption('showSliceTitle')}
                 />
-                <span>切片标题</span>
+                <span>{t('debug.quickToggle.sliceTitle')}</span>
               </label>
               <label className="debug-toggle-item">
                 <input
@@ -215,7 +216,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
                   checked={config.showDimensions}
                   onChange={() => toggleQuickOption('showDimensions')}
                 />
-                <span>尺寸信息</span>
+                <span>{t('debug.quickToggle.dimensions')}</span>
               </label>
               <label className="debug-toggle-item">
                 <input
@@ -223,7 +224,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
                   checked={config.showFileSize}
                   onChange={() => toggleQuickOption('showFileSize')}
                 />
-                <span>文件大小</span>
+                <span>{t('debug.quickToggle.fileSize')}</span>
               </label>
             </div>
           </div>
@@ -234,16 +235,16 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
           <button
             className="debug-btn debug-btn-primary"
             onClick={() => applyDebugLevel('none')}
-            title="隐藏所有调试信息"
+            title={t('debug.button.hideAll')}
           >
-            全部隐藏
+            {t('debug.button.hideAll')}
           </button>
           <button
             className="debug-btn debug-btn-secondary"
             onClick={() => applyDebugLevel('detailed')}
-            title="显示所有调试信息"
+            title={t('debug.button.showAll')}
           >
-            全部显示
+            {t('debug.button.showAll')}
           </button>
         </div>
       </div>

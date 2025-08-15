@@ -38,11 +38,22 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       console.error('SEO metadata generation failed:', error);
       // 返回默认的元数据
       return {
-        title: SEO_CONFIG.siteName[language] || 'Long Screenshot Splitter',
+        title: (SEO_CONFIG.siteName as any)[language] || 'Long Screenshot Splitter',
         description: '长截图分割工具 - 快速、免费、在线处理',
         keywords: ['截图分割', '长截图', '图片处理'],
+        ogTitle: 'Long Screenshot Splitter',
+        ogDescription: '长截图分割工具 - 快速、免费、在线处理',
+        ogImage: `${SEO_CONFIG.siteUrl}/images/og-image.jpg`,
+        ogType: 'website' as const,
+        ogUrl: SEO_CONFIG.siteUrl,
+        twitterCard: 'summary_large_image' as const,
+        twitterTitle: 'Long Screenshot Splitter',
+        twitterDescription: '长截图分割工具 - 快速、免费、在线处理',
+        twitterImage: `${SEO_CONFIG.siteUrl}/images/twitter-image.jpg`,
         canonicalUrl: SEO_CONFIG.siteUrl,
         hreflang: {},
+        robots: 'index,follow',
+        author: SEO_CONFIG.structuredData.organization.name,
       };
     }
   }, [page, context, language, customMetadata]);
@@ -54,7 +65,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     const baseStructuredData = {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
-      name: SEO_CONFIG.siteName[language],
+      name: (SEO_CONFIG.siteName as any)[language],
       description: metadata.description,
       url: SEO_CONFIG.siteUrl,
       applicationCategory: 'UtilitiesApplication',

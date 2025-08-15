@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
@@ -34,6 +35,9 @@ export function createBaseConfig(options = {}) {
     root,
     base,
     mode: mode === 'singlefile' ? 'production' : mode,
+    
+    // 单文件模式下不复制public目录，避免生成不必要的workers目录
+    publicDir: isSingleFile ? false : 'public',
     
     // 环境变量
     define: {

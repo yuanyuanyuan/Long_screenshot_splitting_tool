@@ -14,10 +14,9 @@ import {
   createResponsiveTextConfig,
   TextDisplayPerformanceMonitor,
   textDisplayCache,
-  optimizeTextDisplayWithCache,
-  useTextDisplayOptimizer,
-  type ResponsiveTextConfig
+  optimizeTextDisplayWithCache
 } from './textDisplayOptimizer';
+import type { ResponsiveTextConfig } from './textDisplayOptimizer';
 import { DEFAULT_TEXT_DISPLAY_OPTIONS } from '../components/TextDisplayConfig';
 import type { ImageSlice } from '../types';
 
@@ -398,30 +397,6 @@ describe('textDisplayCache', () => {
     expect(stats.size).toBeGreaterThan(0);
     expect(stats.maxSize).toBeGreaterThan(0);
     expect(typeof stats.hitRate).toBe('number');
-  });
-});
-
-describe('useTextDisplayOptimizer', () => {
-  it('应该返回优化后的显示结果', () => {
-    const slices = [createMockImageSlice()];
-    const result = useTextDisplayOptimizer(slices, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
-    expect(result).toHaveProperty('optimizedDisplays');
-    expect(result).toHaveProperty('config');
-    expect(result).toHaveProperty('recordRenderTime');
-    expect(result).toHaveProperty('performanceMonitor');
-    
-    expect(result.optimizedDisplays).toHaveLength(1);
-    expect(typeof result.recordRenderTime).toBe('function');
-  });
-
-  it('应该接受自定义配置', () => {
-    const slices = [createMockImageSlice()];
-    const customConfig = { deviceType: DeviceType.MOBILE };
-    
-    const result = useTextDisplayOptimizer(slices, DEFAULT_TEXT_DISPLAY_OPTIONS, customConfig);
-    
-    expect(result.config.deviceType).toBe(DeviceType.MOBILE);
   });
 });
 

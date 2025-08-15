@@ -66,7 +66,7 @@ export function useImageProcessor({ state, actions }: UseImageProcessorProps): I
   }, [actions]);
   
   // 使用Worker hook
-  const { worker, createWorker, startProcessing } = useWorker({
+  const { createWorker, startProcessing } = useWorker({
     onProgress: handleProgress,
     onChunk: handleChunk,
     onDone: handleDone,

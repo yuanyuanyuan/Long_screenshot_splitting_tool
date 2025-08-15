@@ -35,6 +35,7 @@
     "type-check": "tsc --noEmit",
     "test": "NODE_OPTIONS='--max-old-space-size=2048' vitest",
     "test:run": "NODE_OPTIONS='--max-old-space-size=2048' vitest run",
+    "test:coverage": "NODE_OPTIONS='--max-old-space-size=2048' vitest run --coverage",
     "test:ui": "NODE_OPTIONS='--max-old-space-size=2048' vitest --ui",
     "test:light": "NODE_OPTIONS='--max-old-space-size=1024' vitest run --pool=forks --poolOptions.forks.maxForks=1",
     "test:groups": "node scripts/run-tests-in-groups.js",

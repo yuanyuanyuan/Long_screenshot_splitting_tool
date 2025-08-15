@@ -18,7 +18,6 @@ import type {
 export class StructuredDataGenerator {
   private readonly baseUrl: string;
   private readonly siteName: Record<Language, string>;
-  private readonly organizationInfo: any;
 
   constructor() {
     this.baseUrl = SEO_CONFIG.siteUrl;
@@ -27,7 +26,7 @@ export class StructuredDataGenerator {
       'zh-CN': SEO_CONFIG.siteName,
       'en': 'Long Screenshot Splitter'
     };
-    this.organizationInfo = SEO_CONFIG.structuredData.organization;
+    // this.organizationInfo = SEO_CONFIG.structuredData.organization;
   }
 
   /**
@@ -165,7 +164,7 @@ export class StructuredDataGenerator {
         '@type': 'HowToTool',
         name: tool,
       })),
-      step: howToData.steps.map((step, index) => ({
+      step: howToData.steps.map((step) => ({
         '@type': 'HowToStep',
         name: step.name,
         text: step.text,

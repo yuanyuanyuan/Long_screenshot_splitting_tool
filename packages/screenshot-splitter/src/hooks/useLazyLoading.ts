@@ -134,7 +134,7 @@ export const useLazyLoading = (
         resolve();
       };
       
-      img.onerror = (event) => {
+      img.onerror = () => {
         const error = new Error(`Failed to load image: ${src}`);
         reject(error);
       };
@@ -455,7 +455,7 @@ export const useLazyLoadingPerformance = () => {
     loadTimes: [] as number[],
   });
 
-  const recordLoadStart = useCallback((id: string) => {
+  const recordLoadStart = useCallback((_id: string) => {
     const startTime = performance.now();
     return () => {
       const endTime = performance.now();

@@ -45,7 +45,6 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
 }) => {
   const [exportFormat, setExportFormat] = useState<'pdf' | 'zip'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     format: 'pdf',
@@ -107,9 +106,9 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
               type="radio"
               value="pdf"
               checked={exportFormat === 'pdf'}
-              onChange={(e) => {
-                setExportFormat('pdf');
-                updateExportOptions({ format: 'pdf' });
+              onChange={() => {
+                setExportFormat('zip');
+                updateExportOptions({ format: 'zip' });
               }}
               className="mr-2"
               disabled={disabled}
@@ -125,7 +124,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
               type="radio"
               value="zip"
               checked={exportFormat === 'zip'}
-              onChange={(e) => {
+              onChange={() => {
                 setExportFormat('zip');
                 updateExportOptions({ format: 'zip' });
               }}

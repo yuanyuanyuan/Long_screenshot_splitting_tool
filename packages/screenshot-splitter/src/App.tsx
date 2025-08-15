@@ -3,7 +3,6 @@ import { useAppState } from './hooks/useAppState';
 import { useImageProcessor } from './hooks/useImageProcessor';
 import { useI18n } from './hooks/useI18n';
 import { useRouter } from './hooks/useRouter';
-import { useNavigationState } from './hooks/useNavigationState';
 import { FileUploader } from './components/FileUploader';
 import { ImagePreview } from './components/ImagePreview';
 import { ExportControls } from './components/ExportControls';
@@ -15,8 +14,7 @@ import {
   navigationErrorHandler, 
   validateNavigation, 
   handleProcessingError,
-  type NavigationError,
-  type RecoveryStrategy 
+  type NavigationError
 } from './utils/navigationErrorHandler';
 
 function App() {
@@ -30,10 +28,10 @@ function App() {
   const [navigationError, setNavigationError] = useState<NavigationError | null>(null);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   
-  // 调试控制状态
+  // 调试控制状态 - 只在开发环境启用
   const [debugControlVisible, setDebugControlVisible] = useState(false);
   const isDevelopment = import.meta.env.DEV;
-  const shouldShowDebugInfo = isDevelopment || debugControlVisible;
+  const shouldShowDebugInfo = isDevelopment && debugControlVisible;
   
   // 调试日志包装函数
   const debugLog = (...args: any[]) => {
@@ -131,7 +129,7 @@ function App() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('app.loading') || '正在加载...'}</p>
+          <p className="text-gray-600">{t('app.loading')}</p>
         </div>
       </div>
     );
@@ -231,7 +229,7 @@ function App() {
       case '/upload':
         return (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('upload.title') || '上传图片'}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('upload.title')}</h2>
             <FileUploader
               onFileSelect={handleFileSelect}
               isProcessing={isProcessing}
@@ -248,23 +246,23 @@ function App() {
               <div className="max-w-md mx-auto">
                 <div className="text-6xl mb-4">📤</div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {t('split.validation.title') || '需要先上传图片'}
+                  {t('split.validation.title')}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {t('split.validation.message') || '要使用分割功能，请先上传一张长截图。系统会自动将其分割成多个部分。'}
+                  {t('split.validation.message')}
                 </p>
                 <div className="space-y-3">
                   <button
                     onClick={() => push('/upload')}
                     className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
-                    {t('split.validation.goUpload') || '📤 去上传图片'}
+                    {t('split.validation.goUpload')}
                   </button>
                   <button
                     onClick={() => push('/')}
                     className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    {t('split.validation.goHome') || '🏠 返回首页'}
+                    {t('split.validation.goHome')}
                   </button>
                 </div>
               </div>
@@ -273,7 +271,7 @@ function App() {
         }
         return (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('split.title') || '分割设置'}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('split.title')}</h2>
             <ImagePreview
               originalImage={state.originalImage}
               slices={state.imageSlices}
@@ -298,23 +296,23 @@ function App() {
               <div className="max-w-md mx-auto">
                 <div className="text-6xl mb-4">📤</div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {t('export.validation.noImage.title') || '需要先上传图片'}
+                  {t('export.validation.noImage.title')}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {t('export.validation.noImage.message') || '要导出图片，请先上传一张长截图并完成分割。'}
+                  {t('export.validation.noImage.message')}
                 </p>
                 <div className="space-y-3">
                   <button
                     onClick={() => push('/upload')}
                     className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
-                    {t('export.validation.noImage.goUpload') || '📤 去上传图片'}
+                    {t('export.validation.noImage.goUpload')}
                   </button>
                   <button
                     onClick={() => push('/')}
                     className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    {t('export.validation.goHome') || '🏠 返回首页'}
+                    {t('export.validation.goHome')}
                   </button>
                 </div>
               </div>
@@ -328,15 +326,15 @@ function App() {
               <div className="max-w-md mx-auto">
                 <div className="text-6xl mb-4">✂️</div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {t('export.validation.noSelection.title') || '需要选择要导出的图片'}
+                  {t('export.validation.noSelection.title')}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {t('export.validation.noSelection.message') || '请先在分割页面选择要导出的图片切片，然后再进行导出操作。'}
+                  {t('export.validation.noSelection.message')}
                 </p>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                   <div className="flex items-center text-blue-800 text-sm">
                     <span className="mr-2">💡</span>
-                    <span>{t('export.validation.noSelection.tip') || `当前有 ${state.imageSlices.length} 个切片可供选择`}</span>
+                    <span>{t('export.validation.noSelection.tip', { count: state.imageSlices.length })}</span>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -344,13 +342,13 @@ function App() {
                     onClick={() => push('/split')}
                     className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
-                    {t('export.validation.noSelection.goSplit') || '✂️ 去选择图片'}
+                    {t('export.validation.noSelection.goSplit')}
                   </button>
                   <button
                     onClick={() => push('/')}
                     className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    {t('export.validation.goHome') || '🏠 返回首页'}
+                    {t('export.validation.goHome')}
                   </button>
                 </div>
               </div>
@@ -360,7 +358,7 @@ function App() {
         
         return (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('export.title') || '导出结果'}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('export.title')}</h2>
             <ExportControls
               selectedSlices={Array.from(state.selectedSlices)}
               slices={state.imageSlices}
@@ -434,7 +432,13 @@ function App() {
             <ExportControls
               selectedSlices={Array.from(state.selectedSlices)}
               slices={state.imageSlices}
-              onExport={handleExportPDF}
+              onExport={(format) => {
+                if (format === 'pdf') {
+                  handleExportPDF();
+                } else if (format === 'zip') {
+                  handleExportZIP();
+                }
+              }}
               disabled={isExporting}
             />
                 </section>
@@ -486,7 +490,7 @@ function App() {
                   </div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">
-                      {t('navigation.error.title') || '导航错误'}
+                      {t('navigation.error.title')}
                     </h3>
                     <div className="mt-2 text-sm text-red-700">
                       <p>{t(navigationError.message) || navigationError.message}</p>
@@ -497,7 +501,7 @@ function App() {
                         className="text-sm bg-red-100 text-red-800 rounded px-2 py-1 hover:bg-red-200 transition-colors"
                         onClick={() => setShowErrorMessage(false)}
                       >
-                        {t('navigation.error.dismiss') || '关闭'}
+                        {t('navigation.error.dismiss')}
                       </button>
                     </div>
                   </div>

@@ -4,6 +4,7 @@ node_modules/
 
 # Build outputs
 dist/
+dist-single/
 build/
 *.tsbuildinfo
 
@@ -114,8 +115,11 @@ coverage
 
 # Monorepo specific
 packages/*/dist/
+packages/*/dist-single/
 packages/*/build/
 apps/*/dist/
 apps/*/build/
 tools/*/dist/
 tools/*/build/
+
+.codebuddy

@@ -182,7 +182,7 @@ export function TextDisplayConfig({
             'font-semibold text-gray-900',
             compact ? 'text-base' : 'text-lg'
           )}>
-            {t('textDisplay.title') || '文字显示设置'}
+            {t('textDisplay.title')}
           </h3>
           <button
             onClick={() => setIsExpanded(!isExpanded)}

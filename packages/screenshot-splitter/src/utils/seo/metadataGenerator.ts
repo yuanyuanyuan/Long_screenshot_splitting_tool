@@ -3,7 +3,7 @@
  * 用于生成页面的SEO元数据
  */
 
-import type { SEOMetadata, PageType } from '../../types/seo.types';
+import type { SEOMetadata, PageType, SEOContext, Language } from '../../types/seo.types';
 import { SEO_CONFIG } from '../../config/seo.config';
 
 /**
@@ -28,17 +28,17 @@ export const generatePageMetadata = (
   const metadata: SEOMetadata = {
     title: customMetadata.title || baseTitle,
     description: customMetadata.description || baseDescription,
-    keywords: customMetadata.keywords || SEO_CONFIG.keywords.primary,
+    keywords: customMetadata.keywords || [...SEO_CONFIG.keywords.primary],
     ogTitle: customMetadata.ogTitle || baseTitle,
     ogDescription: customMetadata.ogDescription || baseDescription,
     ogImage: customMetadata.ogImage || `${SEO_CONFIG.siteUrl}${SEO_CONFIG.defaultImages.ogImage}`,
     ogType: customMetadata.ogType || 'website',
-    ogUrl: customMetadata.ogUrl || generateCanonicalUrl(pageType, language),
+    ogUrl: customMetadata.ogUrl || generateCanonicalUrlWithLang(pageType, language),
     twitterCard: customMetadata.twitterCard || 'summary_large_image',
     twitterTitle: customMetadata.twitterTitle || baseTitle,
     twitterDescription: customMetadata.twitterDescription || baseDescription,
     twitterImage: customMetadata.twitterImage || `${SEO_CONFIG.siteUrl}${SEO_CONFIG.defaultImages.twitterImage}`,
-    canonicalUrl: customMetadata.canonicalUrl || generateCanonicalUrl(pageType, language),
+    canonicalUrl: customMetadata.canonicalUrl || generateCanonicalUrlWithLang(pageType, language),
     hreflang: customMetadata.hreflang || generateHreflangLinks(pageType),
     robots: customMetadata.robots || 'index,follow',
     author: customMetadata.author || SEO_CONFIG.structuredData.organization.name,
@@ -96,12 +96,12 @@ const generatePageDescription = (pageType: PageType, language: string, context: 
 };
 
 /**
- * 生成规范URL
+ * 生成规范URL（内部函数，支持语言参数）
  * @param pageType 页面类型
  * @param language 语言
  * @returns 规范URL
  */
-const generateCanonicalUrl = (pageType: PageType, language: string): string => {
+const generateCanonicalUrlWithLang = (pageType: PageType, language: string): string => {
   const baseUrl = SEO_CONFIG.siteUrl;
   const langPrefix = language === 'zh-CN' ? '' : `/${language}`;
   
@@ -185,4 +185,155 @@ const isValidUrl = (url: string): boolean => {
   } catch {
     return false;
   }
+};
+
+/**
+ * 生成动态标题
+ * @param pageType 页面类型
+ * @param context 上下文信息
+ * @param language 语言
+ * @returns 动态标题
+ */
+export const generateDynamicTitle = (
+  pageType: PageType,
+  context: SEOContext = {},
+  language: Language = 'zh-CN'
+): string => {
+  return generatePageTitle(pageType, language, context);
+};
+
+/**
+ * 生成动态描述
+ * @param pageType 页面类型
+ * @param context 上下文信息
+ * @param language 语言
+ * @returns 动态描述
+ */
+export const generateDynamicDescription = (
+  pageType: PageType,
+  context: SEOContext = {},
+  language: Language = 'zh-CN'
+): string => {
+  return generatePageDescription(pageType, language, context);
+};
+
+/**
+ * 生成关键词
+ * @param baseKeywords 基础关键词
+ * @param contextKeywords 上下文关键词
+ * @returns 合并后的关键词数组
+ */
+export const generateKeywords = (
+  baseKeywords: string[] = [],
+  contextKeywords: string[] = []
+): string[] => {
+  const allKeywords = [...baseKeywords, ...contextKeywords];
+  const uniqueKeywords = Array.from(new Set(allKeywords));
+  return uniqueKeywords.slice(0, 10); // 限制最多10个关键词
+};
+
+/**
+ * 生成规范URL（导出版本，不带语言参数）
+ * @param pageType 页面类型
+ * @returns 规范URL
+ */
+export const generateCanonicalUrl = (pageType: PageType): string => {
+  const baseUrl = SEO_CONFIG.siteUrl;
+  
+  switch (pageType) {
+    case 'home':
+      return baseUrl;
+    case 'upload':
+      return `${baseUrl}/upload`;
+    case 'split':
+      return `${baseUrl}/split`;
+    case 'export':
+      return `${baseUrl}/export`;
+    default:
+      return baseUrl;
+  }
+};
+
+/**
+ * 生成hreflang映射
+ * @param pageType 页面类型
+ * @returns hreflang映射对象
+ */
+export const generateHreflangMapping = (pageType: PageType): Record<string, string> => {
+  return generateHreflangLinks(pageType);
+};
+
+/**
+ * 生成结构化数据元数据
+ * @param pageType 页面类型
+ * @param language 语言
+ * @returns 包含结构化数据的元数据
+ */
+export const generateStructuredDataMetadata = (
+  pageType: PageType,
+  language: Language = 'zh-CN'
+): { structuredData: any } => {
+  const baseStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': pageType === 'home' ? 'SoftwareApplication' : 'WebApplication',
+    name: SEO_CONFIG.structuredData.webApplication.name,
+    description: SEO_CONFIG.structuredData.webApplication.description,
+    applicationCategory: SEO_CONFIG.structuredData.webApplication.applicationCategory,
+    operatingSystem: SEO_CONFIG.structuredData.webApplication.operatingSystem,
+    browserRequirements: SEO_CONFIG.structuredData.webApplication.browserRequirements,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD'
+    }
+  };
+
+  return {
+    structuredData: baseStructuredData
+  };
+};
+
+/**
+ * 生成设备优化的元数据
+ * @param metadata 原始元数据
+ * @param deviceType 设备类型
+ * @returns 优化后的元数据
+ */
+export const generateDeviceOptimizedMetadata = (
+  metadata: { title: string; description: string },
+  deviceType: 'mobile' | 'tablet' | 'desktop'
+): { title: string; description: string } => {
+  let optimizedTitle = metadata.title;
+  let optimizedDescription = metadata.description;
+
+  switch (deviceType) {
+    case 'mobile':
+      // 移动端标题限制在50字符以内
+      if (optimizedTitle.length > 50) {
+        optimizedTitle = optimizedTitle.substring(0, 47) + '...';
+      }
+      // 移动端描述限制在120字符以内
+      if (optimizedDescription.length > 120) {
+        optimizedDescription = optimizedDescription.substring(0, 117) + '...';
+      }
+      break;
+    case 'tablet':
+      // 平板端标题限制在60字符以内
+      if (optimizedTitle.length > 60) {
+        optimizedTitle = optimizedTitle.substring(0, 57) + '...';
+      }
+      // 平板端描述限制在140字符以内
+      if (optimizedDescription.length > 140) {
+        optimizedDescription = optimizedDescription.substring(0, 137) + '...';
+      }
+      break;
+    case 'desktop':
+      // 桌面端保持原始长度
+      break;
+  }
+
+  return {
+    title: optimizedTitle,
+    description: optimizedDescription
+  };
 };

@@ -310,7 +310,10 @@ export function useNavigationState(
     navigationState,
     navigationItems,
     navigationMetrics,
-    hasValidationErrors,
+    
+    // 验证相关
+    isValid: !hasValidationErrors,
+    validationErrors: hasValidationErrors ? ['导航状态验证失败'] : [],
     
     // 工具方法
     getNextAvailableStep,
@@ -330,7 +333,7 @@ export function useNavigationState(
 /**
  * 简化版导航状态Hook - 兼容测试
  */
-export function useNavigationStateSimple(appState: AppState) {
+export function useNavigationStateSimple(appState: AppState, currentPath: string = '/') {
   const keyStates = useMemo(() => ({
     hasOriginalImage: !!appState.originalImage,
     hasImageSlices: appState.imageSlices.length > 0,
@@ -343,10 +346,15 @@ export function useNavigationStateSimple(appState: AppState) {
     appState.isProcessing
   ]);
 
+  const isCurrentPathActive = useCallback((path: string) => {
+    return currentPath === path;
+  }, [currentPath]);
+
   return {
     canAccessSplit: keyStates.hasOriginalImage && !keyStates.isProcessing,
     canAccessExport: keyStates.hasSelectedSlices && !keyStates.isProcessing,
-    isProcessing: keyStates.isProcessing
+    isProcessing: keyStates.isProcessing,
+    isCurrentPathActive
   };
 }
 
@@ -358,23 +366,18 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
     const steps = ['/', '/upload', '/split', '/export'];
     const currentIndex = steps.indexOf(currentPath);
     
-    if (currentIndex === -1) {
-      return {
-        currentStep: currentPath,
-        currentIndex: 0,
-        totalSteps: steps.length,
-        nextStep: steps[1],
-        previousStep: null,
-        progress: 0
-      };
-    }
-
     const keyStates = {
       hasOriginalImage: !!appState.originalImage,
       hasImageSlices: appState.imageSlices.length > 0,
       hasSelectedSlices: appState.selectedSlices.size > 0,
       isProcessing: appState.isProcessing || false
     };
+
+    // 计算已完成步骤数
+    let completedSteps = 0;
+    if (keyStates.hasOriginalImage) completedSteps++;
+    if (keyStates.hasImageSlices) completedSteps++;
+    if (keyStates.hasSelectedSlices) completedSteps++;
 
     // 计算下一个可用步骤
     let nextStep: string | null = null;
@@ -407,13 +410,19 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
       nextStep = null;
     }
 
+    const totalSteps = steps.length;
+    const progressText = `${completedSteps}/${totalSteps} 步骤已完成`;
+    const progressPercentage = Math.round((completedSteps / totalSteps) * 100);
+
     return {
       currentStep: currentPath,
-      currentIndex,
-      totalSteps: steps.length,
+      currentIndex: currentIndex >= 0 ? currentIndex : 0,
+      totalSteps,
+      completedSteps,
       nextStep,
       previousStep: currentIndex > 0 ? steps[currentIndex - 1] : null,
-      progress: Math.round(((currentIndex + 1) / steps.length) * 100)
+      progressText,
+      progressPercentage
     };
   }, [appState, currentPath]);
 

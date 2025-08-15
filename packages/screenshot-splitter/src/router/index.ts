@@ -57,9 +57,14 @@ const AppPlaceholder: React.FC = () => {
   return React.createElement('div', { id: 'app-placeholder' }, 'Loading...');
 };
 
+// 获取构建模式，在single模式下使用history模式而不是hash模式
+declare const __BUILD_MODE__: string;
+const BUILD_MODE = typeof __BUILD_MODE__ !== 'undefined' ? __BUILD_MODE__ : 'spa';
+const isSingleMode = BUILD_MODE === 'singlefile';
+
 // 导出路由配置
 export const routerConfig: RouterConfig = {
-  mode: 'hash', // 使用hash模式，兼容GitHub Pages
+  mode: isSingleMode ? 'history' : 'hash', // single模式使用history模式，spa模式兼容GitHub Pages使用hash模式
   base: '/',
   fallback: '/',
   routes: [
@@ -68,8 +73,8 @@ export const routerConfig: RouterConfig = {
       name: 'home',
       component: AppPlaceholder,
       meta: {
-        title: '长截图分割工具',
-        description: '智能分割长截图，支持自动检测和手动调整'
+        title: 'header.title',
+        description: 'header.subtitle'
       }
     },
     {
@@ -77,8 +82,8 @@ export const routerConfig: RouterConfig = {
       name: 'upload',
       component: AppPlaceholder,
       meta: {
-        title: '上传图片 - 长截图分割工具',
-        description: '上传需要分割的长截图'
+        title: 'upload.pageTitle',
+        description: 'upload.pageDescription'
       }
     },
     {
@@ -86,8 +91,8 @@ export const routerConfig: RouterConfig = {
       name: 'split',
       component: AppPlaceholder,
       meta: {
-        title: '分割设置 - 长截图分割工具',
-        description: '设置分割参数和预览效果'
+        title: 'split.pageTitle',
+        description: 'split.pageDescription'
       }
     },
     {
@@ -95,8 +100,8 @@ export const routerConfig: RouterConfig = {
       name: 'export',
       component: AppPlaceholder,
       meta: {
-        title: '导出结果 - 长截图分割工具',
-        description: '下载分割后的图片'
+        title: 'export.pageTitle',
+        description: 'export.pageDescription'
       }
     }
   ]
