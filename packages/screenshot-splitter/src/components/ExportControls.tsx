@@ -1,110 +1,211 @@
-import type { ImageSlice } from '../types';
-import { useI18n } from '../hooks/useI18n';
-import { cn } from '../utils/styleMapping';
+/**
+ * 导出控制组件
+ * 提供PDF和ZIP导出功能
+ */
+
+import React, { useState, useCallback } from 'react';
+
+interface ImageSlice {
+  blob: Blob;
+  url: string;
+  index: number;
+  width: number;
+  height: number;
+}
 
 interface ExportControlsProps {
-  selectedSlices: Set<number>;
-  imageSlices: ImageSlice[];
-  onExportPDF: () => void;
-  onExportZIP: () => void;
-  isExporting: boolean;
+  selectedSlices: number[];
+  slices: ImageSlice[];
+  onExport: (format: 'pdf' | 'zip', options?: any) => void;
+  disabled?: boolean;
+  className?: string;
 }
 
-export function ExportControls({
+interface ExportOptions {
+  format: 'pdf' | 'zip';
+  quality: number;
+  filename: string;
+  pdfOptions?: {
+    orientation: 'portrait' | 'landscape';
+    pageSize: 'A4' | 'A3' | 'Letter';
+    margin: number;
+  };
+  zipOptions?: {
+    compression: 'none' | 'low' | 'medium' | 'high';
+    imageFormat: 'png' | 'jpeg';
+  };
+}
+
+export const ExportControls: React.FC<ExportControlsProps> = ({
   selectedSlices,
-  imageSlices,
-  onExportPDF,
-  onExportZIP,
-  isExporting
-}: ExportControlsProps) {
-  const { t } = useI18n();
+  slices,
+  onExport,
+  disabled = false,
+  className = ''
+}) => {
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'zip'>('pdf');
+  const [isExporting, setIsExporting] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   
-  const hasSelectedSlices = selectedSlices.size > 0;
-  const hasSlices = imageSlices.length > 0;
-  
+  const [exportOptions, setExportOptions] = useState<ExportOptions>({
+    format: 'pdf',
+    quality: 0.9,
+    filename: 'screenshot-slices',
+    pdfOptions: {
+      orientation: 'portrait',
+      pageSize: 'A4',
+      margin: 20
+    },
+    zipOptions: {
+      compression: 'medium',
+      imageFormat: 'png'
+    }
+  });
+
+  // 处理导出
+  const handleExport = useCallback(async () => {
+    if (disabled || selectedSlices.length === 0) return;
+
+    setIsExporting(true);
+    try {
+      await onExport(exportFormat, {
+        ...exportOptions,
+        selectedSlices,
+        slices: selectedSlices.map(index => slices[index])
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [disabled, selectedSlices, exportFormat, exportOptions, onExport, slices]);
+
+  // 更新导出选项
+  const updateExportOptions = useCallback((updates: Partial<ExportOptions>) => {
+    setExportOptions(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const canExport = selectedSlices.length > 0 && !disabled && !isExporting;
+
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mt-4 md:mt-6 w-full">
-      <div className="mb-4 md:mb-6">
-        <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-2">{t('export.title') || '导出选项'}</h3>
-        <div>
-          {hasSlices ? (
-            <span className="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
-              {t('export.selectedInfo') || `已选择 ${selectedSlices.size} / ${imageSlices.length} 个片段`}
+    <div className={`export-controls ${className}`}>
+      <div className="export-header mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">导出设置</h3>
+        <p className="text-sm text-gray-600">
+          已选择 {selectedSlices.length} 个切片，选择导出格式和参数
+        </p>
+      </div>
+
+      {/* 格式选择 */}
+      <div className="format-selection mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          导出格式
+        </label>
+        <div className="format-options flex gap-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="pdf"
+              checked={exportFormat === 'pdf'}
+              onChange={(e) => {
+                setExportFormat('pdf');
+                updateExportOptions({ format: 'pdf' });
+              }}
+              className="mr-2"
+              disabled={disabled}
+            />
+            <span className="flex items-center">
+              📄 PDF文档
+              <span className="ml-2 text-xs text-gray-500">(适合打印和阅读)</span>
             </span>
-          ) : (
-            <span className="text-gray-500 text-sm">
-              {t('export.noSlices') || '暂无可导出的片段'}
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="zip"
+              checked={exportFormat === 'zip'}
+              onChange={(e) => {
+                setExportFormat('zip');
+                updateExportOptions({ format: 'zip' });
+              }}
+              className="mr-2"
+              disabled={disabled}
+            />
+            <span className="flex items-center">
+              📦 ZIP压缩包
+              <span className="ml-2 text-xs text-gray-500">(包含所有图片文件)</span>
             </span>
-          )}
+          </label>
         </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4">
-        <button
-          className={cn(
-            "flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200",
-            !hasSelectedSlices || isExporting 
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed" 
-              : "bg-error-500 text-white hover:bg-error-600 hover:shadow-md hover:-translate-y-0.5"
-          )}
-          onClick={onExportPDF}
-          disabled={!hasSelectedSlices || isExporting}
-          title={t('export.pdfTooltip') || '将选中的片段导出为 PDF 文件'}
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          {isExporting ? (
-            t('export.exporting') || '导出中...'
-          ) : (
-            t('export.exportPDF') || '导出为 PDF'
-          )}
-        </button>
-        
-        <button
-          className={cn(
-            "flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200",
-            !hasSelectedSlices || isExporting 
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed" 
-              : "bg-purple-600 text-white hover:bg-purple-700 hover:shadow-md hover:-translate-y-0.5"
-          )}
-          onClick={onExportZIP}
-          disabled={!hasSelectedSlices || isExporting}
-          title={t('export.zipTooltip') || '将选中的片段打包为 ZIP 文件'}
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6m6-6v6" />
-          </svg>
-          {isExporting ? (
-            t('export.exporting') || '导出中...'
-          ) : (
-            t('export.exportZIP') || '导出为 ZIP'
-          )}
-        </button>
-      </div>
-      
-      {!hasSelectedSlices && hasSlices && (
-        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="m9 12 2 2 4-4"/>
-          </svg>
-          <span>{t('export.selectHint') || '请先选择要导出的片段'}</span>
-        </div>
-      )}
-      
-      {isExporting && (
-        <div className="mt-4">
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full animate-pulse"></div>
+
+      {/* 基础设置 */}
+      <div className="basic-settings mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              文件名
+            </label>
+            <input
+              type="text"
+              value={exportOptions.filename}
+              onChange={(e) => updateExportOptions({ filename: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={disabled}
+            />
           </div>
-          <span className="text-sm text-gray-600 mt-2 block text-center">
-            {t('export.processing') || '正在处理，请稍候...'}
-          </span>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              图片质量
+            </label>
+            <select
+              value={exportOptions.quality}
+              onChange={(e) => updateExportOptions({ quality: parseFloat(e.target.value) })}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={disabled}
+            >
+              <option value={1.0}>最高质量</option>
+              <option value={0.9}>高质量</option>
+              <option value={0.8}>中等质量</option>
+              <option value={0.7}>较低质量</option>
+            </select>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* 导出按钮 */}
+      <div className="export-actions">
+        <button
+          onClick={handleExport}
+          disabled={!canExport}
+          className={`
+            w-full px-6 py-3 rounded-lg font-medium transition-colors
+            ${canExport
+              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }
+          `}
+        >
+          {isExporting ? (
+            <span className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              正在导出...
+            </span>
+          ) : (
+            `导出为 ${exportFormat.toUpperCase()}`
+          )}
+        </button>
+
+        {!canExport && selectedSlices.length === 0 && (
+          <p className="text-sm text-red-500 mt-2 text-center">
+            请先选择要导出的切片
+          </p>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default ExportControls;

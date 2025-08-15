@@ -10,6 +10,7 @@ interface AppState {
   originalImage: HTMLImageElement | null;
   imageSlices: any[];
   selectedSlices: Set<number>;
+  isProcessing?: boolean;
   [key: string]: any;
 }
 
@@ -49,7 +50,16 @@ const DEFAULT_NAVIGATION_ITEMS: NavigationItem[] = [
 /**
  * 优化的导航状态Hook
  */
-export function useNavigationState(appState: AppState, currentPath: string) {
+export function useNavigationState(
+  appState: AppState, 
+  currentPath: string = '/',
+  options: { 
+    enableValidation?: boolean;
+    onStateChange?: (state: NavigationState) => void;
+  } = {}
+) {
+  const { enableValidation = true, onStateChange } = options;
+  
   const [navigationState, setNavigationState] = useState<NavigationState>({
     currentStep: currentPath,
     availableSteps: ['/'],
@@ -58,12 +68,12 @@ export function useNavigationState(appState: AppState, currentPath: string) {
   });
 
   // 使用ref来存储上一次的依赖值，避免不必要的计算
-  // 使用ref来存储上一次的依赖值，避免不必要的计算
   const prevDepsRef = useRef<{
     hasOriginalImage: boolean;
     imageSlicesLength: number;
     selectedSlicesSize: number;
     currentPath: string;
+    isProcessing: boolean;
   } | undefined>(undefined);
 
   // 计算关键状态，使用useMemo优化
@@ -71,23 +81,26 @@ export function useNavigationState(appState: AppState, currentPath: string) {
     const hasOriginalImage = !!appState.originalImage;
     const imageSlicesLength = appState.imageSlices.length;
     const selectedSlicesSize = appState.selectedSlices.size;
+    const isProcessing = appState.isProcessing || false;
 
     return {
       hasOriginalImage,
       hasImageSlices: imageSlicesLength > 0,
       hasSelectedSlices: selectedSlicesSize > 0,
       imageSlicesLength,
-      selectedSlicesSize
+      selectedSlicesSize,
+      isProcessing
     };
   }, [
     appState.originalImage,
     appState.imageSlices.length,
-    appState.selectedSlices.size
+    appState.selectedSlices.size,
+    appState.isProcessing
   ]);
 
   // 计算导航项状态，使用useMemo优化
   const navigationItems = useMemo(() => {
-    const { hasOriginalImage, hasSelectedSlices } = keyStates;
+    const { hasOriginalImage, hasSelectedSlices, isProcessing } = keyStates;
 
     return DEFAULT_NAVIGATION_ITEMS.map(item => {
       let disabled = false;
@@ -97,16 +110,16 @@ export function useNavigationState(appState: AppState, currentPath: string) {
       switch (item.path) {
         case '/':
         case '/upload':
-          disabled = false;
+          disabled = isProcessing;
           break;
         case '/split':
-          disabled = !hasOriginalImage;
+          disabled = !hasOriginalImage || isProcessing;
           break;
         case '/export':
-          disabled = !hasSelectedSlices;
+          disabled = !hasSelectedSlices || isProcessing;
           break;
         default:
-          disabled = false;
+          disabled = isProcessing;
       }
 
       return {
@@ -175,7 +188,8 @@ export function useNavigationState(appState: AppState, currentPath: string) {
       hasOriginalImage: keyStates.hasOriginalImage,
       imageSlicesLength: keyStates.imageSlicesLength,
       selectedSlicesSize: keyStates.selectedSlicesSize,
-      currentPath
+      currentPath,
+      isProcessing: keyStates.isProcessing
     };
 
     // 浅比较，避免不必要的更新
@@ -184,12 +198,18 @@ export function useNavigationState(appState: AppState, currentPath: string) {
         prevDeps.hasOriginalImage !== currentDeps.hasOriginalImage ||
         prevDeps.imageSlicesLength !== currentDeps.imageSlicesLength ||
         prevDeps.selectedSlicesSize !== currentDeps.selectedSlicesSize ||
-        prevDeps.currentPath !== currentDeps.currentPath) {
+        prevDeps.currentPath !== currentDeps.currentPath ||
+        prevDeps.isProcessing !== currentDeps.isProcessing) {
       
       setNavigationState(computedNavigationState);
       prevDepsRef.current = currentDeps;
+      
+      // 调用状态变化回调
+      if (onStateChange) {
+        onStateChange(computedNavigationState);
+      }
     }
-  }, [computedNavigationState, keyStates, currentPath]);
+  }, [computedNavigationState, keyStates, currentPath, onStateChange]);
 
   // 计算导航指标，使用useMemo优化
   const navigationMetrics = useMemo((): NavigationMetrics => {
@@ -256,17 +276,48 @@ export function useNavigationState(appState: AppState, currentPath: string) {
     return 'blocked';
   }, [computedNavigationState]);
 
+  // 刷新函数
+  const refresh = useCallback(() => {
+    // 强制重新计算导航状态
+    const newState = {
+      currentStep: currentPath,
+      availableSteps: computedNavigationState.availableSteps,
+      completedSteps: computedNavigationState.completedSteps,
+      blockedSteps: computedNavigationState.blockedSteps
+    };
+    setNavigationState(newState);
+    
+    if (onStateChange) {
+      onStateChange(newState);
+    }
+  }, [currentPath, computedNavigationState, onStateChange]);
+
+  // 验证状态
+  const hasValidationErrors = useMemo(() => {
+    if (!enableValidation) return false;
+    
+    // 简单的验证逻辑
+    const { hasOriginalImage, hasSelectedSlices } = keyStates;
+    
+    if (currentPath === '/split' && !hasOriginalImage) return true;
+    if (currentPath === '/export' && !hasSelectedSlices) return true;
+    
+    return false;
+  }, [enableValidation, keyStates, currentPath]);
+
   return {
     // 状态
     navigationState,
     navigationItems,
     navigationMetrics,
+    hasValidationErrors,
     
     // 工具方法
     getNextAvailableStep,
     getPreviousAvailableStep,
     isStepAccessible,
     getStepStatus,
+    refresh,
     
     // 便捷属性
     canGoNext: getNextAvailableStep() !== null,
@@ -274,6 +325,99 @@ export function useNavigationState(appState: AppState, currentPath: string) {
     isFirstStep: currentPath === DEFAULT_NAVIGATION_ITEMS[0].path,
     isLastStep: currentPath === DEFAULT_NAVIGATION_ITEMS[DEFAULT_NAVIGATION_ITEMS.length - 1].path
   };
+}
+
+/**
+ * 简化版导航状态Hook - 兼容测试
+ */
+export function useNavigationStateSimple(appState: AppState) {
+  const keyStates = useMemo(() => ({
+    hasOriginalImage: !!appState.originalImage,
+    hasImageSlices: appState.imageSlices.length > 0,
+    hasSelectedSlices: appState.selectedSlices.size > 0,
+    isProcessing: appState.isProcessing || false
+  }), [
+    appState.originalImage,
+    appState.imageSlices.length,
+    appState.selectedSlices.size,
+    appState.isProcessing
+  ]);
+
+  return {
+    canAccessSplit: keyStates.hasOriginalImage && !keyStates.isProcessing,
+    canAccessExport: keyStates.hasSelectedSlices && !keyStates.isProcessing,
+    isProcessing: keyStates.isProcessing
+  };
+}
+
+/**
+ * 导航进度Hook
+ */
+export function useNavigationProgress(appState: AppState, currentPath: string = '/') {
+  const progressInfo = useMemo(() => {
+    const steps = ['/', '/upload', '/split', '/export'];
+    const currentIndex = steps.indexOf(currentPath);
+    
+    if (currentIndex === -1) {
+      return {
+        currentStep: currentPath,
+        currentIndex: 0,
+        totalSteps: steps.length,
+        nextStep: steps[1],
+        previousStep: null,
+        progress: 0
+      };
+    }
+
+    const keyStates = {
+      hasOriginalImage: !!appState.originalImage,
+      hasImageSlices: appState.imageSlices.length > 0,
+      hasSelectedSlices: appState.selectedSlices.size > 0,
+      isProcessing: appState.isProcessing || false
+    };
+
+    // 计算下一个可用步骤
+    let nextStep: string | null = null;
+    for (let i = currentIndex + 1; i < steps.length; i++) {
+      const step = steps[i];
+      let canAccess = false;
+      
+      switch (step) {
+        case '/upload':
+          canAccess = true;
+          break;
+        case '/split':
+          canAccess = keyStates.hasOriginalImage && !keyStates.isProcessing;
+          break;
+        case '/export':
+          canAccess = keyStates.hasSelectedSlices && !keyStates.isProcessing;
+          break;
+        default:
+          canAccess = true;
+      }
+      
+      if (canAccess) {
+        nextStep = step;
+        break;
+      }
+    }
+
+    // 如果是最后一步，nextStep为null
+    if (currentIndex === steps.length - 1) {
+      nextStep = null;
+    }
+
+    return {
+      currentStep: currentPath,
+      currentIndex,
+      totalSteps: steps.length,
+      nextStep,
+      previousStep: currentIndex > 0 ? steps[currentIndex - 1] : null,
+      progress: Math.round(((currentIndex + 1) / steps.length) * 100)
+    };
+  }, [appState, currentPath]);
+
+  return progressInfo;
 }
 
 /**

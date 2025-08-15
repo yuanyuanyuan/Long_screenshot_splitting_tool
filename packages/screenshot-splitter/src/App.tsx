@@ -275,11 +275,17 @@ function App() {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('split.title') || '分割设置'}</h2>
             <ImagePreview
-              imageSlices={state.imageSlices}
-              selectedSlices={state.selectedSlices}
-              onToggleSelection={actions.toggleSliceSelection}
-              onSelectAll={actions.selectAllSlices}
-              onDeselectAll={actions.deselectAllSlices}
+              originalImage={state.originalImage}
+              slices={state.imageSlices}
+              selectedSlices={Array.from(state.selectedSlices)}
+              onSelectionChange={(selectedIndices) => {
+                // 清除当前选择
+                actions.deselectAllSlices();
+                // 添加新选择
+                selectedIndices.forEach(index => {
+                  actions.toggleSliceSelection(index);
+                });
+              }}
             />
           </section>
         );
@@ -356,11 +362,16 @@ function App() {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t('export.title') || '导出结果'}</h2>
             <ExportControls
-              selectedSlices={state.selectedSlices}
-              imageSlices={state.imageSlices}
-              onExportPDF={handleExportPDF}
-              onExportZIP={handleExportZIP}
-              isExporting={isExporting}
+              selectedSlices={Array.from(state.selectedSlices)}
+              slices={state.imageSlices}
+              onExport={(format) => {
+                if (format === 'pdf') {
+                  handleExportPDF();
+                } else if (format === 'zip') {
+                  handleExportZIP();
+                }
+              }}
+              disabled={isExporting}
             />
           </section>
         );
@@ -385,22 +396,47 @@ function App() {
                     </h2>
                   )}
                   <ImagePreview
-                    imageSlices={state.imageSlices}
-                    selectedSlices={state.selectedSlices}
-                    onToggleSelection={actions.toggleSliceSelection}
-                    onSelectAll={actions.selectAllSlices}
-                    onDeselectAll={actions.deselectAllSlices}
+                    originalImage={state.originalImage}
+                    slices={state.imageSlices}
+                    selectedSlices={Array.from(state.selectedSlices)}
+                    onSelectionChange={(selectedIndices) => {
+                      // 清除当前选择
+                      actions.deselectAllSlices();
+                      // 添加新选择
+                      selectedIndices.forEach(index => {
+                        actions.toggleSliceSelection(index);
+                      });
+                    }}
                   />
+                  {/* 调试信息 */}
+                  {shouldShowDebugInfo && (
+                    <div className="debug-info mt-4 p-4 bg-yellow-100 rounded">
+                      <h3 className="font-bold">🔍 App.tsx 传递给 ImagePreview 的数据:</h3>
+                      <pre className="text-xs mt-2">
+                        {JSON.stringify({
+                          originalImage: !!state.originalImage,
+                          slicesCount: state.imageSlices.length,
+                          selectedSlicesCount: Array.from(state.selectedSlices).length,
+                          firstSlice: state.imageSlices[0] ? {
+                            hasBlob: !!state.imageSlices[0].blob,
+                            hasUrl: !!state.imageSlices[0].url,
+                            url: state.imageSlices[0].url?.substring(0, 50) + '...',
+                            width: state.imageSlices[0].width,
+                            height: state.imageSlices[0].height
+                          } : null
+                        }, null, 2)}
+                      </pre>
+                    </div>
+                  )}
                 </section>
 
                 <section className="mb-8">
-                  <ExportControls
-                    selectedSlices={state.selectedSlices}
-                    imageSlices={state.imageSlices}
-                    onExportPDF={handleExportPDF}
-                    onExportZIP={handleExportZIP}
-                    isExporting={isExporting}
-                  />
+            <ExportControls
+              selectedSlices={Array.from(state.selectedSlices)}
+              slices={state.imageSlices}
+              onExport={handleExportPDF}
+              disabled={isExporting}
+            />
                 </section>
               </>
             )}

@@ -1,0 +1,1 @@
+{"title":"图片切割界面渲染问题修复","features":["状态诊断","渲染逻辑修复","调试面板","预览修复"],"tech":{"Web":{"arch":"react","component":"shadcn"}},"design":"现代简洁的Material Design风格，白色主背景配合蓝色主色调，卡片式布局确保调试信息和图片预览区域层次分明","plan":{"创建调试状态Hook，收集所有相关状态数据":"done","修复ImagePreview组件的条件渲染逻辑":"done","实现调试面板组件，显示状态数据":"done","修复图片URL对象的生成和管理逻辑":"done","优化切片预览的渲染性能":"holding","添加错误边界和异常处理":"holding"}}

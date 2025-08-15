@@ -33,9 +33,17 @@
     "preview:spa": "vite preview --mode spa",
     "preview:single": "vite preview --mode singlefile",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:ui": "vitest --ui",
+    "test": "NODE_OPTIONS='--max-old-space-size=2048' vitest",
+    "test:run": "NODE_OPTIONS='--max-old-space-size=2048' vitest run",
+    "test:ui": "NODE_OPTIONS='--max-old-space-size=2048' vitest --ui",
+    "test:light": "NODE_OPTIONS='--max-old-space-size=1024' vitest run --pool=forks --poolOptions.forks.maxForks=1",
+    "test:groups": "node scripts/run-tests-in-groups.js",
+    "test:file": "NODE_OPTIONS='--max-old-space-size=1024' vitest run",
+    "test:smart": "node scripts/test-runner.js",
+    "test:monitor": "node scripts/test-runner.js --monitor",
+    "test:low-memory": "node scripts/test-runner.js --mode=ultra-light",
+    "test:leak-detect": "node --expose-gc scripts/detect-memory-leaks.js",
+    "test:optimize-all": "node scripts/test-runner.js --mode=ultra-light --monitor",
     "clean": "rm -rf dist dist-single",
     "deploy:prepare": "node ../../tools/build-scripts/deploy-prepare.js screenshot-splitter",
     "standalone": "pnpm run build && pnpm run preview:spa"
@@ -44,7 +52,9 @@
     "jspdf": "^3.0.1",
     "jszip": "^3.10.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-helmet-async": "^2.0.5",
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",

@@ -61,8 +61,6 @@
   "navigation.error.missingImage": "Need to upload image first",
   "navigation.error.missingSlices": "Need to select image slices first",
   "navigation.error.invalidState": "Application state invalid, please restart",
-  "navigation.error.navigationFailed": "Navigation failed, please try again"
-  "navigation.error.navigationFailed": "Navigation failed, please try again",
   "navigation.error.navigationFailed": "Navigation failed, please try again",
   "navigation.shortcuts.next": "Next",
   "navigation.shortcuts.previous": "Previous",

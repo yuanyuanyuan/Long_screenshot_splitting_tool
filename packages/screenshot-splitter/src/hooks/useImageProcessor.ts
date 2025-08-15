@@ -85,20 +85,17 @@ export function useImageProcessor({ state, actions }: UseImageProcessorProps): I
     actions.setProcessing(true);
     actions.setFileName(file.name.replace(/\.[^/.]+$/, '') || '分割结果');
     
-    // 创建Worker（如果还没有）
-    if (!worker) {
-      createWorker();
-      // 等待一小段时间确保Worker创建完成
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
+    // 确保Worker已创建
+    createWorker();
     
-    actions.setWorker(worker);
+    // 等待一小段时间确保Worker创建完成
+    await new Promise(resolve => setTimeout(resolve, 200));
     
     // 开始处理
     startProcessing(file, state.splitHeight);
     
     console.log('[ImageProcessor] 已发送文件到 Worker，分割高度:', state.splitHeight);
-  }, [actions, worker, createWorker, startProcessing, state.splitHeight]);
+  }, [actions, createWorker, startProcessing, state.splitHeight]);
   
   return {
     processImage,
