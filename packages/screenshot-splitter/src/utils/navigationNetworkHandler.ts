@@ -12,7 +12,7 @@ export enum NetworkErrorType {
   SERVER_ERROR = 'SERVER_ERROR',
   RESOURCE_NOT_FOUND = 'RESOURCE_NOT_FOUND',
   PROCESSING_FAILED = 'PROCESSING_FAILED',
-  UPLOAD_FAILED = 'UPLOAD_FAILED'
+  UPLOAD_FAILED = 'UPLOAD_FAILED',
 }
 
 // 网络错误接口
@@ -51,8 +51,8 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
   retryableErrors: [
     NetworkErrorType.CONNECTION_FAILED,
     NetworkErrorType.TIMEOUT,
-    NetworkErrorType.SERVER_ERROR
-  ]
+    NetworkErrorType.SERVER_ERROR,
+  ],
 };
 
 /**
@@ -67,7 +67,7 @@ export class NavigationNetworkHandler {
   constructor(retryConfig: Partial<RetryConfig> = {}) {
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
     this.networkState = this.getNetworkState();
-    
+
     this.initNetworkMonitoring();
   }
 
@@ -93,7 +93,7 @@ export class NavigationNetworkHandler {
    */
   private handleOnlineStatusChange = () => {
     this.networkState.isOnline = navigator.onLine;
-    
+
     if (this.networkState.isOnline) {
       // 网络恢复，重试失败的请求
       this.retryFailedRequests();
@@ -115,7 +115,7 @@ export class NavigationNetworkHandler {
    */
   private getNetworkState(): NetworkState {
     const state: NetworkState = {
-      isOnline: navigator.onLine
+      isOnline: navigator.onLine,
     };
 
     if ('connection' in navigator) {
@@ -145,18 +145,17 @@ export class NavigationNetworkHandler {
   ): Promise<T> {
     const config = { ...this.retryConfig, ...options.retryConfig };
     const timeout = options.timeout || 30000;
-    
+
     let lastError: NetworkError | null = null;
-    
+
     for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
       try {
         // 检查网络状态
         if (!this.networkState.isOnline) {
-          throw this.createNetworkError(
-            NetworkErrorType.CONNECTION_FAILED,
-            'Network is offline',
-            { requestId, attempt }
-          );
+          throw this.createNetworkError(NetworkErrorType.CONNECTION_FAILED, 'Network is offline', {
+            requestId,
+            attempt,
+          });
         }
 
         // 创建AbortController用于超时控制
@@ -170,52 +169,52 @@ export class NavigationNetworkHandler {
 
         try {
           const result = await requestFn(abortController.signal);
-          
+
           // 请求成功，清理资源
           clearTimeout(timeoutId);
           this.pendingRequests.delete(requestId);
           this.retryAttempts.delete(requestId);
-          
+
           return result;
         } catch (error) {
           clearTimeout(timeoutId);
           this.pendingRequests.delete(requestId);
-          
+
           if (abortController.signal.aborted) {
-            throw this.createNetworkError(
-              NetworkErrorType.TIMEOUT,
-              'Request timeout',
-              { requestId, attempt, timeout }
-            );
+            throw this.createNetworkError(NetworkErrorType.TIMEOUT, 'Request timeout', {
+              requestId,
+              attempt,
+              timeout,
+            });
           }
-          
+
           throw error;
         }
       } catch (error) {
         lastError = this.normalizeError(error, requestId, attempt);
-        
+
         // 检查是否应该重试
         if (attempt < config.maxRetries && this.shouldRetry(lastError, config)) {
           this.retryAttempts.set(requestId, attempt + 1);
-          
+
           // 调用重试回调
           if (options.onRetry) {
             options.onRetry(attempt + 1, lastError);
           }
-          
+
           // 计算延迟时间
           const delay = this.calculateRetryDelay(attempt, config);
           await this.delay(delay);
-          
+
           continue;
         }
-        
+
         // 不再重试，抛出错误
         this.retryAttempts.delete(requestId);
         throw lastError;
       }
     }
-    
+
     throw lastError;
   }
 
@@ -234,7 +233,7 @@ export class NavigationNetworkHandler {
       currentPath: context.currentPath || '',
       timestamp: Date.now(),
       retryCount: this.retryAttempts.get(context.requestId) || 0,
-      maxRetries: this.retryConfig.maxRetries
+      maxRetries: this.retryConfig.maxRetries,
     } as NetworkError;
   }
 
@@ -268,7 +267,7 @@ export class NavigationNetworkHandler {
       requestId,
       attempt,
       statusCode,
-      originalError: error
+      originalError: error,
     });
   }
 
@@ -321,21 +320,17 @@ export class NavigationNetworkHandler {
     uploadFn: (file: File, signal?: AbortSignal) => Promise<any>
   ): Promise<any> {
     const requestId = `upload-${Date.now()}`;
-    
+
     try {
-      return await this.executeWithRetry(
-        requestId,
-        (signal) => uploadFn(file, signal),
-        {
-          timeout: 60000, // 上传超时时间更长
-          onRetry: (attempt, error) => {
-            console.log(`Upload retry attempt ${attempt}:`, error.message);
-          }
-        }
-      );
+      return await this.executeWithRetry(requestId, signal => uploadFn(file, signal), {
+        timeout: 60000, // 上传超时时间更长
+        onRetry: (attempt, error) => {
+          console.log(`Upload retry attempt ${attempt}:`, error.message);
+        },
+      });
     } catch (error) {
       const networkError = error as NetworkError;
-      
+
       // 处理上传特定的错误
       if (networkError.networkType === NetworkErrorType.TIMEOUT) {
         throw this.createNetworkError(
@@ -344,7 +339,7 @@ export class NavigationNetworkHandler {
           { originalError: error }
         );
       }
-      
+
       throw error;
     }
   }
@@ -352,29 +347,23 @@ export class NavigationNetworkHandler {
   /**
    * 处理图片处理错误
    */
-  async handleImageProcessing(
-    processingFn: (signal?: AbortSignal) => Promise<any>
-  ): Promise<any> {
+  async handleImageProcessing(processingFn: (signal?: AbortSignal) => Promise<any>): Promise<any> {
     const requestId = `processing-${Date.now()}`;
-    
+
     try {
-      return await this.executeWithRetry(
-        requestId,
-        processingFn,
-        {
-          timeout: 120000, // 处理超时时间更长
-          retryConfig: {
-            maxRetries: 2, // 处理失败重试次数较少
-            retryableErrors: [NetworkErrorType.TIMEOUT, NetworkErrorType.SERVER_ERROR]
-          },
-          onRetry: (attempt, error) => {
-            console.log(`Processing retry attempt ${attempt}:`, error.message);
-          }
-        }
-      );
+      return await this.executeWithRetry(requestId, processingFn, {
+        timeout: 120000, // 处理超时时间更长
+        retryConfig: {
+          maxRetries: 2, // 处理失败重试次数较少
+          retryableErrors: [NetworkErrorType.TIMEOUT, NetworkErrorType.SERVER_ERROR],
+        },
+        onRetry: (attempt, error) => {
+          console.log(`Processing retry attempt ${attempt}:`, error.message);
+        },
+      });
     } catch (error) {
       const networkError = error as NetworkError;
-      
+
       if (networkError.networkType === NetworkErrorType.TIMEOUT) {
         throw this.createNetworkError(
           NetworkErrorType.PROCESSING_FAILED,
@@ -382,7 +371,7 @@ export class NavigationNetworkHandler {
           { originalError: error }
         );
       }
-      
+
       throw error;
     }
   }
@@ -411,14 +400,14 @@ export class NavigationNetworkHandler {
   destroy() {
     window.removeEventListener('online', this.handleOnlineStatusChange);
     window.removeEventListener('offline', this.handleOnlineStatusChange);
-    
+
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
       if (connection) {
         connection.removeEventListener('change', this.handleConnectionChange);
       }
     }
-    
+
     this.cancelAllRequests();
     this.retryAttempts.clear();
   }

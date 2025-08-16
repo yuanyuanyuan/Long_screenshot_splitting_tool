@@ -19,24 +19,24 @@ export interface PerformanceMetrics {
 export interface PerformanceEvent {
   type: 'render' | 'update' | 'interaction' | 'memory';
   duration: number;
-  details?: any;
+  details?: Record<string, unknown>;
   timestamp: number;
 }
 
 // 性能阈值配置
 export interface PerformanceThresholds {
-  renderTime: number;      // 渲染时间阈值（毫秒）
-  updateTime: number;      // 更新时间阈值（毫秒）
+  renderTime: number; // 渲染时间阈值（毫秒）
+  updateTime: number; // 更新时间阈值（毫秒）
   interactionTime: number; // 交互响应时间阈值（毫秒）
-  memoryUsage: number;     // 内存使用阈值（MB）
+  memoryUsage: number; // 内存使用阈值（MB）
 }
 
 // 默认性能阈值
 const DEFAULT_THRESHOLDS: PerformanceThresholds = {
-  renderTime: 16,      // 60fps = 16.67ms per frame
-  updateTime: 100,     // 100ms for state updates
+  renderTime: 16, // 60fps = 16.67ms per frame
+  updateTime: 100, // 100ms for state updates
   interactionTime: 50, // 50ms for user interactions
-  memoryUsage: 50      // 50MB memory usage
+  memoryUsage: 50, // 50MB memory usage
 };
 
 /**
@@ -65,15 +65,18 @@ export class NavigationPerformanceMonitor {
 
     try {
       // 观察渲染性能
-      const paintObserver = new PerformanceObserver((list) => {
+      const paintObserver = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach(entry => {
-          if (entry.name === 'first-contentful-paint' || entry.name === 'largest-contentful-paint') {
+          if (
+            entry.name === 'first-contentful-paint' ||
+            entry.name === 'largest-contentful-paint'
+          ) {
             this.recordEvent({
               type: 'render',
               duration: entry.startTime,
               details: { name: entry.name },
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
           }
         });
@@ -82,20 +85,19 @@ export class NavigationPerformanceMonitor {
       this.observers.set('paint', paintObserver);
 
       // 观察用户交互
-      const eventObserver = new PerformanceObserver((list) => {
+      const eventObserver = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach(entry => {
           this.recordEvent({
             type: 'interaction',
             duration: entry.duration,
             details: { name: entry.name },
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
         });
       });
       eventObserver.observe({ entryTypes: ['event'] });
       this.observers.set('event', eventObserver);
-
     } catch (error) {
       console.warn('Failed to initialize performance observers:', error);
     }
@@ -111,22 +113,22 @@ export class NavigationPerformanceMonitor {
 
     const startTime = performance.now();
     const markName = `navigation-${name}-start`;
-    
+
     try {
       performance.mark(markName);
-    } catch (error) {
+    } catch {
       // Fallback for environments that don't support performance.mark
     }
 
     return () => {
       const endTime = performance.now();
       const duration = endTime - startTime;
-      
+
       try {
         const endMarkName = `navigation-${name}-end`;
         performance.mark(endMarkName);
         performance.measure(`navigation-${name}`, markName, endMarkName);
-      } catch (error) {
+      } catch {
         // Fallback
       }
 
@@ -140,11 +142,10 @@ export class NavigationPerformanceMonitor {
    */
   private recordMeasurement(name: string, duration: number) {
     const event: PerformanceEvent = {
-      type: name.includes('render') ? 'render' : 
-            name.includes('update') ? 'update' : 'interaction',
+      type: name.includes('render') ? 'render' : name.includes('update') ? 'update' : 'interaction',
       duration,
       details: { name },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.recordEvent(event);
@@ -158,7 +159,7 @@ export class NavigationPerformanceMonitor {
    */
   private recordEvent(event: PerformanceEvent) {
     this.events.push(event);
-    
+
     // 限制历史记录大小
     if (this.events.length > this.maxHistorySize) {
       this.events = this.events.slice(-this.maxHistorySize);
@@ -170,7 +171,7 @@ export class NavigationPerformanceMonitor {
    */
   private checkThresholds(event: PerformanceEvent) {
     let threshold: number;
-    
+
     switch (event.type) {
       case 'render':
         threshold = this.thresholds.renderTime;
@@ -186,7 +187,10 @@ export class NavigationPerformanceMonitor {
     }
 
     if (event.duration > threshold) {
-      console.warn(`Navigation performance warning: ${event.type} took ${event.duration.toFixed(2)}ms (threshold: ${threshold}ms)`, event.details);
+      console.warn(
+        `Navigation performance warning: ${event.type} took ${event.duration.toFixed(2)}ms (threshold: ${threshold}ms)`,
+        event.details
+      );
     }
   }
 
@@ -201,11 +205,11 @@ export class NavigationPerformanceMonitor {
       updateTime: 0,
       interactionTime: 0,
       componentCount: 1,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.metrics.push(metric);
-    
+
     if (this.metrics.length > this.maxHistorySize) {
       this.metrics = this.metrics.slice(-this.maxHistorySize);
     }
@@ -214,7 +218,7 @@ export class NavigationPerformanceMonitor {
       type: 'render',
       duration: renderTime,
       details: { component: componentName },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -228,7 +232,7 @@ export class NavigationPerformanceMonitor {
       type: 'update',
       duration: updateTime,
       details,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -242,7 +246,7 @@ export class NavigationPerformanceMonitor {
       type: 'interaction',
       duration: responseTime,
       details: { type: interactionType },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -256,13 +260,13 @@ export class NavigationPerformanceMonitor {
 
     const calculateStats = (events: PerformanceEvent[]) => {
       if (events.length === 0) return { avg: 0, min: 0, max: 0, count: 0 };
-      
+
       const durations = events.map(e => e.duration);
       return {
         avg: durations.reduce((a, b) => a + b, 0) / durations.length,
         min: Math.min(...durations),
         max: Math.max(...durations),
-        count: durations.length
+        count: durations.length,
       };
     };
 
@@ -272,9 +276,11 @@ export class NavigationPerformanceMonitor {
       interaction: calculateStats(interactionEvents),
       total: {
         events: this.events.length,
-        timespan: this.events.length > 0 ? 
-          this.events[this.events.length - 1].timestamp - this.events[0].timestamp : 0
-      }
+        timespan:
+          this.events.length > 0
+            ? this.events[this.events.length - 1].timestamp - this.events[0].timestamp
+            : 0,
+      },
     };
   }
 
@@ -298,7 +304,9 @@ export class NavigationPerformanceMonitor {
     if (memoryUsage === null) return true;
 
     if (memoryUsage > this.thresholds.memoryUsage) {
-      console.warn(`Navigation memory warning: ${memoryUsage}MB used (threshold: ${this.thresholds.memoryUsage}MB)`);
+      console.warn(
+        `Navigation memory warning: ${memoryUsage}MB used (threshold: ${this.thresholds.memoryUsage}MB)`
+      );
       return false;
     }
 
@@ -311,34 +319,34 @@ export class NavigationPerformanceMonitor {
   generateReport(): string {
     const stats = this.getPerformanceStats();
     const memoryUsage = this.getMemoryUsage();
-    
+
     let report = '=== Navigation Performance Report ===\n\n';
-    
+
     report += `Render Performance:\n`;
     report += `  Average: ${stats.render.avg.toFixed(2)}ms\n`;
     report += `  Min: ${stats.render.min.toFixed(2)}ms\n`;
     report += `  Max: ${stats.render.max.toFixed(2)}ms\n`;
     report += `  Count: ${stats.render.count}\n\n`;
-    
+
     report += `Update Performance:\n`;
     report += `  Average: ${stats.update.avg.toFixed(2)}ms\n`;
     report += `  Min: ${stats.update.min.toFixed(2)}ms\n`;
     report += `  Max: ${stats.update.max.toFixed(2)}ms\n`;
     report += `  Count: ${stats.update.count}\n\n`;
-    
+
     report += `Interaction Performance:\n`;
     report += `  Average: ${stats.interaction.avg.toFixed(2)}ms\n`;
     report += `  Min: ${stats.interaction.min.toFixed(2)}ms\n`;
     report += `  Max: ${stats.interaction.max.toFixed(2)}ms\n`;
     report += `  Count: ${stats.interaction.count}\n\n`;
-    
+
     if (memoryUsage !== null) {
       report += `Memory Usage: ${memoryUsage}MB\n\n`;
     }
-    
+
     report += `Total Events: ${stats.total.events}\n`;
     report += `Monitoring Duration: ${(stats.total.timespan / 1000).toFixed(2)}s\n`;
-    
+
     return report;
   }
 
@@ -373,15 +381,21 @@ export class NavigationPerformanceMonitor {
 export const navigationPerformanceMonitor = new NavigationPerformanceMonitor();
 
 // 性能装饰器，用于自动监控函数执行时间
-export function performanceMonitor(target: any, propertyName: string, descriptor: PropertyDescriptor) {
+export function performanceMonitor(
+  target: any,
+  propertyName: string,
+  descriptor: PropertyDescriptor
+) {
   const method = descriptor.value;
 
   descriptor.value = function (...args: any[]) {
-    const endMeasure = navigationPerformanceMonitor.startMeasure(`${target.constructor.name}.${propertyName}`);
-    
+    const endMeasure = navigationPerformanceMonitor.startMeasure(
+      `${target.constructor.name}.${propertyName}`
+    );
+
     try {
       const result = method.apply(this, args);
-      
+
       if (result instanceof Promise) {
         return result.finally(() => {
           endMeasure();
@@ -413,6 +427,8 @@ export function usePerformanceMonitor(componentName: string) {
   return {
     startMeasure: navigationPerformanceMonitor.startMeasure.bind(navigationPerformanceMonitor),
     recordUpdate: navigationPerformanceMonitor.recordUpdate.bind(navigationPerformanceMonitor),
-    recordInteraction: navigationPerformanceMonitor.recordInteraction.bind(navigationPerformanceMonitor)
+    recordInteraction: navigationPerformanceMonitor.recordInteraction.bind(
+      navigationPerformanceMonitor
+    ),
   };
 }

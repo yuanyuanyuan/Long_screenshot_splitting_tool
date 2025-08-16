@@ -24,7 +24,7 @@ import type {
   SEOMonitor,
   StructuredDataType,
   SEOComponentProps,
-  SEOAnalyticsEvent
+  SEOAnalyticsEvent,
 } from '../seo.types';
 
 describe('SEO类型定义测试', () => {
@@ -43,8 +43,8 @@ describe('SEO类型定义测试', () => {
         canonicalUrl: 'https://example.com',
         hreflang: {
           'zh-CN': 'https://example.com/zh-cn',
-          'en': 'https://example.com/en'
-        }
+          en: 'https://example.com/en',
+        },
       };
 
       expect(mockMetadata.title).toBe('测试标题');
@@ -60,16 +60,16 @@ describe('SEO类型定义测试', () => {
         path: '/test',
         title: {
           'zh-CN': '中文标题',
-          'en': 'English Title'
+          en: 'English Title',
         },
         description: {
           'zh-CN': '中文描述',
-          'en': 'English Description'
+          en: 'English Description',
         },
         keywords: ['keyword1', 'keyword2'],
         priority: 0.8,
         changeFrequency: 'weekly',
-        lastModified: new Date()
+        lastModified: new Date(),
       };
 
       expect(mockPageSEO.title['zh-CN']).toBe('中文标题');
@@ -87,23 +87,23 @@ describe('SEO类型定义测试', () => {
         socialMedia: {
           twitter: '@test',
           facebook: 'test',
-          linkedin: 'test'
+          linkedin: 'test',
         },
         analytics: {
           googleAnalyticsId: 'GA-TEST',
-          googleSearchConsoleId: 'GSC-TEST'
+          googleSearchConsoleId: 'GSC-TEST',
         },
         keywords: {
           primary: ['主关键词'],
           secondary: ['次关键词'],
-          longTail: ['长尾关键词']
+          longTail: ['长尾关键词'],
         },
         defaultImages: {
           ogImage: '/og.png',
           twitterImage: '/twitter.png',
           favicon: '/favicon.ico',
-          appleTouchIcon: '/apple-touch-icon.png'
-        }
+          appleTouchIcon: '/apple-touch-icon.png',
+        },
       };
 
       expect(mockConfig.siteName).toBe('测试站点');
@@ -127,8 +127,8 @@ describe('SEO类型定义测试', () => {
         offers: {
           '@type': 'Offer',
           price: '0',
-          priceCurrency: 'USD'
-        }
+          priceCurrency: 'USD',
+        },
       };
 
       expect(mockSchema['@context']).toBe('https://schema.org');
@@ -146,15 +146,15 @@ describe('SEO类型定义测试', () => {
             '@type': 'ListItem',
             position: 1,
             name: '首页',
-            item: 'https://test.com'
+            item: 'https://test.com',
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: '上传',
-            item: 'https://test.com/upload'
-          }
-        ]
+            item: 'https://test.com/upload',
+          },
+        ],
       };
 
       expect(mockBreadcrumb['@type']).toBe('BreadcrumbList');
@@ -173,10 +173,10 @@ describe('SEO类型定义测试', () => {
             name: '如何使用这个工具？',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: '上传图片，然后点击分割按钮。'
-            }
-          }
-        ]
+              text: '上传图片，然后点击分割按钮。',
+            },
+          },
+        ],
       };
 
       expect(mockFAQ['@type']).toBe('FAQPage');
@@ -194,7 +194,7 @@ describe('SEO类型定义测试', () => {
         fid: 100,
         cls: 0.1,
         ttfb: 800,
-        inp: 200
+        inp: 200,
       };
 
       expect(typeof mockMetrics.fcp).toBe('number');
@@ -214,11 +214,11 @@ describe('SEO类型定义测试', () => {
           lcp: 2500,
           fid: 100,
           cls: 0.1,
-          ttfb: 800
+          ttfb: 800,
         },
         seoScore: 85,
         issues: [],
-        recommendations: ['优化图片加载', '减少JavaScript执行时间']
+        recommendations: ['优化图片加载', '减少JavaScript执行时间'],
       };
 
       expect(mockReport.url).toBe('https://test.com');
@@ -234,11 +234,13 @@ describe('SEO类型定义测试', () => {
         message: '缺少meta描述',
         element: 'meta[name="description"]',
         severity: 'medium',
-        fix: '添加meta描述标签'
+        fix: '添加meta描述标签',
       };
 
       expect(['error', 'warning', 'info']).toContain(mockIssue.type);
-      expect(['metadata', 'structured-data', 'performance', 'content', 'technical']).toContain(mockIssue.category);
+      expect(['metadata', 'structured-data', 'performance', 'content', 'technical']).toContain(
+        mockIssue.category
+      );
       expect(['low', 'medium', 'high', 'critical']).toContain(mockIssue.severity);
     });
   });
@@ -246,18 +248,18 @@ describe('SEO类型定义测试', () => {
   describe('内容优化接口测试', () => {
     it('KeywordDensity应该包含关键词分析数据', () => {
       const mockDensity: KeywordDensity = {
-        '长截图分割': {
+        长截图分割: {
           count: 5,
           density: 2.5,
           isOptimal: true,
-          positions: [10, 25, 50, 75, 90]
+          positions: [10, 25, 50, 75, 90],
         },
-        '图片处理': {
+        图片处理: {
           count: 3,
           density: 1.5,
           isOptimal: true,
-          positions: [15, 35, 80]
-        }
+          positions: [15, 35, 80],
+        },
       };
 
       expect(mockDensity['长截图分割'].count).toBe(5);
@@ -271,12 +273,12 @@ describe('SEO类型定义测试', () => {
         title: {
           length: 45,
           isOptimal: true,
-          suggestions: []
+          suggestions: [],
         },
         description: {
           length: 155,
           isOptimal: true,
-          suggestions: []
+          suggestions: [],
         },
         headings: {
           h1Count: 1,
@@ -286,16 +288,16 @@ describe('SEO类型定义测试', () => {
             {
               level: 1,
               text: '主标题',
-              hasKeywords: true
-            }
+              hasKeywords: true,
+            },
           ],
-          issues: []
+          issues: [],
         },
         keywords: {},
         readability: {
           score: 75,
           level: '中等',
-          suggestions: ['使用更简单的词汇']
+          suggestions: ['使用更简单的词汇'],
         },
         internalLinks: {
           count: 5,
@@ -303,10 +305,10 @@ describe('SEO类型定义测试', () => {
             {
               text: '上传页面',
               href: '/upload',
-              isOptimal: true
-            }
-          ]
-        }
+              isOptimal: true,
+            },
+          ],
+        },
       };
 
       expect(mockResult.title.length).toBe(45);
@@ -324,10 +326,10 @@ describe('SEO类型定义测试', () => {
         selectedCount: 3,
         language: 'zh-CN',
         customMetadata: {
-          title: '自定义标题'
+          title: '自定义标题',
         },
         enableStructuredData: true,
-        enablePerformanceMonitoring: true
+        enablePerformanceMonitoring: true,
       };
 
       expect(['home', 'upload', 'split', 'export']).toContain(mockProps.page);
@@ -353,13 +355,13 @@ describe('SEO类型定义测试', () => {
           offers: {
             '@type': 'Offer',
             price: '0',
-            priceCurrency: 'USD'
-          }
-        })
+            priceCurrency: 'USD',
+          },
+        }),
       };
 
       expect(typeof mockGenerator.generateWebApplication).toBe('function');
-      
+
       if (mockGenerator.generateWebApplication) {
         const result = mockGenerator.generateWebApplication();
         expect(result['@type']).toBe('WebApplication');
@@ -369,12 +371,12 @@ describe('SEO类型定义测试', () => {
     it('SEOMonitor接口应该定义监控方法', () => {
       const mockMonitor: Partial<SEOMonitor> = {
         checkMetaTags: () => true,
-        checkStructuredData: () => true
+        checkStructuredData: () => true,
       };
 
       expect(typeof mockMonitor.checkMetaTags).toBe('function');
       expect(typeof mockMonitor.checkStructuredData).toBe('function');
-      
+
       if (mockMonitor.checkMetaTags && mockMonitor.checkStructuredData) {
         expect(mockMonitor.checkMetaTags()).toBe(true);
         expect(mockMonitor.checkStructuredData()).toBe(true);
@@ -396,14 +398,14 @@ describe('SEO类型定义测试', () => {
         offers: {
           '@type': 'Offer',
           price: '0',
-          priceCurrency: 'USD'
-        }
+          priceCurrency: 'USD',
+        },
       };
 
       const breadcrumbSchema: StructuredDataType = {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
-        itemListElement: []
+        itemListElement: [],
       };
 
       expect(webAppSchema['@type']).toBe('WebApplication');
@@ -417,8 +419,8 @@ describe('SEO类型定义测试', () => {
         value: 100,
         metadata: {
           page: 'home',
-          optimizations: ['meta-tags', 'structured-data']
-        }
+          optimizations: ['meta-tags', 'structured-data'],
+        },
       };
 
       expect(['SEO', 'Performance', 'User Interaction']).toContain(mockEvent.category);
@@ -432,11 +434,11 @@ describe('SEO类型定义测试', () => {
     it('SEOComponentProps应该与SEOManagerProps兼容', () => {
       const props: SEOManagerProps = {
         page: 'upload',
-        language: 'en'
+        language: 'en',
       };
 
       const componentProps: SEOComponentProps = props;
-      
+
       expect(componentProps.page).toBe('upload');
       expect(componentProps.language).toBe('en');
     });

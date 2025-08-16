@@ -36,8 +36,8 @@ export const DEBUG_LEVELS: DebugLevel[] = [
     options: {
       showSliceTitle: false,
       showDimensions: false,
-      showFileSize: false
-    }
+      showFileSize: false,
+    },
   },
   {
     id: 'minimal',
@@ -46,8 +46,8 @@ export const DEBUG_LEVELS: DebugLevel[] = [
     options: {
       showSliceTitle: true,
       showDimensions: true,
-      showFileSize: false
-    }
+      showFileSize: false,
+    },
   },
   {
     id: 'standard',
@@ -56,8 +56,8 @@ export const DEBUG_LEVELS: DebugLevel[] = [
     options: {
       showSliceTitle: true,
       showDimensions: true,
-      showFileSize: true
-    }
+      showFileSize: true,
+    },
   },
   {
     id: 'detailed',
@@ -66,9 +66,9 @@ export const DEBUG_LEVELS: DebugLevel[] = [
     options: {
       showSliceTitle: true,
       showDimensions: true,
-      showFileSize: true
-    }
-  }
+      showFileSize: true,
+    },
+  },
 ];
 
 /**
@@ -79,7 +79,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
   position = 'top-right',
   compact = false,
   className = '',
-  onVisibilityChange
+  onVisibilityChange,
 }) => {
   const { t } = useI18nContext();
   const { options: config, updateOptions: updateConfig } = useTextDisplayConfig();
@@ -108,32 +108,38 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
   }, []);
 
   // 应用调试级别
-  const applyDebugLevel = useCallback((levelId: string) => {
-    const level = DEBUG_LEVELS.find(l => l.id === levelId);
-    if (level) {
-      // 合并当前配置和级别选项，确保所有必需字段都有值
-      const mergedOptions: TextDisplayOptions = {
-        ...config,
-        ...level.options
-      };
-      updateConfig(mergedOptions);
-      setCurrentLevel(levelId);
-      if (compact) {
-        setIsExpanded(false);
+  const applyDebugLevel = useCallback(
+    (levelId: string) => {
+      const level = DEBUG_LEVELS.find(l => l.id === levelId);
+      if (level) {
+        // 合并当前配置和级别选项，确保所有必需字段都有值
+        const mergedOptions: TextDisplayOptions = {
+          ...config,
+          ...level.options,
+        };
+        updateConfig(mergedOptions);
+        setCurrentLevel(levelId);
+        if (compact) {
+          setIsExpanded(false);
+        }
       }
-    }
-  }, [updateConfig, compact, config]);
+    },
+    [updateConfig, compact, config]
+  );
 
   // 快速切换常用选项
-  const toggleQuickOption = useCallback((optionKey: keyof TextDisplayOptions) => {
-    const newConfig = {
-      ...config,
-      [optionKey]: !config[optionKey]
-    };
-    updateConfig(newConfig);
-    // 更新当前级别为自定义
-    setCurrentLevel('custom');
-  }, [config, updateConfig]);
+  const toggleQuickOption = useCallback(
+    (optionKey: keyof TextDisplayOptions) => {
+      const newConfig = {
+        ...config,
+        [optionKey]: !config[optionKey],
+      };
+      updateConfig(newConfig);
+      // 更新当前级别为自定义
+      setCurrentLevel('custom');
+    },
+    [config, updateConfig]
+  );
 
   if (!visible) {
     return (
@@ -180,7 +186,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
           <label>{t('debug.level.label')}</label>
           <select
             value={currentLevel}
-            onChange={(e) => applyDebugLevel(e.target.value)}
+            onChange={e => applyDebugLevel(e.target.value)}
             className="debug-level-select"
           >
             {DEBUG_LEVELS.map(level => (
@@ -188,9 +194,7 @@ export const DebugInfoControl: React.FC<DebugInfoControlProps> = ({
                 {t(level.nameKey)}
               </option>
             ))}
-            {currentLevel === 'custom' && (
-              <option value="custom">{t('debug.level.custom')}</option>
-            )}
+            {currentLevel === 'custom' && <option value="custom">{t('debug.level.custom')}</option>}
           </select>
         </div>
 

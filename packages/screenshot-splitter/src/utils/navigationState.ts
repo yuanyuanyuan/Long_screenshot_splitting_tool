@@ -3,19 +3,14 @@
  * 根据应用状态计算导航按钮的状态（激活、可点击、禁用）
  */
 
-import type { 
-  AppState, 
-  NavigationItem, 
-  NavigationState, 
-  NavigationMetrics 
-} from '../types';
+import type { AppState, NavigationItem, NavigationState, NavigationMetrics } from '../types';
 
 // 默认导航项配置
 export const defaultNavigationItems: NavigationItem[] = [
   { path: '/', name: '首页', icon: '🏠' },
   { path: '/upload', name: '上传', icon: '📤' },
   { path: '/split', name: '分割', icon: '✂️' },
-  { path: '/export', name: '导出', icon: '💾' }
+  { path: '/export', name: '导出', icon: '💾' },
 ];
 
 /**
@@ -43,7 +38,7 @@ export function determineNavigationState(
   const updatedItems = items.map(item => {
     let disabled = false;
     const active = currentPath === item.path;
-    
+
     // 根据路径和应用状态确定是否禁用
     switch (item.path) {
       case '/':
@@ -65,11 +60,11 @@ export function determineNavigationState(
       default:
         disabled = false;
     }
-    
+
     return {
       ...item,
       disabled,
-      active
+      active,
     };
   });
 
@@ -124,7 +119,7 @@ export function determineNavigationState(
     currentStep: currentPath,
     availableSteps,
     completedSteps,
-    blockedSteps
+    blockedSteps,
   };
 
   return { items: updatedItems, navigationState };
@@ -144,7 +139,7 @@ export function calculateNavigationMetrics(
   const currentStepIndex = defaultNavigationItems.findIndex(
     item => item.path === navigationState.currentStep
   );
-  
+
   // 计算进度百分比：已完成步骤 + 当前步骤的权重
   const progressPercentage = Math.round(
     ((completedCount + (currentStepIndex >= 0 ? 0.5 : 0)) / totalSteps) * 100
@@ -154,7 +149,7 @@ export function calculateNavigationMetrics(
     totalSteps,
     completedSteps: completedCount,
     currentStepIndex: Math.max(0, currentStepIndex),
-    progressPercentage: Math.min(100, Math.max(0, progressPercentage))
+    progressPercentage: Math.min(100, Math.max(0, progressPercentage)),
   };
 }
 
@@ -180,41 +175,41 @@ export function checkPathAccess(
     case '/':
     case '/upload':
       return { allowed: true };
-      
+
     case '/split':
       if (isProcessing) {
         return {
           allowed: false,
           reason: '图片正在处理中，请稍候',
-          suggestedPath: '/upload'
+          suggestedPath: '/upload',
         };
       }
       if (!hasOriginalImage) {
         return {
           allowed: false,
           reason: '请先上传图片',
-          suggestedPath: '/upload'
+          suggestedPath: '/upload',
         };
       }
       return { allowed: true };
-      
+
     case '/export':
       if (isProcessing) {
         return {
           allowed: false,
           reason: '图片正在处理中，请稍候',
-          suggestedPath: '/split'
+          suggestedPath: '/split',
         };
       }
       if (!hasSelectedSlices) {
         return {
           allowed: false,
           reason: '请先选择要导出的图片切片',
-          suggestedPath: '/split'
+          suggestedPath: '/split',
         };
       }
       return { allowed: true };
-      
+
     default:
       return { allowed: true };
   }
@@ -234,14 +229,16 @@ export function getNavigationItemTooltip(
   }
 
   // 如果没有提供翻译函数，使用默认中文文本
-  const translate = t || ((key: string) => {
-    const fallbackTexts: Record<string, string> = {
-      'navigation.tooltip.split.disabled': '请先上传图片',
-      'navigation.tooltip.export.disabled': '请先选择要导出的切片',
-      'navigation.tooltip.processing': '正在处理中，请稍候...'
-    };
-    return fallbackTexts[key] || key;
-  });
+  const translate =
+    t ||
+    ((key: string) => {
+      const fallbackTexts: Record<string, string> = {
+        'navigation.tooltip.split.disabled': '请先上传图片',
+        'navigation.tooltip.export.disabled': '请先选择要导出的切片',
+        'navigation.tooltip.processing': '正在处理中，请稍候...',
+      };
+      return fallbackTexts[key] || key;
+    });
 
   switch (item.path) {
     case '/split':
@@ -279,30 +276,30 @@ export function validateNavigationState(
   errors: string[];
 } {
   const errors: string[] = [];
-  
+
   // 检查当前步骤是否在可用步骤或已完成步骤中
-  const isCurrentStepValid = 
+  const isCurrentStepValid =
     navigationState.availableSteps.includes(navigationState.currentStep) ||
     navigationState.completedSteps.includes(navigationState.currentStep);
-    
+
   if (!isCurrentStepValid && navigationState.blockedSteps.includes(navigationState.currentStep)) {
     errors.push(`当前步骤 ${navigationState.currentStep} 被阻塞但仍处于激活状态`);
   }
-  
+
   // 检查状态逻辑一致性
   const hasOriginalImage = !!appState.originalImage;
   const hasSelectedSlices = appState.selectedSlices.size > 0;
-  
+
   if (navigationState.availableSteps.includes('/split') && !hasOriginalImage) {
     errors.push('分割步骤可用但没有原始图片');
   }
-  
+
   if (navigationState.availableSteps.includes('/export') && !hasSelectedSlices) {
     errors.push('导出步骤可用但没有选中的切片');
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }

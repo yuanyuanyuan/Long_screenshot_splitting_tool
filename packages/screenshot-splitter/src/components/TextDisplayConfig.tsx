@@ -100,29 +100,26 @@ interface ConfigItemProps {
 
 function ConfigItem({ label, description, checked, onChange, compact = false }: ConfigItemProps) {
   return (
-    <div className={cn(
-      'flex items-start gap-3 p-3 rounded-lg border transition-colors',
-      checked ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200',
-      compact ? 'p-2' : ''
-    )}>
+    <div
+      className={cn(
+        'flex items-start gap-3 p-3 rounded-lg border transition-colors',
+        checked ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200',
+        compact ? 'p-2' : ''
+      )}
+    >
       <label className="flex items-start gap-2 cursor-pointer flex-1">
         <input
           type="checkbox"
           checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
+          onChange={e => onChange(e.target.checked)}
           className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
         />
         <div className="flex-1">
-          <div className={cn(
-            'font-medium text-gray-900',
-            compact ? 'text-sm' : 'text-base'
-          )}>
+          <div className={cn('font-medium text-gray-900', compact ? 'text-sm' : 'text-base')}>
             {label}
           </div>
           {description && !compact && (
-            <div className="text-sm text-gray-600 mt-1">
-              {description}
-            </div>
+            <div className="text-sm text-gray-600 mt-1">{description}</div>
           )}
         </div>
       </label>
@@ -138,23 +135,29 @@ export function TextDisplayConfig({
   onChange,
   compact = false,
   showPresets = true,
-  className
+  className,
 }: TextDisplayConfigProps) {
   const { t } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // 更新单个配置项
-  const updateOption = useCallback((key: keyof TextDisplayOptions, value: boolean) => {
-    onChange({
-      ...options,
-      [key]: value
-    });
-  }, [options, onChange]);
+  const updateOption = useCallback(
+    (key: keyof TextDisplayOptions, value: boolean) => {
+      onChange({
+        ...options,
+        [key]: value,
+      });
+    },
+    [options, onChange]
+  );
 
   // 应用预设配置
-  const applyPreset = useCallback((preset: TextDisplayOptions) => {
-    onChange(preset);
-  }, [onChange]);
+  const applyPreset = useCallback(
+    (preset: TextDisplayOptions) => {
+      onChange(preset);
+    },
+    [onChange]
+  );
 
   // 重置为默认配置
   const resetToDefault = useCallback(() => {
@@ -162,26 +165,23 @@ export function TextDisplayConfig({
   }, [onChange]);
 
   // 切换全部显示/隐藏
-  const toggleAll = useCallback((show: boolean) => {
-    const newOptions = { ...options };
-    Object.keys(newOptions).forEach(key => {
-      (newOptions as any)[key] = show;
-    });
-    onChange(newOptions);
-  }, [options, onChange]);
+  const toggleAll = useCallback(
+    (show: boolean) => {
+      const newOptions = { ...options };
+      Object.keys(newOptions).forEach(key => {
+        (newOptions as any)[key] = show;
+      });
+      onChange(newOptions);
+    },
+    [options, onChange]
+  );
 
   return (
-    <div className={cn(
-      'bg-white rounded-lg border border-gray-200 shadow-sm',
-      className
-    )}>
+    <div className={cn('bg-white rounded-lg border border-gray-200 shadow-sm', className)}>
       {/* 配置头部 */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <h3 className={cn(
-            'font-semibold text-gray-900',
-            compact ? 'text-base' : 'text-lg'
-          )}>
+          <h3 className={cn('font-semibold text-gray-900', compact ? 'text-base' : 'text-lg')}>
             {t('textDisplay.title')}
           </h3>
           <button
@@ -195,10 +195,7 @@ export function TextDisplayConfig({
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              className={cn(
-                'transition-transform',
-                isExpanded ? 'rotate-180' : ''
-              )}
+              className={cn('transition-transform', isExpanded ? 'rotate-180' : '')}
             >
               <polyline points="6,9 12,15 18,9" />
             </svg>
@@ -252,7 +249,11 @@ export function TextDisplayConfig({
                 </button>
                 <button
                   onClick={resetToDefault}
-                  className={cn(styleMapping['btn'], 'bg-gray-100 text-gray-700 hover:bg-gray-200', 'text-sm')}
+                  className={cn(
+                    styleMapping['btn'],
+                    'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                    'text-sm'
+                  )}
                 >
                   重置
                 </button>
@@ -268,28 +269,28 @@ export function TextDisplayConfig({
                 label="切片标题"
                 description="显示切片编号，如 '切片 1'"
                 checked={options.showSliceTitle}
-                onChange={(checked) => updateOption('showSliceTitle', checked)}
+                onChange={checked => updateOption('showSliceTitle', checked)}
                 compact={compact}
               />
               <ConfigItem
                 label="尺寸信息"
                 description="显示图片尺寸，如 '800 × 600'"
                 checked={options.showDimensions}
-                onChange={(checked) => updateOption('showDimensions', checked)}
+                onChange={checked => updateOption('showDimensions', checked)}
                 compact={compact}
               />
               <ConfigItem
                 label="文件大小"
                 description="显示文件大小，如 '1000 KB'"
                 checked={options.showFileSize}
-                onChange={(checked) => updateOption('showFileSize', checked)}
+                onChange={checked => updateOption('showFileSize', checked)}
                 compact={compact}
               />
               <ConfigItem
                 label="完整格式化文本"
                 description="显示完整信息，如 '切片 1 800 × 600 | 1000 KB'"
                 checked={options.showFullText}
-                onChange={(checked) => updateOption('showFullText', checked)}
+                onChange={checked => updateOption('showFullText', checked)}
                 compact={compact}
               />
             </div>
@@ -303,14 +304,14 @@ export function TextDisplayConfig({
                 label="缩略图序号"
                 description="显示缩略图左上角的序号标识"
                 checked={options.showThumbnailNumber}
-                onChange={(checked) => updateOption('showThumbnailNumber', checked)}
+                onChange={checked => updateOption('showThumbnailNumber', checked)}
                 compact={compact}
               />
               <ConfigItem
                 label="键盘导航提示"
                 description="显示键盘快捷键使用提示"
                 checked={options.showKeyboardHints}
-                onChange={(checked) => updateOption('showKeyboardHints', checked)}
+                onChange={checked => updateOption('showKeyboardHints', checked)}
                 compact={compact}
               />
             </div>
@@ -324,14 +325,14 @@ export function TextDisplayConfig({
                 label="预加载状态"
                 description="显示图片预加载进度信息"
                 checked={options.showPreloadStatus}
-                onChange={(checked) => updateOption('showPreloadStatus', checked)}
+                onChange={checked => updateOption('showPreloadStatus', checked)}
                 compact={compact}
               />
               <ConfigItem
                 label="调试信息"
                 description="显示开发调试相关信息（建议生产环境关闭）"
                 checked={options.showDebugInfo}
-                onChange={(checked) => updateOption('showDebugInfo', checked)}
+                onChange={checked => updateOption('showDebugInfo', checked)}
                 compact={compact}
               />
             </div>
@@ -341,7 +342,8 @@ export function TextDisplayConfig({
           <div className="mt-6 p-3 bg-gray-50 rounded-lg">
             <h4 className="text-sm font-medium text-gray-700 mb-2">当前配置摘要</h4>
             <div className="text-xs text-gray-600">
-              {Object.entries(options).filter(([_, value]) => value).length} / {Object.keys(options).length} 项已启用
+              {Object.entries(options).filter(([_, value]) => value).length} /{' '}
+              {Object.keys(options).length} 项已启用
             </div>
             <div className="flex flex-wrap gap-1 mt-2">
               {Object.entries(options).map(([key, value]) => (
@@ -349,9 +351,7 @@ export function TextDisplayConfig({
                   key={key}
                   className={cn(
                     'px-2 py-1 text-xs rounded-full',
-                    value 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-gray-100 text-gray-500'
+                    value ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                   )}
                 >
                   {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
@@ -366,7 +366,8 @@ export function TextDisplayConfig({
       {!isExpanded && (
         <div className="px-4 pb-4">
           <div className="text-sm text-gray-600">
-            {Object.entries(options).filter(([_, value]) => value).length} / {Object.keys(options).length} 项已启用
+            {Object.entries(options).filter(([_, value]) => value).length} /{' '}
+            {Object.keys(options).length} 项已启用
             {!options.showDebugInfo && (
               <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
                 简洁模式
@@ -383,7 +384,9 @@ export function TextDisplayConfig({
  * 文字显示配置Hook
  * 提供配置状态管理和本地存储功能
  */
-export function useTextDisplayConfig(initialOptions: TextDisplayOptions = DEFAULT_TEXT_DISPLAY_OPTIONS) {
+export function useTextDisplayConfig(
+  initialOptions: TextDisplayOptions = DEFAULT_TEXT_DISPLAY_OPTIONS
+) {
   const [options, setOptions] = useState<TextDisplayOptions>(() => {
     // 尝试从localStorage加载配置
     try {
@@ -415,9 +418,12 @@ export function useTextDisplayConfig(initialOptions: TextDisplayOptions = DEFAUL
   }, [initialOptions, updateOptions]);
 
   // 应用预设
-  const applyPreset = useCallback((preset: TextDisplayOptions) => {
-    updateOptions(preset);
-  }, [updateOptions]);
+  const applyPreset = useCallback(
+    (preset: TextDisplayOptions) => {
+      updateOptions(preset);
+    },
+    [updateOptions]
+  );
 
   return {
     options,

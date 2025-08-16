@@ -36,11 +36,11 @@ const DEFAULT_OPTIONS: Required<PDFExportOptions> = {
  */
 export class PDFExporter {
   private options: Required<PDFExportOptions>;
-  
+
   constructor(options: PDFExportOptions = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
   }
-  
+
   /**
    * 导出图片切片为PDF
    * @param imageSlices 图片切片数组
@@ -56,47 +56,47 @@ export class PDFExporter {
   ): Promise<void> {
     try {
       // 过滤选中的切片
-      const selectedSlices = imageSlices.filter(slice => 
-        selectedIndices.has(slice.index)
-      ).sort((a, b) => a.index - b.index);
-      
+      const selectedSlices = imageSlices
+        .filter(slice => selectedIndices.has(slice.index))
+        .sort((a, b) => a.index - b.index);
+
       if (selectedSlices.length === 0) {
         throw new Error('没有选中的图片切片');
       }
-      
+
       // 创建PDF文档
       const pdf = new jsPDF({
         orientation: this.options.orientation,
         unit: 'mm',
         format: this.options.format,
       });
-      
+
       // 获取页面尺寸
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const contentWidth = pageWidth - (this.options.margin * 2);
-      const contentHeight = pageHeight - (this.options.margin * 2);
-      
+      const contentWidth = pageWidth - this.options.margin * 2;
+      const contentHeight = pageHeight - this.options.margin * 2;
+
       let imagesOnCurrentPage = 0;
-      
+
       for (let i = 0; i < selectedSlices.length; i++) {
         const slice = selectedSlices[i];
-        
+
         // 如果需要新页面
         if (imagesOnCurrentPage >= this.options.imagesPerPage) {
           pdf.addPage();
           imagesOnCurrentPage = 0;
         }
-        
+
         // 如果是第一张图片，不需要添加页面
         if (i === 0) {
           // 第一页已经存在
         }
-        
+
         try {
           // 将Blob转换为base64
           const imageData = await this.blobToBase64(slice.blob);
-          
+
           // 计算图片尺寸
           const { width, height } = this.calculateImageSize(
             slice.width,
@@ -104,49 +104,40 @@ export class PDFExporter {
             contentWidth,
             contentHeight
           );
-          
+
           // 计算图片位置（居中）
           const x = this.options.margin + (contentWidth - width) / 2;
-          const y = this.options.margin + (imagesOnCurrentPage * (contentHeight / this.options.imagesPerPage));
-          
+          const y =
+            this.options.margin +
+            imagesOnCurrentPage * (contentHeight / this.options.imagesPerPage);
+
           // 添加图片到PDF
-          pdf.addImage(
-            imageData,
-            'JPEG',
-            x,
-            y,
-            width,
-            height,
-            undefined,
-            'FAST'
-          );
-          
+          pdf.addImage(imageData, 'JPEG', x, y, width, height, undefined, 'FAST');
+
           imagesOnCurrentPage++;
-          
+
           // 更新进度
           if (onProgress) {
             const progress = Math.round(((i + 1) / selectedSlices.length) * 100);
             onProgress(progress);
           }
-          
         } catch (error) {
           console.warn(`处理图片切片 ${slice.index} 时出错:`, error);
           continue;
         }
       }
-      
+
       // 保存PDF
       const pdfFileName = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
       pdf.save(pdfFileName);
-      
+
       console.log(`PDF导出完成: ${pdfFileName}`);
-      
     } catch (error) {
       console.error('PDF导出失败:', error);
       throw error;
     }
   }
-  
+
   /**
    * 将Blob转换为base64字符串
    */
@@ -161,7 +152,7 @@ export class PDFExporter {
       reader.readAsDataURL(blob);
     });
   }
-  
+
   /**
    * 计算图片在PDF中的尺寸
    */
@@ -174,28 +165,28 @@ export class PDFExporter {
     if (!this.options.autoResize) {
       return { width: originalWidth, height: originalHeight };
     }
-    
+
     const aspectRatio = originalWidth / originalHeight;
-    
+
     let width = maxWidth;
     let height = width / aspectRatio;
-    
+
     // 如果高度超出限制，按高度缩放
     if (height > maxHeight) {
       height = maxHeight;
       width = height * aspectRatio;
     }
-    
+
     return { width, height };
   }
-  
+
   /**
    * 更新导出选项
    */
   updateOptions(options: Partial<PDFExportOptions>): void {
     this.options = { ...this.options, ...options };
   }
-  
+
   /**
    * 获取当前配置
    */

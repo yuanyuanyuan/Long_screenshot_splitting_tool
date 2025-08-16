@@ -28,10 +28,7 @@
     }
   },
   "features": {
-    "i18n": [
-      "zh-CN",
-      "en"
-    ],
+    "i18n": ["zh-CN", "en"],
     "capabilities": [
       "image-upload",
       "auto-split-detection",
@@ -54,13 +51,7 @@
     "license": "MIT",
     "repository": "https://github.com/your-username/dual-build-monorepo-system",
     "homepage": "https://your-username.github.io/dual-build-monorepo-system",
-    "keywords": [
-      "screenshot",
-      "image-processing",
-      "react",
-      "typescript",
-      "vite"
-    ],
+    "keywords": ["screenshot", "image-processing", "react", "typescript", "vite"],
     "seo": {
       "title": "长截图分割工具 - 智能图片处理",
       "description": "免费在线长截图分割工具，支持自动检测分割点、手动调整、批量处理，无需上传到服务器，保护隐私安全",

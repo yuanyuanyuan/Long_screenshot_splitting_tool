@@ -16,7 +16,7 @@ export function useRouter() {
   const [state, setState] = useState<SimpleRouterState>(() => ({
     currentPath: window.location.hash.slice(1) || '/',
     params: {},
-    query: {}
+    query: {},
   }));
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function useRouter() {
       setState({
         currentPath: path,
         params: {},
-        query: {}
+        query: {},
       });
     };
 
@@ -47,7 +47,7 @@ export function useRouter() {
     query: state.query,
     push,
     replace,
-    isActive: (path: string) => state.currentPath === path
+    isActive: (path: string) => state.currentPath === path,
   };
 }
 

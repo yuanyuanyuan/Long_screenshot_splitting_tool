@@ -11,13 +11,6 @@
       "@ui/*": ["../ui-library/src/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "index.html"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.*"
-  ]
+  "include": ["src/**/*", "index.html"],
+  "exclude": ["node_modules", "dist", "**/*.test.*"]
 }

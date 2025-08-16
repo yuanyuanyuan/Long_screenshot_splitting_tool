@@ -23,62 +23,67 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
   className = '',
   onStateChange,
   maxFileSize = 10 * 1024 * 1024, // 10MB
-  supportedFormats = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
+  supportedFormats = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
 }) => {
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { state, actions } = useAppState();
   const { processImage, isProcessing } = useImageProcessor({ state, actions });
-  
+
   // 添加调试状态Hook
   const debugState = useDebugState({
     state,
     originalImage: state.originalImage,
     slices: state.imageSlices,
     selectedSlices: Array.from(state.selectedSlices),
-    isProcessing: isProcessing || state.isProcessing
+    isProcessing: isProcessing || state.isProcessing,
   });
 
   // 处理文件上传
-  const handleFileUpload = useCallback(async (file: File) => {
-    try {
-      setError(null);
-      setCurrentFile(file);
-      
-      // 验证文件大小
-      if (file.size > maxFileSize) {
-        throw new Error(`文件大小不能超过 ${Math.round(maxFileSize / 1024 / 1024)}MB`);
+  const handleFileUpload = useCallback(
+    async (file: File) => {
+      try {
+        setError(null);
+        setCurrentFile(file);
+
+        // 验证文件大小
+        if (file.size > maxFileSize) {
+          throw new Error(`文件大小不能超过 ${Math.round(maxFileSize / 1024 / 1024)}MB`);
+        }
+
+        // 验证文件格式
+        if (!supportedFormats.includes(file.type)) {
+          throw new Error(`不支持的文件格式，请上传 ${supportedFormats.join(', ')} 格式的图片`);
+        }
+
+        // 处理图片
+        await processImage(file);
+
+        // 通知父组件状态变化
+        onStateChange?.(state);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '文件处理失败';
+        setError(errorMessage);
+        console.error('File upload error:', err);
       }
-
-      // 验证文件格式
-      if (!supportedFormats.includes(file.type)) {
-        throw new Error(`不支持的文件格式，请上传 ${supportedFormats.join(', ')} 格式的图片`);
-      }
-
-      // 处理图片
-      await processImage(file);
-
-      // 通知父组件状态变化
-      onStateChange?.(state);
-      
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '文件处理失败';
-      setError(errorMessage);
-      console.error('File upload error:', err);
-    }
-  }, [maxFileSize, supportedFormats, processImage, onStateChange, state]);
+    },
+    [maxFileSize, supportedFormats, processImage, onStateChange, state]
+  );
 
   // 处理切片选择
-  const handleSliceSelection = useCallback((selectedIndices: number[]) => {
-    // 清除当前选择
-    actions.deselectAllSlices();
-    // 添加新选择
-    selectedIndices.forEach(index => {
-      actions.toggleSliceSelection(index);
-    });
-    onStateChange?.(state);
-  }, [actions, onStateChange, state]);
+  const handleSliceSelection = useCallback(
+    (selectedIndices: number[]) => {
+      // 清除当前选择
+      actions.deselectAllSlices();
+      // 添加新选择
+      selectedIndices.forEach(index => {
+        actions.toggleSliceSelection(index);
+      });
+      onStateChange?.(state);
+    },
+    [actions, onStateChange, state]
+  );
 
   // 处理导出
   const handleExport = useCallback((format: 'pdf' | 'zip', options?: any) => {
@@ -95,13 +100,22 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
   }, [actions, onStateChange, state]);
 
   // 计算组件状态
-  const componentState = useMemo(() => ({
-    hasFile: !!currentFile,
-    hasSlices: state.imageSlices.length > 0,
-    hasSelection: state.selectedSlices.size > 0,
-    isProcessing: isProcessing || state.isProcessing,
-    canExport: state.selectedSlices.size > 0 && !isProcessing
-  }), [currentFile, state.imageSlices.length, state.selectedSlices.size, isProcessing, state.isProcessing]);
+  const componentState = useMemo(
+    () => ({
+      hasFile: Boolean(currentFile),
+      hasSlices: state.imageSlices.length > 0,
+      hasSelection: state.selectedSlices.size > 0,
+      isProcessing: isProcessing || state.isProcessing,
+      canExport: state.selectedSlices.size > 0 && !isProcessing,
+    }),
+    [
+      currentFile,
+      state.imageSlices.length,
+      state.selectedSlices.size,
+      isProcessing,
+      state.isProcessing,
+    ]
+  );
 
   return (
     <div className={`screenshot-splitter ${className}`}>
@@ -109,7 +123,7 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
       {error && (
         <div className="error-message bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           <strong>错误：</strong> {error}
-          <button 
+          <button
             onClick={() => setError(null)}
             className="float-right text-red-700 hover:text-red-900"
           >
@@ -173,12 +187,12 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
             重新开始
           </button>
         )}
-        
+
         {/* 状态信息 */}
         <div className="status-info flex-1 text-sm text-gray-600 flex items-center">
           {componentState.hasFile && (
             <span>
-              文件：{currentFile?.name} 
+              文件：{currentFile?.name}
               {componentState.hasSlices && ` | 切片：${state.imageSlices.length}个`}
               {componentState.hasSelection && ` | 已选择：${state.selectedSlices.size}个`}
             </span>
@@ -195,9 +209,11 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
             onRunDiagnostics={() => {
               const diagnostics = debugState.getDiagnostics();
               console.log('🩺 问题诊断结果:', diagnostics);
-              
+
               if (diagnostics.hasIssues) {
-                alert(`发现 ${diagnostics.issues.length} 个问题:\n\n${diagnostics.issues.join('\n')}\n\n建议:\n${diagnostics.recommendations.join('\n')}`);
+                alert(
+                  `发现 ${diagnostics.issues.length} 个问题:\n\n${diagnostics.issues.join('\n')}\n\n建议:\n${diagnostics.recommendations.join('\n')}`
+                );
               } else {
                 alert('✅ 状态检查正常，未发现问题');
               }

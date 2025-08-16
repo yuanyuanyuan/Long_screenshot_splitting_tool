@@ -24,7 +24,7 @@ export class StructuredDataGenerator {
     // 创建多语言站点名称映射
     this.siteName = {
       'zh-CN': SEO_CONFIG.siteName,
-      'en': 'Long Screenshot Splitter'
+      en: 'Long Screenshot Splitter',
     };
     // this.organizationInfo = SEO_CONFIG.structuredData.organization;
   }
@@ -39,7 +39,7 @@ export class StructuredDataGenerator {
   ): WebApplicationSchema {
     const appName = this.siteName[language];
     const description = this.getPageDescription(page, language, context);
-    
+
     return {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
@@ -73,7 +73,7 @@ export class StructuredDataGenerator {
   ): SoftwareApplicationSchema {
     const appName = this.siteName[language];
     const description = this.getPageDescription('home', language, context);
-    
+
     return {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
@@ -100,12 +100,9 @@ export class StructuredDataGenerator {
   /**
    * 生成面包屑导航结构化数据
    */
-  generateBreadcrumb(
-    page: PageType,
-    language: Language = 'zh-CN'
-  ): BreadcrumbSchema {
+  generateBreadcrumb(page: PageType, language: Language = 'zh-CN'): BreadcrumbSchema {
     const breadcrumbItems = this.getBreadcrumbItems(page, language);
-    
+
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
@@ -123,7 +120,7 @@ export class StructuredDataGenerator {
    */
   generateFAQ(language: Language = 'zh-CN'): FAQSchema {
     const faqData = this.getFAQData(language);
-    
+
     return {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
@@ -143,7 +140,7 @@ export class StructuredDataGenerator {
    */
   generateHowTo(language: Language = 'zh-CN'): HowToSchema {
     const howToData = this.getHowToData(language);
-    
+
     return {
       '@context': 'https://schema.org',
       '@type': 'HowTo',
@@ -164,7 +161,7 @@ export class StructuredDataGenerator {
         '@type': 'HowToTool',
         name: tool,
       })),
-      step: howToData.steps.map((step) => ({
+      step: howToData.steps.map(step => ({
         '@type': 'HowToStep',
         name: step.name,
         text: step.text,
@@ -228,26 +225,20 @@ export class StructuredDataGenerator {
           'breadcrumb',
           'faq',
         ]);
-      
+
       case 'upload':
         return this.generateStructuredData(page, language, context, [
           'webApp',
           'breadcrumb',
           'howTo',
         ]);
-      
+
       case 'split':
-        return this.generateStructuredData(page, language, context, [
-          'webApp',
-          'breadcrumb',
-        ]);
-      
+        return this.generateStructuredData(page, language, context, ['webApp', 'breadcrumb']);
+
       case 'export':
-        return this.generateStructuredData(page, language, context, [
-          'webApp',
-          'breadcrumb',
-        ]);
-      
+        return this.generateStructuredData(page, language, context, ['webApp', 'breadcrumb']);
+
       default:
         return this.generateStructuredData(page, language, context, ['webApp']);
     }
@@ -285,7 +276,7 @@ export class StructuredDataGenerator {
         if (!app.offers) errors.push('缺少offers字段');
         break;
       }
-      
+
       case 'BreadcrumbList': {
         const breadcrumb = data as BreadcrumbSchema;
         if (!breadcrumb.itemListElement || breadcrumb.itemListElement.length === 0) {
@@ -293,7 +284,7 @@ export class StructuredDataGenerator {
         }
         break;
       }
-      
+
       case 'FAQPage': {
         const faq = data as FAQSchema;
         if (!faq.mainEntity || faq.mainEntity.length === 0) {
@@ -301,7 +292,7 @@ export class StructuredDataGenerator {
         }
         break;
       }
-      
+
       case 'HowTo': {
         const howTo = data as HowToSchema;
         if (!howTo.step || howTo.step.length === 0) {
@@ -314,8 +305,10 @@ export class StructuredDataGenerator {
     // 检查URL格式
     const urlFields = ['url', 'downloadUrl'];
     urlFields.forEach(field => {
-      if (data[field as keyof StructuredDataType] && 
-          !this.isValidUrl(data[field as keyof StructuredDataType] as string)) {
+      if (
+        data[field as keyof StructuredDataType] &&
+        !this.isValidUrl(data[field as keyof StructuredDataType] as string)
+      ) {
         warnings.push(`${field}字段的URL格式可能不正确`);
       }
     });
@@ -329,11 +322,7 @@ export class StructuredDataGenerator {
 
   // 私有辅助方法
 
-  private getPageDescription(
-    page: PageType,
-    language: Language,
-    context: SEOContext
-  ): string {
+  private getPageDescription(page: PageType, language: Language, context: SEOContext): string {
     const descriptions = {
       'zh-CN': {
         home: '免费的在线长截图分割工具，支持PNG、JPG等格式，自动智能分割，批量导出。',
@@ -341,9 +330,10 @@ export class StructuredDataGenerator {
         split: `调整分割设置并预览切片效果${context.sliceCount ? `，当前已生成${context.sliceCount}个切片` : ''}。`,
         export: `下载分割后的图片切片${context.selectedCount ? `，已选择${context.selectedCount}个切片` : ''}。`,
       },
-      'en': {
+      en: {
         home: 'Free online long screenshot splitting tool, supports PNG, JPG formats, automatic intelligent splitting, batch export.',
-        upload: 'Upload your long screenshot files, supports drag and drop upload, automatic format and size detection.',
+        upload:
+          'Upload your long screenshot files, supports drag and drop upload, automatic format and size detection.',
         split: `Adjust split settings and preview slice effects${context.sliceCount ? `, currently generated ${context.sliceCount} slices` : ''}.`,
         export: `Download split image slices${context.selectedCount ? `, selected ${context.selectedCount} slices` : ''}.`,
       },
@@ -364,7 +354,7 @@ export class StructuredDataGenerator {
         'PDF和ZIP导出',
         '响应式设计',
       ],
-      'en': [
+      en: [
         'Automatic long screenshot splitting',
         'Multi-format support (PNG, JPG, JPEG)',
         'Batch export functionality',
@@ -408,7 +398,7 @@ export class StructuredDataGenerator {
           { name: '导出结果', url: `${this.baseUrl}/export` },
         ],
       },
-      'en': {
+      en: {
         home: [{ name: 'Home', url: this.baseUrl }],
         upload: [
           { name: 'Home', url: this.baseUrl },
@@ -455,14 +445,16 @@ export class StructuredDataGenerator {
           answer: '是的，完全免费。我们不收取任何费用，也不需要注册账户。',
         },
       ],
-      'en': [
+      en: [
         {
           question: 'What image formats does this tool support?',
-          answer: 'We support common image formats like PNG, JPG, JPEG. PNG format is recommended for best quality.',
+          answer:
+            'We support common image formats like PNG, JPG, JPEG. PNG format is recommended for best quality.',
         },
         {
           question: 'Will the image quality decrease after splitting?',
-          answer: 'No. We use lossless splitting technology to ensure split images maintain original quality.',
+          answer:
+            'No. We use lossless splitting technology to ensure split images maintain original quality.',
         },
         {
           question: 'Is there a file size limit?',
@@ -470,11 +462,13 @@ export class StructuredDataGenerator {
         },
         {
           question: 'Can split images be merged back together?',
-          answer: 'Merging functionality is not currently supported, but you can save the original image for future use.',
+          answer:
+            'Merging functionality is not currently supported, but you can save the original image for future use.',
         },
         {
           question: 'Is this tool free?',
-          answer: 'Yes, completely free. We don\'t charge any fees and no account registration is required.',
+          answer:
+            "Yes, completely free. We don't charge any fees and no account registration is required.",
         },
       ],
     };
@@ -517,9 +511,10 @@ export class StructuredDataGenerator {
           },
         ],
       },
-      'en': {
+      en: {
         name: 'How to Use Long Screenshot Splitter',
-        description: 'Complete long screenshot splitting in 4 simple steps to quickly get the image slices you need.',
+        description:
+          'Complete long screenshot splitting in 4 simple steps to quickly get the image slices you need.',
         images: [`${this.baseUrl}/images/howto-overview.jpg`],
         supplies: ['Long screenshot file', 'Modern browser'],
         tools: ['Long Screenshot Splitter Tool'],

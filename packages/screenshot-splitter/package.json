@@ -26,7 +26,7 @@
     "build:spa": "tsc -b && vite build --mode spa",
     "build:single": "tsc -b && BUILD_MODE=singlefile vite build --mode singlefile --outDir dist-single",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+      "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --ignore-pattern '**/*.test.*' --ignore-pattern '**/__tests__/**'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",

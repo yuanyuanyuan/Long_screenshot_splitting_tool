@@ -74,8 +74,8 @@ export const routerConfig: RouterConfig = {
       component: AppPlaceholder,
       meta: {
         title: 'header.title',
-        description: 'header.subtitle'
-      }
+        description: 'header.subtitle',
+      },
     },
     {
       path: '/upload',
@@ -83,8 +83,8 @@ export const routerConfig: RouterConfig = {
       component: AppPlaceholder,
       meta: {
         title: 'upload.pageTitle',
-        description: 'upload.pageDescription'
-      }
+        description: 'upload.pageDescription',
+      },
     },
     {
       path: '/split',
@@ -92,8 +92,8 @@ export const routerConfig: RouterConfig = {
       component: AppPlaceholder,
       meta: {
         title: 'split.pageTitle',
-        description: 'split.pageDescription'
-      }
+        description: 'split.pageDescription',
+      },
     },
     {
       path: '/export',
@@ -101,37 +101,37 @@ export const routerConfig: RouterConfig = {
       component: AppPlaceholder,
       meta: {
         title: 'export.pageTitle',
-        description: 'export.pageDescription'
-      }
-    }
-  ]
+        description: 'export.pageDescription',
+      },
+    },
+  ],
 };
 
 // 路径匹配工具
 export function matchRoute(path: string, routes: RouteConfig[]): RouteConfig | null {
   // 移除hash前缀
   const cleanPath = path.replace(/^#/, '');
-  
+
   // 精确匹配
   const exactMatch = routes.find(route => route.path === cleanPath);
   if (exactMatch) return exactMatch;
-  
+
   // 参数匹配（简单实现）
   for (const route of routes) {
     if (route.path.includes(':')) {
       const routeSegments = route.path.split('/');
       const pathSegments = cleanPath.split('/');
-      
+
       if (routeSegments.length === pathSegments.length) {
         const isMatch = routeSegments.every((segment, index) => {
           return segment.startsWith(':') || segment === pathSegments[index];
         });
-        
+
         if (isMatch) return route;
       }
     }
   }
-  
+
   return null;
 }
 
@@ -139,17 +139,17 @@ export function matchRoute(path: string, routes: RouteConfig[]): RouteConfig | n
 export function parseParams(path: string, routePath: string): Record<string, string> {
   const params: Record<string, string> = {};
   const cleanPath = path.replace(/^#/, '');
-  
+
   const routeSegments = routePath.split('/');
   const pathSegments = cleanPath.split('/');
-  
+
   routeSegments.forEach((segment, index) => {
     if (segment.startsWith(':')) {
       const paramName = segment.slice(1);
       params[paramName] = pathSegments[index] || '';
     }
   });
-  
+
   return params;
 }
 
@@ -157,22 +157,22 @@ export function parseParams(path: string, routePath: string): Record<string, str
 export function parseQuery(search: string): Record<string, string> {
   const query: Record<string, string> = {};
   const params = new URLSearchParams(search);
-  
+
   params.forEach((value, key) => {
     query[key] = value;
   });
-  
+
   return query;
 }
 
 // 构建URL
 export function buildUrl(path: string, query?: Record<string, string>): string {
   let url = path;
-  
+
   if (query && Object.keys(query).length > 0) {
     const searchParams = new URLSearchParams(query);
     url += `?${searchParams.toString()}`;
   }
-  
+
   return url;
 }

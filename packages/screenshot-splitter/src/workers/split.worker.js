@@ -88,9 +88,7 @@ async function processImage(file, splitHeight) {
     const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
     const ctx = canvas.getContext('2d');
 
-    console.log(
-      `OffscreenCanvas created with dimensions: ${canvas.width} x ${canvas.height}`
-    );
+    console.log(`OffscreenCanvas created with dimensions: ${canvas.width} x ${canvas.height}`);
 
     // 将图片位图绘制到 OffscreenCanvas 上
     ctx.drawImage(imageBitmap, 0, 0);
@@ -102,15 +100,10 @@ async function processImage(file, splitHeight) {
       `Verification - OffscreenCanvas: ${canvas.width} x ${canvas.height}, Original: ${imageBitmap.width} x ${imageBitmap.height}`
     );
 
-    if (
-      canvas.width === imageBitmap.width &&
-      canvas.height === imageBitmap.height
-    ) {
+    if (canvas.width === imageBitmap.width && canvas.height === imageBitmap.height) {
       console.log('✅ OffscreenCanvas dimensions match original image');
     } else {
-      console.error(
-        '❌ OffscreenCanvas dimensions do not match original image'
-      );
+      console.error('❌ OffscreenCanvas dimensions do not match original image');
     }
 
     // 更新进度到 25% (图片解码和绘制完成)
@@ -174,9 +167,7 @@ async function processImage(file, splitHeight) {
         progress: progress,
       });
 
-      console.log(
-        `Chunk ${i + 1}/${totalChunks} completed, progress: ${progress}%`
-      );
+      console.log(`Chunk ${i + 1}/${totalChunks} completed, progress: ${progress}%`);
     }
 
     console.log('Image splitting completed');

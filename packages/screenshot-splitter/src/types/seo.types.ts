@@ -309,11 +309,11 @@ export interface SEOMonitor {
 }
 
 // 导出所有类型的联合类型
-export type StructuredDataType = 
-  | WebApplicationSchema 
-  | SoftwareApplicationSchema 
-  | BreadcrumbSchema 
-  | FAQSchema 
+export type StructuredDataType =
+  | WebApplicationSchema
+  | SoftwareApplicationSchema
+  | BreadcrumbSchema
+  | FAQSchema
   | HowToSchema;
 
 export type SEOComponentProps = SEOManagerProps;

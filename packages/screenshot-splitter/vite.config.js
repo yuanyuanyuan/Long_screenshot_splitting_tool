@@ -6,7 +6,7 @@ printBuildInfo();
 
 // 获取构建配置
 const buildConfig = getBuildConfig({
-  component: 'screenshot-splitter'
+  component: 'screenshot-splitter',
 });
 
 // 导出配置
@@ -17,6 +17,6 @@ export default createAutoConfig({
   base: buildConfig.base,
   env: {
     COMPONENT_NAME: 'screenshot-splitter',
-    BUILD_MODE: buildConfig.mode
-  }
+    BUILD_MODE: buildConfig.mode,
+  },
 });

@@ -14,7 +14,14 @@ export default tseslint.config(
       'old-astro-prj/**/*',
       'vite-migration/**/*',
       'packages/*/dist/**/*',
-      '**/*.worker*.js'
+      '**/*.worker*.js',
+      '**/__tests__/**/*',
+      '**/*.test.{ts,tsx,js,jsx}',
+      '**/*.spec.{ts,tsx,js,jsx}',
+      'test-setup/**/*',
+      'tests/**/*',
+      'scripts/**/*',
+      'tools/**/*'
     ] 
   },
   {

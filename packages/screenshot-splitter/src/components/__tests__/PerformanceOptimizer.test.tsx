@@ -36,7 +36,7 @@ vi.mock('../../utils/analytics/performanceMonitor', () => {
       generateReport: mockGenerateReport,
       clearMetrics: vi.fn(),
     })),
-    onWebVitals: vi.fn((callback) => {
+    onWebVitals: vi.fn(callback => {
       // 存储回调以便测试可以触发它
       (onWebVitals as any).callback = callback;
       return vi.fn(); // 返回取消订阅函数
@@ -91,7 +91,7 @@ describe('PerformanceOptimizer', () => {
   describe('performance monitoring', () => {
     it('should initialize performance monitor on mount', () => {
       const { getPerformanceMonitor } = require('../../utils/analytics/performanceMonitor');
-      
+
       render(<PerformanceOptimizer />);
 
       expect(getPerformanceMonitor).toHaveBeenCalled();
@@ -99,15 +99,15 @@ describe('PerformanceOptimizer', () => {
 
     it('should subscribe to performance metrics', () => {
       const { onWebVitals } = require('../../utils/analytics/performanceMonitor');
-      
+
       render(<PerformanceOptimizer />);
-      
+
       expect(onWebVitals).toHaveBeenCalled();
     });
 
     it('should handle custom configuration', () => {
       const { getPerformanceMonitor } = require('../../utils/analytics/performanceMonitor');
-      
+
       const customConfig = {
         performanceConfig: {
           sampleRate: 0.5,
@@ -133,12 +133,8 @@ describe('PerformanceOptimizer', () => {
   describe('lazy loading integration', () => {
     it('should use lazy loading when enabled', () => {
       const { useLazyLoadingPerformance } = require('../../hooks/useLazyLoading');
-      
-      render(
-        <PerformanceOptimizer 
-          config={{ enableLazyLoading: true }}
-        />
-      );
+
+      render(<PerformanceOptimizer config={{ enableLazyLoading: true }} />);
 
       expect(useLazyLoadingPerformance).toHaveBeenCalled();
     });
@@ -146,12 +142,8 @@ describe('PerformanceOptimizer', () => {
     it('should not use lazy loading when disabled', () => {
       const { useLazyLoadingPerformance } = require('../../hooks/useLazyLoading');
       vi.mocked(useLazyLoadingPerformance).mockClear();
-      
-      render(
-        <PerformanceOptimizer 
-          config={{ enableLazyLoading: false }}
-        />
-      );
+
+      render(<PerformanceOptimizer config={{ enableLazyLoading: false }} />);
 
       // 组件仍然会调用hook，但不会使用其数据
       expect(useLazyLoadingPerformance).toHaveBeenCalled();
@@ -164,23 +156,19 @@ describe('PerformanceOptimizer', () => {
       process.env.NODE_ENV = 'development';
 
       render(
-        <PerformanceOptimizer 
-          config={{ showMetrics: true }}
-        >
+        <PerformanceOptimizer config={{ showMetrics: true }}>
           <div data-testid="content">Content</div>
         </PerformanceOptimizer>
       );
 
       expect(screen.getByTestId('content')).toBeInTheDocument();
-      
+
       process.env.NODE_ENV = originalEnv;
     });
 
     it('should hide metrics when disabled', () => {
       render(
-        <PerformanceOptimizer 
-          config={{ showMetrics: false }}
-        >
+        <PerformanceOptimizer config={{ showMetrics: false }}>
           <div data-testid="content">Content</div>
         </PerformanceOptimizer>
       );
@@ -205,12 +193,8 @@ describe('PerformanceOptimizer', () => {
         throw new Error('Lazy loading failed');
       });
 
-      expect(() => 
-        render(
-          <PerformanceOptimizer 
-            config={{ enableLazyLoading: true }}
-          />
-        )
+      expect(() =>
+        render(<PerformanceOptimizer config={{ enableLazyLoading: true }} />)
       ).not.toThrow();
     });
   });
@@ -218,7 +202,7 @@ describe('PerformanceOptimizer', () => {
   describe('web vitals callback', () => {
     it('should handle web vitals metrics', () => {
       const { onWebVitals } = require('../../utils/analytics/performanceMonitor');
-      
+
       render(<PerformanceOptimizer />);
 
       // 获取存储的回调函数

@@ -13,21 +13,21 @@ export interface AppState {
   worker: Worker | null;
   blobs: Blob[];
   objectUrls: string[];
-  
+
   // 图片处理状态
   originalImage: HTMLImageElement | null;
   imageSlices: ImageSlice[];
   selectedSlices: Set<number>;
-  
+
   // 处理状态
   isProcessing: boolean;
-  
+
   // 元数据
   splitHeight: number;
   fileName: string;
 }
 
-export type AppAction = 
+export type AppAction =
   | { type: 'SET_WORKER'; payload: Worker | null }
   | { type: 'ADD_BLOB'; payload: { blob: Blob; index: number } }
   | { type: 'SET_ORIGINAL_IMAGE'; payload: HTMLImageElement | null }
@@ -101,7 +101,10 @@ export interface NavigationProps {
 }
 
 export type NavigationCallback = (path: string, navigationState: NavigationState) => boolean | void;
-export type NavigationStateChangeCallback = (state: NavigationState, error?: NavigationError) => void;
+export type NavigationStateChangeCallback = (
+  state: NavigationState,
+  error?: NavigationError
+) => void;
 
 export interface NavigationError {
   type: 'INVALID_STATE' | 'MISSING_PREREQUISITES' | 'PROCESSING_ERROR' | 'UNKNOWN_ERROR';

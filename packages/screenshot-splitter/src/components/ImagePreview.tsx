@@ -27,24 +27,27 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   slices,
   selectedSlices,
   onSelectionChange,
-  className = ''
+  className = '',
 }) => {
   // 移除tab切换，直接显示切片预览
   const [selectAll, setSelectAll] = useState(false);
 
   // 处理切片选择
-  const handleSliceSelect = useCallback((sliceIndex: number) => {
-    const isSelected = selectedSlices.includes(sliceIndex);
-    let newSelection: number[];
+  const handleSliceSelect = useCallback(
+    (sliceIndex: number) => {
+      const isSelected = selectedSlices.includes(sliceIndex);
+      let newSelection: number[];
 
-    if (isSelected) {
-      newSelection = selectedSlices.filter(index => index !== sliceIndex);
-    } else {
-      newSelection = [...selectedSlices, sliceIndex];
-    }
+      if (isSelected) {
+        newSelection = selectedSlices.filter(index => index !== sliceIndex);
+      } else {
+        newSelection = [...selectedSlices, sliceIndex];
+      }
 
-    onSelectionChange(newSelection);
-  }, [selectedSlices, onSelectionChange]);
+      onSelectionChange(newSelection);
+    },
+    [selectedSlices, onSelectionChange]
+  );
 
   // 处理全选/取消全选
   const handleSelectAll = useCallback(() => {
@@ -53,7 +56,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       setSelectAll(false);
     } else {
       if (slices && slices.length > 0) {
-        onSelectionChange(slices.map((_, index) => index));
+        onSelectionChange(slices.map((_slice, index) => index));
         setSelectAll(true);
       }
     }
@@ -71,8 +74,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       console.log('🎯 ImagePreview渲染状态:', {
         hasOriginalImage: Boolean(originalImage),
         slicesCount: slices?.length || 0,
-        slicesData: slices?.map(s => ({ hasUrl: !!s.url, hasBlob: !!s.blob })) || [],
-        selectedSlicesCount: selectedSlices?.length || 0
+        slicesData: slices?.map(s => ({ hasUrl: Boolean(s.url), hasBlob: Boolean(s.blob) })) || [],
+        selectedSlicesCount: selectedSlices?.length || 0,
       });
     }
   }, [originalImage, slices, selectedSlices]);
@@ -87,7 +90,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           <p className="text-gray-600">请先上传一张图片进行处理</p>
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4 text-xs text-red-600 bg-red-50 p-2 rounded">
-              调试: 原图={!!originalImage ? '有' : '无'}, 切片={slices?.length || 0}个
+              调试: 原图={originalImage ? '有' : '无'}, 切片={slices?.length || 0}个
               <br />
               slices类型: {typeof slices}, 是否为数组: {Array.isArray(slices) ? '是' : '否'}
             </div>
@@ -102,12 +105,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       {/* 简化的控制栏 - 只保留全选功能 */}
       <div className="preview-controls flex justify-between items-center mb-4 p-4 bg-gray-50 rounded">
         <div className="preview-title">
-          <h3 className="text-lg font-semibold text-gray-800">
-            切片预览 ({slices.length}个)
-          </h3>
-          <p className="text-sm text-gray-600">
-            点击切片进行选择，选中的切片将用于导出
-          </p>
+          <h3 className="text-lg font-semibold text-gray-800">切片预览 ({slices.length}个)</h3>
+          <p className="text-sm text-gray-600">点击切片进行选择，选中的切片将用于导出</p>
         </div>
 
         <div className="selection-controls">
@@ -128,17 +127,16 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
               key={slice.index}
               className={`
                 slice-item border-2 rounded-lg p-2 cursor-pointer transition-all
-                ${selectedSlices.includes(index) 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-200 hover:border-gray-300'
+                ${
+                  selectedSlices.includes(index)
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 }
               `}
               onClick={() => handleSliceSelect(index)}
             >
               <div className="slice-header flex justify-between items-center mb-2">
-                <span className="slice-number text-sm font-medium">
-                  切片 {index + 1}
-                </span>
+                <span className="slice-number text-sm font-medium">切片 {index + 1}</span>
                 <div className="selection-indicator">
                   {selectedSlices.includes(index) ? (
                     <span className="text-blue-500">✓</span>
@@ -147,19 +145,19 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="slice-image-container">
                 <img
                   src={slice.url}
                   alt={`切片 ${index + 1}`}
                   className="w-full h-auto border rounded"
-                  onError={(e) => {
+                  onError={e => {
                     console.error('图片加载失败:', slice.url);
                     e.currentTarget.style.display = 'none';
                   }}
                 />
               </div>
-              
+
               <div className="slice-info mt-2 text-xs text-gray-500">
                 {slice.width} × {slice.height}
               </div>

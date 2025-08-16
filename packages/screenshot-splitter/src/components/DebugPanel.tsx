@@ -16,7 +16,7 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
   debugSnapshot,
   onLogDebugInfo,
   onRunDiagnostics,
-  className = ''
+  className = '',
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'status' | 'slices' | 'diagnostics'>('status');
@@ -89,9 +89,7 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
               </div>
               <div className="mt-1 text-gray-500">
                 <span>大小: {(slice.blobSize / 1024).toFixed(1)}KB</span>
-                {slice.urlValid && (
-                  <span className="ml-2 text-green-600">URL有效</span>
-                )}
+                {slice.urlValid && <span className="ml-2 text-green-600">URL有效</span>}
               </div>
             </div>
           ))}
@@ -111,7 +109,9 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
           <div className="condition-item bg-white p-2 rounded border text-xs">
             <div className="flex justify-between">
               <span>应显示"暂无内容":</span>
-              <span className={conditions.shouldShowNoContent ? 'text-orange-600' : 'text-green-600'}>
+              <span
+                className={conditions.shouldShowNoContent ? 'text-orange-600' : 'text-green-600'}
+              >
                 {conditions.shouldShowNoContent ? '⚠️ 是' : '✓ 否'}
               </span>
             </div>
@@ -119,7 +119,9 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
           <div className="condition-item bg-white p-2 rounded border text-xs">
             <div className="flex justify-between">
               <span>应优先显示切片:</span>
-              <span className={conditions.shouldShowSlicesFirst ? 'text-blue-600' : 'text-gray-600'}>
+              <span
+                className={conditions.shouldShowSlicesFirst ? 'text-blue-600' : 'text-gray-600'}
+              >
                 {conditions.shouldShowSlicesFirst ? '✓ 是' : '- 否'}
               </span>
             </div>
@@ -151,9 +153,7 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
       <div className="debug-header flex justify-between items-center p-4 border-b">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-sm">🔍 调试面板</h3>
-          <span className="text-xs text-gray-500">
-            ({debugSnapshot.slicesCount} 切片)
-          </span>
+          <span className="text-xs text-gray-500">({debugSnapshot.slicesCount} 切片)</span>
         </div>
         <div className="debug-actions flex gap-2">
           <button
@@ -181,13 +181,19 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
       <div className="quick-status p-3 bg-white border-b">
         <div className="flex items-center justify-between text-xs">
           <div className="flex gap-4">
-            <span className={`status-indicator ${debugSnapshot.hasSlices ? 'text-green-600' : 'text-red-600'}`}>
+            <span
+              className={`status-indicator ${debugSnapshot.hasSlices ? 'text-green-600' : 'text-red-600'}`}
+            >
               切片: {debugSnapshot.hasSlices ? '✓' : '✗'}
             </span>
-            <span className={`status-indicator ${debugSnapshot.hasOriginalImage ? 'text-green-600' : 'text-gray-500'}`}>
+            <span
+              className={`status-indicator ${debugSnapshot.hasOriginalImage ? 'text-green-600' : 'text-gray-500'}`}
+            >
               原图: {debugSnapshot.hasOriginalImage ? '✓' : '-'}
             </span>
-            <span className={`status-indicator ${debugSnapshot.isProcessing ? 'text-orange-600' : 'text-green-600'}`}>
+            <span
+              className={`status-indicator ${debugSnapshot.isProcessing ? 'text-orange-600' : 'text-green-600'}`}
+            >
               处理: {debugSnapshot.isProcessing ? '⏳' : '✓'}
             </span>
           </div>
@@ -205,7 +211,7 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({
             {[
               { key: 'status', label: '状态概览', icon: '📊' },
               { key: 'slices', label: '切片详情', icon: '🧩' },
-              { key: 'diagnostics', label: '渲染诊断', icon: '🩺' }
+              { key: 'diagnostics', label: '渲染诊断', icon: '🩺' },
             ].map(tab => (
               <button
                 key={tab.key}

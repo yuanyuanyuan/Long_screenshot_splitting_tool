@@ -37,13 +37,15 @@ export const generatePageMetadata = (
     twitterCard: customMetadata.twitterCard || 'summary_large_image',
     twitterTitle: customMetadata.twitterTitle || baseTitle,
     twitterDescription: customMetadata.twitterDescription || baseDescription,
-    twitterImage: customMetadata.twitterImage || `${SEO_CONFIG.siteUrl}${SEO_CONFIG.defaultImages.twitterImage}`,
+    twitterImage:
+      customMetadata.twitterImage ||
+      `${SEO_CONFIG.siteUrl}${SEO_CONFIG.defaultImages.twitterImage}`,
     canonicalUrl: customMetadata.canonicalUrl || generateCanonicalUrlWithLang(pageType, language),
     hreflang: customMetadata.hreflang || generateHreflangLinks(pageType),
     robots: customMetadata.robots || 'index,follow',
     author: customMetadata.author || SEO_CONFIG.structuredData.organization.name,
     publishedTime: customMetadata.publishedTime,
-    modifiedTime: customMetadata.modifiedTime || new Date().toISOString()
+    modifiedTime: customMetadata.modifiedTime || new Date().toISOString(),
   };
 
   return metadata;
@@ -52,22 +54,26 @@ export const generatePageMetadata = (
 /**
  * 生成页面标题
  */
-const generatePageTitle = (pageType: PageType, language: string, context: Record<string, any> = {}): string => {
+const generatePageTitle = (
+  pageType: PageType,
+  language: string,
+  context: Record<string, any> = {}
+): string => {
   const siteName = SEO_CONFIG.siteName;
-  
+
   const titles = {
     'zh-CN': {
       home: `${siteName} - 免费在线长截图分割工具`,
       upload: `上传图片 - ${siteName}`,
       split: `图片分割${context.sliceCount ? ` (${context.sliceCount}张)` : ''} - ${siteName}`,
-      export: `导出结果${context.selectedCount ? ` (${context.selectedCount}张)` : ''} - ${siteName}`
+      export: `导出结果${context.selectedCount ? ` (${context.selectedCount}张)` : ''} - ${siteName}`,
     },
-    'en': {
+    en: {
       home: `${siteName} - Free Online Long Screenshot Splitter`,
       upload: `Upload Image - ${siteName}`,
       split: `Split Image${context.sliceCount ? ` (${context.sliceCount} pieces)` : ''} - ${siteName}`,
-      export: `Export Results${context.selectedCount ? ` (${context.selectedCount} selected)` : ''} - ${siteName}`
-    }
+      export: `Export Results${context.selectedCount ? ` (${context.selectedCount} selected)` : ''} - ${siteName}`,
+    },
   };
 
   return titles[language as keyof typeof titles]?.[pageType] || titles['zh-CN'][pageType];
@@ -76,23 +82,31 @@ const generatePageTitle = (pageType: PageType, language: string, context: Record
 /**
  * 生成页面描述
  */
-const generatePageDescription = (pageType: PageType, language: string, context: Record<string, any> = {}): string => {
+const generatePageDescription = (
+  pageType: PageType,
+  language: string,
+  context: Record<string, any> = {}
+): string => {
   const descriptions = {
     'zh-CN': {
       home: '免费的在线长截图分割工具，支持将长图片自动切割成多个部分，无需下载软件，操作简单快捷。',
       upload: '上传您的长截图文件，支持PNG、JPG等格式，文件大小限制10MB以内。',
       split: `正在处理您的图片分割${context.sliceCount ? `，已生成${context.sliceCount}张图片` : ''}，请稍候...`,
-      export: `图片分割完成${context.selectedCount ? `，已选择${context.selectedCount}张图片` : ''}，可以下载单张图片或打包下载。`
+      export: `图片分割完成${context.selectedCount ? `，已选择${context.selectedCount}张图片` : ''}，可以下载单张图片或打包下载。`,
     },
-    'en': {
+    en: {
       home: 'Free online long screenshot splitter tool. Automatically split long images into multiple parts without downloading software.',
-      upload: 'Upload your long screenshot file. Supports PNG, JPG formats with file size limit of 10MB.',
+      upload:
+        'Upload your long screenshot file. Supports PNG, JPG formats with file size limit of 10MB.',
       split: `Processing your image splitting${context.sliceCount ? `, generated ${context.sliceCount} images` : ''}, please wait...`,
-      export: `Image splitting completed${context.selectedCount ? `, ${context.selectedCount} images selected` : ''}, you can download individual images or download as a package.`
-    }
+      export: `Image splitting completed${context.selectedCount ? `, ${context.selectedCount} images selected` : ''}, you can download individual images or download as a package.`,
+    },
   };
 
-  return descriptions[language as keyof typeof descriptions]?.[pageType] || descriptions['zh-CN'][pageType];
+  return (
+    descriptions[language as keyof typeof descriptions]?.[pageType] ||
+    descriptions['zh-CN'][pageType]
+  );
 };
 
 /**
@@ -104,7 +118,7 @@ const generatePageDescription = (pageType: PageType, language: string, context: 
 const generateCanonicalUrlWithLang = (pageType: PageType, language: string): string => {
   const baseUrl = SEO_CONFIG.siteUrl;
   const langPrefix = language === 'zh-CN' ? '' : `/${language}`;
-  
+
   switch (pageType) {
     case 'home':
       return `${baseUrl}${langPrefix}`;
@@ -127,11 +141,11 @@ const generateCanonicalUrlWithLang = (pageType: PageType, language: string): str
 const generateHreflangLinks = (pageType: PageType): Record<string, string> => {
   const baseUrl = SEO_CONFIG.siteUrl;
   const pagePath = pageType === 'home' ? '' : `/${pageType}`;
-  
+
   return {
     'zh-CN': `${baseUrl}${pagePath}`,
-    'en': `${baseUrl}/en${pagePath}`,
-    'x-default': `${baseUrl}${pagePath}`
+    en: `${baseUrl}/en${pagePath}`,
+    'x-default': `${baseUrl}${pagePath}`,
   };
 };
 
@@ -169,7 +183,7 @@ export const validateMetadata = (metadata: SEOMetadata): { isValid: boolean; err
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -239,7 +253,7 @@ export const generateKeywords = (
  */
 export const generateCanonicalUrl = (pageType: PageType): string => {
   const baseUrl = SEO_CONFIG.siteUrl;
-  
+
   switch (pageType) {
     case 'home':
       return baseUrl;
@@ -284,12 +298,12 @@ export const generateStructuredDataMetadata = (
     offers: {
       '@type': 'Offer',
       price: '0',
-      priceCurrency: 'USD'
-    }
+      priceCurrency: 'USD',
+    },
   };
 
   return {
-    structuredData: baseStructuredData
+    structuredData: baseStructuredData,
   };
 };
 
@@ -334,6 +348,6 @@ export const generateDeviceOptimizedMetadata = (
 
   return {
     title: optimizedTitle,
-    description: optimizedDescription
+    description: optimizedDescription,
   };
 };

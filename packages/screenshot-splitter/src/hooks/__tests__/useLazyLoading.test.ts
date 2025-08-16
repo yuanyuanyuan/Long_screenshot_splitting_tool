@@ -22,7 +22,7 @@ describe('useLazyLoading', () => {
     mockObserve = vi.fn();
     mockUnobserve = vi.fn();
     mockDisconnect = vi.fn();
-    
+
     mockIntersectionObserver.mockReturnValue({
       observe: mockObserve,
       unobserve: mockUnobserve,
@@ -74,8 +74,8 @@ describe('useLazyLoading', () => {
 
   it('should handle intersection callback correctly', () => {
     let intersectionCallback: IntersectionObserverCallback;
-    
-    mockIntersectionObserver.mockImplementation((callback) => {
+
+    mockIntersectionObserver.mockImplementation(callback => {
       intersectionCallback = callback;
       return {
         observe: mockObserve,
@@ -118,8 +118,8 @@ describe('useLazyLoading', () => {
 
   it('should unobserve element when triggerOnce is true and element becomes visible', () => {
     let intersectionCallback: IntersectionObserverCallback;
-    
-    mockIntersectionObserver.mockImplementation((callback) => {
+
+    mockIntersectionObserver.mockImplementation(callback => {
       intersectionCallback = callback;
       return {
         observe: mockObserve,
@@ -150,8 +150,8 @@ describe('useLazyLoading', () => {
 
   it('should not unobserve when triggerOnce is false', () => {
     let intersectionCallback: IntersectionObserverCallback;
-    
-    mockIntersectionObserver.mockImplementation((callback) => {
+
+    mockIntersectionObserver.mockImplementation(callback => {
       intersectionCallback = callback;
       return {
         observe: mockObserve,
@@ -182,8 +182,8 @@ describe('useLazyLoading', () => {
 
   it('should handle element going out of view when triggerOnce is false', () => {
     let intersectionCallback: IntersectionObserverCallback;
-    
-    mockIntersectionObserver.mockImplementation((callback) => {
+
+    mockIntersectionObserver.mockImplementation(callback => {
       intersectionCallback = callback;
       return {
         observe: mockObserve,

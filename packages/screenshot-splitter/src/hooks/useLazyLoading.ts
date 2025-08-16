@@ -71,11 +71,11 @@ const DEFAULT_OPTIONS: Required<LazyLoadingOptions> = {
 /**
  * 图片懒加载Hook
  * 使用Intersection Observer API实现高性能的懒加载功能
- * 
+ *
  * @param src 图片源地址
  * @param options 懒加载配置选项
  * @returns 懒加载状态和控制方法
- * 
+ *
  * @example
  * ```tsx
  * const { ref, src, isLoading, isLoaded, hasError, retry } = useLazyLoading(
@@ -86,11 +86,11 @@ const DEFAULT_OPTIONS: Required<LazyLoadingOptions> = {
  *     fallback: '/error.jpg'
  *   }
  * );
- * 
+ *
  * return (
  *   <div ref={ref}>
- *     <img 
- *       src={src} 
+ *     <img
+ *       src={src}
  *       alt="Lazy loaded image"
  *       onError={retry}
  *     />
@@ -108,7 +108,7 @@ export const useLazyLoading = (
   const ref = useRef<HTMLElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // 状态管理
   const [state, setState] = useState<LazyLoadingState>({
     isLoading: false,
@@ -129,16 +129,16 @@ export const useLazyLoading = (
   const preloadImage = useCallback((src: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      
+
       img.onload = () => {
         resolve();
       };
-      
+
       img.onerror = () => {
         const error = new Error(`Failed to load image: ${src}`);
         reject(error);
       };
-      
+
       img.src = src;
     });
   }, []);
@@ -153,11 +153,11 @@ export const useLazyLoading = (
       return;
     }
 
-    setState(prev => ({ 
-      ...prev, 
-      isLoading: true, 
-      hasError: false, 
-      error: undefined 
+    setState(prev => ({
+      ...prev,
+      isLoading: true,
+      hasError: false,
+      error: undefined,
     }));
 
     try {
@@ -170,23 +170,23 @@ export const useLazyLoading = (
 
       // 预加载图片
       await preloadImage(originalSrc);
-      
+
       // 加载成功
       setCurrentSrc(originalSrc);
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        isLoaded: true 
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        isLoaded: true,
       }));
     } catch (error) {
       // 加载失败
       const errorObj = error instanceof Error ? error : new Error('Unknown error');
       setCurrentSrc(config.fallback || config.placeholder);
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        hasError: true, 
-        error: errorObj 
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        hasError: true,
+        error: errorObj,
       }));
     }
   }, [originalSrc, config, preloadImage]);
@@ -227,10 +227,10 @@ export const useLazyLoading = (
    * 重试加载
    */
   const retry = useCallback(() => {
-    setState(prev => ({ 
-      ...prev, 
-      hasError: false, 
-      error: undefined 
+    setState(prev => ({
+      ...prev,
+      hasError: false,
+      error: undefined,
     }));
     executeLoad();
   }, [executeLoad]);
@@ -238,21 +238,24 @@ export const useLazyLoading = (
   /**
    * Intersection Observer 回调
    */
-  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    const [entry] = entries;
-    const isIntersecting = entry.isIntersecting;
+  const handleIntersection = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      const isIntersecting = entry.isIntersecting;
 
-    setState(prev => ({ ...prev, isIntersecting }));
+      setState(prev => ({ ...prev, isIntersecting }));
 
-    if (isIntersecting && !state.isLoaded && !state.isLoading) {
-      executeLoad();
+      if (isIntersecting && !state.isLoaded && !state.isLoading) {
+        executeLoad();
 
-      // 如果只触发一次，则断开观察
-      if (config.triggerOnce && observerRef.current) {
-        observerRef.current.disconnect();
+        // 如果只触发一次，则断开观察
+        if (config.triggerOnce && observerRef.current) {
+          observerRef.current.disconnect();
+        }
       }
-    }
-  }, [state.isLoaded, state.isLoading, executeLoad, config.triggerOnce]);
+    },
+    [state.isLoaded, state.isLoading, executeLoad, config.triggerOnce]
+  );
 
   /**
    * 设置 Intersection Observer
@@ -324,11 +327,11 @@ export const useLazyLoading = (
 /**
  * 批量懒加载Hook
  * 用于管理多个图片的懒加载
- * 
+ *
  * @param sources 图片源地址数组
  * @param options 懒加载配置选项
  * @returns 懒加载状态数组和控制方法
- * 
+ *
  * @example
  * ```tsx
  * const { items, loadAll, resetAll } = useBatchLazyLoading([
@@ -336,7 +339,7 @@ export const useLazyLoading = (
  *   'image2.jpg',
  *   'image3.jpg'
  * ], { rootMargin: '100px' });
- * 
+ *
  * return (
  *   <div>
  *     {items.map((item, index) => (
@@ -348,27 +351,122 @@ export const useLazyLoading = (
  * );
  * ```
  */
-export const useBatchLazyLoading = (
-  sources: string[],
-  options: LazyLoadingOptions = {}
-) => {
-  const items = sources.map(src => useLazyLoading(src, options));
+export const useBatchLazyLoading = (sources: string[], options: LazyLoadingOptions = {}) => {
+  const [loadedStates, setLoadedStates] = useState<Record<string, boolean>>({});
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [errorStates, setErrorStates] = useState<Record<string, boolean>>({});
+  const [visibleStates, setVisibleStates] = useState<Record<string, boolean>>({});
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const elementsRef = useRef<Map<string, HTMLElement>>(new Map());
+
+  useEffect(() => {
+    if (!observerRef.current) {
+      observerRef.current = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            const src = entry.target.getAttribute('data-src');
+            if (src && entry.isIntersecting) {
+              setVisibleStates(prev => ({ ...prev, [src]: true }));
+              setLoadingStates(prev => ({ ...prev, [src]: true }));
+
+              const img = new Image();
+              img.onload = () => {
+                setLoadedStates(prev => ({ ...prev, [src]: true }));
+                setLoadingStates(prev => ({ ...prev, [src]: false }));
+              };
+              img.onerror = () => {
+                setErrorStates(prev => ({ ...prev, [src]: true }));
+                setLoadingStates(prev => ({ ...prev, [src]: false }));
+              };
+              img.src = src;
+
+              if (observerRef.current) {
+                observerRef.current.unobserve(entry.target);
+              }
+            }
+          });
+        },
+        {
+          threshold: options.threshold || 0.1,
+          rootMargin: options.rootMargin || '50px',
+        }
+      );
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [options.threshold, options.rootMargin]);
+
+  const setRef = useCallback(
+    (src: string) => (element: HTMLElement | null) => {
+      if (element) {
+        element.setAttribute('data-src', src);
+        elementsRef.current.set(src, element);
+        if (observerRef.current) {
+          observerRef.current.observe(element);
+        }
+      } else {
+        elementsRef.current.delete(src);
+      }
+    },
+    []
+  );
+
+  const items = sources.map(src => ({
+    isLoaded: loadedStates[src] || false,
+    isLoading: loadingStates[src] || false,
+    hasError: errorStates[src] || false,
+    isVisible: visibleStates[src] || false,
+    ref: setRef(src),
+  }));
 
   const loadAll = useCallback(() => {
-    items.forEach(item => item.load());
-  }, [items]);
-
-  const resetAll = useCallback(() => {
-    items.forEach(item => item.reset());
-  }, [items]);
-
-  const retryAll = useCallback(() => {
-    items.forEach(item => {
-      if (item.hasError) {
-        item.retry();
+    sources.forEach(src => {
+      if (!loadedStates[src] && !loadingStates[src]) {
+        setLoadingStates(prev => ({ ...prev, [src]: true }));
+        const img = new Image();
+        img.onload = () => {
+          setLoadedStates(prev => ({ ...prev, [src]: true }));
+          setLoadingStates(prev => ({ ...prev, [src]: false }));
+        };
+        img.onerror = () => {
+          setErrorStates(prev => ({ ...prev, [src]: true }));
+          setLoadingStates(prev => ({ ...prev, [src]: false }));
+        };
+        img.src = src;
       }
     });
-  }, [items]);
+  }, [sources, loadedStates, loadingStates]);
+
+  const resetAll = useCallback(() => {
+    setLoadedStates({});
+    setLoadingStates({});
+    setErrorStates({});
+    setVisibleStates({});
+  }, []);
+
+  const retryAll = useCallback(() => {
+    sources.forEach(src => {
+      if (errorStates[src]) {
+        setErrorStates(prev => ({ ...prev, [src]: false }));
+        setLoadingStates(prev => ({ ...prev, [src]: true }));
+        const img = new Image();
+        img.onload = () => {
+          setLoadedStates(prev => ({ ...prev, [src]: true }));
+          setLoadingStates(prev => ({ ...prev, [src]: false }));
+        };
+        img.onerror = () => {
+          setErrorStates(prev => ({ ...prev, [src]: true }));
+          setLoadingStates(prev => ({ ...prev, [src]: false }));
+        };
+        img.src = src;
+      }
+    });
+  }, [sources, errorStates]);
 
   const stats = {
     total: items.length,
@@ -393,11 +491,11 @@ export const useBatchLazyLoading = (
 /**
  * 懒加载图片组件Hook
  * 提供完整的图片懒加载组件逻辑
- * 
+ *
  * @param src 图片源地址
  * @param options 懒加载配置选项
  * @returns 图片组件属性和状态
- * 
+ *
  * @example
  * ```tsx
  * const LazyImage = ({ src, alt, ...props }) => {
@@ -405,7 +503,7 @@ export const useBatchLazyLoading = (
  *     placeholder: '/placeholder.jpg',
  *     fallback: '/error.jpg'
  *   });
- * 
+ *
  *   return (
  *     <div ref={containerRef} className="lazy-image-container">
  *       <img {...imgProps} alt={alt} {...props} />
@@ -416,10 +514,7 @@ export const useBatchLazyLoading = (
  * };
  * ```
  */
-export const useLazyImage = (
-  src: string,
-  options: LazyLoadingOptions = {}
-) => {
+export const useLazyImage = (src: string, options: LazyLoadingOptions = {}) => {
   const lazyLoading = useLazyLoading(src, options);
 
   const imgProps = {
@@ -442,7 +537,7 @@ export const useLazyImage = (
 /**
  * 懒加载性能监控Hook
  * 监控懒加载的性能指标
- * 
+ *
  * @returns 性能监控数据和方法
  */
 export const useLazyLoadingPerformance = () => {
@@ -460,12 +555,12 @@ export const useLazyLoadingPerformance = () => {
     return () => {
       const endTime = performance.now();
       const loadTime = endTime - startTime;
-      
+
       setMetrics(prev => {
         const newLoadTimes = [...prev.loadTimes, loadTime];
         const newTotalLoadTime = prev.totalLoadTime + loadTime;
         const newLoadedImages = prev.loadedImages + 1;
-        
+
         return {
           ...prev,
           loadedImages: newLoadedImages,
@@ -504,14 +599,15 @@ export const useLazyLoadingPerformance = () => {
 
   const getPerformanceReport = useCallback(() => {
     const { loadTimes, totalImages, loadedImages, failedImages } = metrics;
-    
+
     return {
       ...metrics,
       successRate: totalImages > 0 ? (loadedImages / totalImages) * 100 : 0,
       failureRate: totalImages > 0 ? (failedImages / totalImages) * 100 : 0,
-      medianLoadTime: loadTimes.length > 0 
-        ? loadTimes.sort((a, b) => a - b)[Math.floor(loadTimes.length / 2)]
-        : 0,
+      medianLoadTime:
+        loadTimes.length > 0
+          ? loadTimes.sort((a, b) => a - b)[Math.floor(loadTimes.length / 2)]
+          : 0,
       minLoadTime: loadTimes.length > 0 ? Math.min(...loadTimes) : 0,
       maxLoadTime: loadTimes.length > 0 ? Math.max(...loadTimes) : 0,
     };

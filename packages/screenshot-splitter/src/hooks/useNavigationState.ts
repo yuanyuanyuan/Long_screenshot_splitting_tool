@@ -44,37 +44,40 @@ const DEFAULT_NAVIGATION_ITEMS: NavigationItem[] = [
   { path: '/', name: '首页', icon: '🏠' },
   { path: '/upload', name: '上传', icon: '📤' },
   { path: '/split', name: '分割', icon: '✂️' },
-  { path: '/export', name: '导出', icon: '💾' }
+  { path: '/export', name: '导出', icon: '💾' },
 ];
 
 /**
  * 优化的导航状态Hook
  */
 export function useNavigationState(
-  appState: AppState, 
+  appState: AppState,
   currentPath: string = '/',
-  options: { 
+  options: {
     enableValidation?: boolean;
     onStateChange?: (state: NavigationState) => void;
   } = {}
 ) {
   const { enableValidation = true, onStateChange } = options;
-  
+
   const [navigationState, setNavigationState] = useState<NavigationState>({
     currentStep: currentPath,
     availableSteps: ['/'],
     completedSteps: [],
-    blockedSteps: ['/split', '/export']
+    blockedSteps: ['/split', '/export'],
   });
 
   // 使用ref来存储上一次的依赖值，避免不必要的计算
-  const prevDepsRef = useRef<{
-    hasOriginalImage: boolean;
-    imageSlicesLength: number;
-    selectedSlicesSize: number;
-    currentPath: string;
-    isProcessing: boolean;
-  } | undefined>(undefined);
+  const prevDepsRef = useRef<
+    | {
+        hasOriginalImage: boolean;
+        imageSlicesLength: number;
+        selectedSlicesSize: number;
+        currentPath: string;
+        isProcessing: boolean;
+      }
+    | undefined
+  >(undefined);
 
   // 计算关键状态，使用useMemo优化
   const keyStates = useMemo(() => {
@@ -89,13 +92,13 @@ export function useNavigationState(
       hasSelectedSlices: selectedSlicesSize > 0,
       imageSlicesLength,
       selectedSlicesSize,
-      isProcessing
+      isProcessing,
     };
   }, [
     appState.originalImage,
     appState.imageSlices.length,
     appState.selectedSlices.size,
-    appState.isProcessing
+    appState.isProcessing,
   ]);
 
   // 计算导航项状态，使用useMemo优化
@@ -125,7 +128,7 @@ export function useNavigationState(
       return {
         ...item,
         disabled,
-        active
+        active,
       };
     });
   }, [keyStates, currentPath]);
@@ -133,14 +136,14 @@ export function useNavigationState(
   // 计算导航状态，使用useMemo优化
   const computedNavigationState = useMemo(() => {
     const { hasOriginalImage, hasImageSlices, hasSelectedSlices } = keyStates;
-    
+
     const completedSteps: string[] = [];
     const availableSteps: string[] = [];
     const blockedSteps: string[] = [];
 
     DEFAULT_NAVIGATION_ITEMS.forEach(item => {
       const navItem = navigationItems.find(ni => ni.path === item.path);
-      
+
       if (navItem?.disabled) {
         blockedSteps.push(item.path);
       } else if (navItem?.active) {
@@ -178,7 +181,7 @@ export function useNavigationState(
       currentStep: currentPath,
       availableSteps,
       completedSteps,
-      blockedSteps
+      blockedSteps,
     };
   }, [keyStates, navigationItems, currentPath]);
 
@@ -189,21 +192,22 @@ export function useNavigationState(
       imageSlicesLength: keyStates.imageSlicesLength,
       selectedSlicesSize: keyStates.selectedSlicesSize,
       currentPath,
-      isProcessing: keyStates.isProcessing
+      isProcessing: keyStates.isProcessing,
     };
 
     // 浅比较，避免不必要的更新
     const prevDeps = prevDepsRef.current;
-    if (!prevDeps || 
-        prevDeps.hasOriginalImage !== currentDeps.hasOriginalImage ||
-        prevDeps.imageSlicesLength !== currentDeps.imageSlicesLength ||
-        prevDeps.selectedSlicesSize !== currentDeps.selectedSlicesSize ||
-        prevDeps.currentPath !== currentDeps.currentPath ||
-        prevDeps.isProcessing !== currentDeps.isProcessing) {
-      
+    if (
+      !prevDeps ||
+      prevDeps.hasOriginalImage !== currentDeps.hasOriginalImage ||
+      prevDeps.imageSlicesLength !== currentDeps.imageSlicesLength ||
+      prevDeps.selectedSlicesSize !== currentDeps.selectedSlicesSize ||
+      prevDeps.currentPath !== currentDeps.currentPath ||
+      prevDeps.isProcessing !== currentDeps.isProcessing
+    ) {
       setNavigationState(computedNavigationState);
       prevDepsRef.current = currentDeps;
-      
+
       // 调用状态变化回调
       if (onStateChange) {
         onStateChange(computedNavigationState);
@@ -215,25 +219,21 @@ export function useNavigationState(
   const navigationMetrics = useMemo((): NavigationMetrics => {
     const totalSteps = DEFAULT_NAVIGATION_ITEMS.length;
     const completedSteps = computedNavigationState.completedSteps.length;
-    const currentStepIndex = DEFAULT_NAVIGATION_ITEMS.findIndex(
-      item => item.path === currentPath
-    );
+    const currentStepIndex = DEFAULT_NAVIGATION_ITEMS.findIndex(item => item.path === currentPath);
     const progressPercentage = Math.round((completedSteps / totalSteps) * 100);
 
     return {
       totalSteps,
       completedSteps,
       currentStepIndex: currentStepIndex >= 0 ? currentStepIndex : 0,
-      progressPercentage
+      progressPercentage,
     };
   }, [computedNavigationState, currentPath]);
 
   // 获取下一个可用步骤
   const getNextAvailableStep = useCallback((): string | null => {
-    const currentIndex = DEFAULT_NAVIGATION_ITEMS.findIndex(
-      item => item.path === currentPath
-    );
-    
+    const currentIndex = DEFAULT_NAVIGATION_ITEMS.findIndex(item => item.path === currentPath);
+
     for (let i = currentIndex + 1; i < DEFAULT_NAVIGATION_ITEMS.length; i++) {
       const item = DEFAULT_NAVIGATION_ITEMS[i];
       const navItem = navigationItems.find(ni => ni.path === item.path);
@@ -241,16 +241,14 @@ export function useNavigationState(
         return item.path;
       }
     }
-    
+
     return null;
   }, [currentPath, navigationItems]);
 
   // 获取上一个可用步骤
   const getPreviousAvailableStep = useCallback((): string | null => {
-    const currentIndex = DEFAULT_NAVIGATION_ITEMS.findIndex(
-      item => item.path === currentPath
-    );
-    
+    const currentIndex = DEFAULT_NAVIGATION_ITEMS.findIndex(item => item.path === currentPath);
+
     for (let i = currentIndex - 1; i >= 0; i--) {
       const item = DEFAULT_NAVIGATION_ITEMS[i];
       const navItem = navigationItems.find(ni => ni.path === item.path);
@@ -258,23 +256,29 @@ export function useNavigationState(
         return item.path;
       }
     }
-    
+
     return null;
   }, [currentPath, navigationItems]);
 
   // 检查步骤是否可访问
-  const isStepAccessible = useCallback((path: string): boolean => {
-    const navItem = navigationItems.find(item => item.path === path);
-    return navItem ? !navItem.disabled : false;
-  }, [navigationItems]);
+  const isStepAccessible = useCallback(
+    (path: string): boolean => {
+      const navItem = navigationItems.find(item => item.path === path);
+      return navItem ? !navItem.disabled : false;
+    },
+    [navigationItems]
+  );
 
   // 获取步骤状态
-  const getStepStatus = useCallback((path: string): 'active' | 'completed' | 'available' | 'blocked' => {
-    if (computedNavigationState.currentStep === path) return 'active';
-    if (computedNavigationState.completedSteps.includes(path)) return 'completed';
-    if (computedNavigationState.availableSteps.includes(path)) return 'available';
-    return 'blocked';
-  }, [computedNavigationState]);
+  const getStepStatus = useCallback(
+    (path: string): 'active' | 'completed' | 'available' | 'blocked' => {
+      if (computedNavigationState.currentStep === path) return 'active';
+      if (computedNavigationState.completedSteps.includes(path)) return 'completed';
+      if (computedNavigationState.availableSteps.includes(path)) return 'available';
+      return 'blocked';
+    },
+    [computedNavigationState]
+  );
 
   // 刷新函数
   const refresh = useCallback(() => {
@@ -283,10 +287,10 @@ export function useNavigationState(
       currentStep: currentPath,
       availableSteps: computedNavigationState.availableSteps,
       completedSteps: computedNavigationState.completedSteps,
-      blockedSteps: computedNavigationState.blockedSteps
+      blockedSteps: computedNavigationState.blockedSteps,
     };
     setNavigationState(newState);
-    
+
     if (onStateChange) {
       onStateChange(newState);
     }
@@ -295,13 +299,13 @@ export function useNavigationState(
   // 验证状态
   const hasValidationErrors = useMemo(() => {
     if (!enableValidation) return false;
-    
+
     // 简单的验证逻辑
     const { hasOriginalImage, hasSelectedSlices } = keyStates;
-    
+
     if (currentPath === '/split' && !hasOriginalImage) return true;
     if (currentPath === '/export' && !hasSelectedSlices) return true;
-    
+
     return false;
   }, [enableValidation, keyStates, currentPath]);
 
@@ -310,23 +314,23 @@ export function useNavigationState(
     navigationState,
     navigationItems,
     navigationMetrics,
-    
+
     // 验证相关
     isValid: !hasValidationErrors,
     validationErrors: hasValidationErrors ? ['导航状态验证失败'] : [],
-    
+
     // 工具方法
     getNextAvailableStep,
     getPreviousAvailableStep,
     isStepAccessible,
     getStepStatus,
     refresh,
-    
+
     // 便捷属性
     canGoNext: getNextAvailableStep() !== null,
     canGoPrevious: getPreviousAvailableStep() !== null,
     isFirstStep: currentPath === DEFAULT_NAVIGATION_ITEMS[0].path,
-    isLastStep: currentPath === DEFAULT_NAVIGATION_ITEMS[DEFAULT_NAVIGATION_ITEMS.length - 1].path
+    isLastStep: currentPath === DEFAULT_NAVIGATION_ITEMS[DEFAULT_NAVIGATION_ITEMS.length - 1].path,
   };
 }
 
@@ -334,27 +338,33 @@ export function useNavigationState(
  * 简化版导航状态Hook - 兼容测试
  */
 export function useNavigationStateSimple(appState: AppState, currentPath: string = '/') {
-  const keyStates = useMemo(() => ({
-    hasOriginalImage: !!appState.originalImage,
-    hasImageSlices: appState.imageSlices.length > 0,
-    hasSelectedSlices: appState.selectedSlices.size > 0,
-    isProcessing: appState.isProcessing || false
-  }), [
-    appState.originalImage,
-    appState.imageSlices.length,
-    appState.selectedSlices.size,
-    appState.isProcessing
-  ]);
+  const keyStates = useMemo(
+    () => ({
+      hasOriginalImage: !!appState.originalImage,
+      hasImageSlices: appState.imageSlices.length > 0,
+      hasSelectedSlices: appState.selectedSlices.size > 0,
+      isProcessing: appState.isProcessing || false,
+    }),
+    [
+      appState.originalImage,
+      appState.imageSlices.length,
+      appState.selectedSlices.size,
+      appState.isProcessing,
+    ]
+  );
 
-  const isCurrentPathActive = useCallback((path: string) => {
-    return currentPath === path;
-  }, [currentPath]);
+  const isCurrentPathActive = useCallback(
+    (path: string) => {
+      return currentPath === path;
+    },
+    [currentPath]
+  );
 
   return {
     canAccessSplit: keyStates.hasOriginalImage && !keyStates.isProcessing,
     canAccessExport: keyStates.hasSelectedSlices && !keyStates.isProcessing,
     isProcessing: keyStates.isProcessing,
-    isCurrentPathActive
+    isCurrentPathActive,
   };
 }
 
@@ -365,12 +375,12 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
   const progressInfo = useMemo(() => {
     const steps = ['/', '/upload', '/split', '/export'];
     const currentIndex = steps.indexOf(currentPath);
-    
+
     const keyStates = {
       hasOriginalImage: !!appState.originalImage,
       hasImageSlices: appState.imageSlices.length > 0,
       hasSelectedSlices: appState.selectedSlices.size > 0,
-      isProcessing: appState.isProcessing || false
+      isProcessing: appState.isProcessing || false,
     };
 
     // 计算已完成步骤数
@@ -384,7 +394,7 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
     for (let i = currentIndex + 1; i < steps.length; i++) {
       const step = steps[i];
       let canAccess = false;
-      
+
       switch (step) {
         case '/upload':
           canAccess = true;
@@ -398,7 +408,7 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
         default:
           canAccess = true;
       }
-      
+
       if (canAccess) {
         nextStep = step;
         break;
@@ -422,7 +432,7 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
       nextStep,
       previousStep: currentIndex > 0 ? steps[currentIndex - 1] : null,
       progressText,
-      progressPercentage
+      progressPercentage,
     };
   }, [appState, currentPath]);
 
@@ -434,22 +444,25 @@ export function useNavigationProgress(appState: AppState, currentPath: string = 
  * 用于不需要完整功能的组件，减少性能开销
  */
 export function useNavigationStateLight(appState: AppState, currentPath: string) {
-  const keyStates = useMemo(() => ({
-    hasOriginalImage: !!appState.originalImage,
-    hasImageSlices: appState.imageSlices.length > 0,
-    hasSelectedSlices: appState.selectedSlices.size > 0
-  }), [
-    appState.originalImage,
-    appState.imageSlices.length,
-    appState.selectedSlices.size
-  ]);
+  const keyStates = useMemo(
+    () => ({
+      hasOriginalImage: !!appState.originalImage,
+      hasImageSlices: appState.imageSlices.length > 0,
+      hasSelectedSlices: appState.selectedSlices.size > 0,
+    }),
+    [appState.originalImage, appState.imageSlices.length, appState.selectedSlices.size]
+  );
 
   const navigationItems = useMemo(() => {
     return DEFAULT_NAVIGATION_ITEMS.map(item => ({
       ...item,
-      disabled: item.path === '/split' ? !keyStates.hasOriginalImage :
-                item.path === '/export' ? !keyStates.hasSelectedSlices : false,
-      active: currentPath === item.path
+      disabled:
+        item.path === '/split'
+          ? !keyStates.hasOriginalImage
+          : item.path === '/export'
+            ? !keyStates.hasSelectedSlices
+            : false,
+      active: currentPath === item.path,
     }));
   }, [keyStates, currentPath]);
 

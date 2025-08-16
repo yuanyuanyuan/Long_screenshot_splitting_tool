@@ -4,9 +4,9 @@ import { createBaseConfig } from '../../vite.config.base.js';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isSingleFile = mode === 'singlefile';
-  
-  const baseConfig = createBaseConfig({ 
-    mode, 
+
+  const baseConfig = createBaseConfig({
+    mode,
     component: 'screenshot-splitter',
     customConfig: {
       // 组件特定配置
@@ -14,9 +14,9 @@ export default defineConfig(({ mode }) => {
       publicDir: isSingleFile ? false : 'public',
       server: {
         port: 3000,
-        open: true
-      }
-    }
+        open: true,
+      },
+    },
   });
 
   return baseConfig;

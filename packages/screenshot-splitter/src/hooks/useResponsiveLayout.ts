@@ -9,16 +9,16 @@ import { useState, useEffect, useCallback } from 'react';
 export const LayoutMode = {
   MOBILE: 'mobile',
   TABLET: 'tablet',
-  DESKTOP: 'desktop'
+  DESKTOP: 'desktop',
 } as const;
 
-export type LayoutMode = typeof LayoutMode[keyof typeof LayoutMode];
+export type LayoutMode = (typeof LayoutMode)[keyof typeof LayoutMode];
 
 // 断点配置
 const BREAKPOINTS = {
-  mobile: 768,   // < 768px
-  tablet: 1024,  // 768px - 1024px
-  desktop: 1024  // >= 1024px
+  mobile: 768, // < 768px
+  tablet: 1024, // 768px - 1024px
+  desktop: 1024, // >= 1024px
 } as const;
 
 // 布局策略配置
@@ -41,7 +41,7 @@ const LAYOUT_STRATEGIES: Record<LayoutMode, LayoutStrategy> = {
     sidebarWidth: '100%',
     thumbnailDisplay: 'horizontal',
     showKeyboardHints: false,
-    compactMode: true
+    compactMode: true,
   },
   [LayoutMode.TABLET]: {
     mode: LayoutMode.TABLET,
@@ -50,7 +50,7 @@ const LAYOUT_STRATEGIES: Record<LayoutMode, LayoutStrategy> = {
     sidebarWidth: '100%',
     thumbnailDisplay: 'horizontal',
     showKeyboardHints: true,
-    compactMode: false
+    compactMode: false,
   },
   [LayoutMode.DESKTOP]: {
     mode: LayoutMode.DESKTOP,
@@ -59,8 +59,8 @@ const LAYOUT_STRATEGIES: Record<LayoutMode, LayoutStrategy> = {
     sidebarWidth: '320px',
     thumbnailDisplay: 'vertical',
     showKeyboardHints: true,
-    compactMode: false
-  }
+    compactMode: false,
+  },
 };
 
 // Hook返回值接口
@@ -100,9 +100,9 @@ export interface UseResponsiveLayoutReturn {
 export function useResponsiveLayout(): UseResponsiveLayoutReturn {
   const [screenSize, setScreenSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 1024,
-    height: typeof window !== 'undefined' ? window.innerHeight : 768
+    height: typeof window !== 'undefined' ? window.innerHeight : 768,
   });
-  
+
   const [manualMode, setManualMode] = useState<LayoutMode | null>(null);
 
   // 根据屏幕宽度确定布局模式
@@ -118,7 +118,7 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
 
   // 当前布局模式（手动模式优先）
   const layoutMode = manualMode || getLayoutModeFromWidth(screenSize.width);
-  
+
   // 当前布局策略
   const layoutStrategy = LAYOUT_STRATEGIES[layoutMode];
 
@@ -131,11 +131,11 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
   const handleResize = useCallback(() => {
     const newSize = {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     };
-    
+
     setScreenSize(newSize);
-    
+
     // 如果是手动模式，检查是否需要自动切换回自动模式
     if (manualMode) {
       const autoMode = getLayoutModeFromWidth(newSize.width);
@@ -147,11 +147,11 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
         setManualMode(null);
       }
     }
-    
+
     console.log('[useResponsiveLayout] 屏幕尺寸变化:', {
       size: newSize,
       layoutMode: manualMode || getLayoutModeFromWidth(newSize.width),
-      isManual: !!manualMode
+      isManual: !!manualMode,
     });
   }, [manualMode, getLayoutModeFromWidth]);
 
@@ -160,10 +160,10 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
     if (typeof window === 'undefined') return;
 
     window.addEventListener('resize', handleResize);
-    
+
     // 初始化时触发一次
     handleResize();
-    
+
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -178,7 +178,7 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
   // 获取响应式类名
   const getResponsiveClasses = useCallback(() => {
     const strategy = layoutStrategy;
-    
+
     return {
       container: `flex ${strategy.containerDirection === 'column' ? 'flex-col' : 'flex-row'} gap-4 md:gap-6 p-4 md:p-6 bg-white rounded-lg shadow-sm w-full`,
       sidebar: `${strategy.containerDirection === 'column' ? 'w-full' : 'w-full md:w-1/3 xl:w-1/4'} flex-shrink-0 ${strategy.containerDirection === 'column' ? 'order-first' : ''} ${isMobile ? 'overscroll-contain scroll-smooth' : ''}`,
@@ -186,7 +186,7 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
       thumbnailList: `${strategy.thumbnailDisplay === 'horizontal' ? 'flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory' : 'space-y-3'} ${strategy.thumbnailDisplay === 'vertical' ? 'max-h-96 lg:max-h-[600px] overflow-y-auto' : ''} ${isMobile ? 'overscroll-contain scroll-smooth -mx-4 px-4' : ''}`,
       thumbnailItem: `${strategy.compactMode ? 'p-2 md:p-3' : 'p-3 md:p-4'} ${isMobile ? 'min-h-[60px] touch-manipulation snap-start flex-shrink-0' : ''} border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer relative flex items-center gap-3`,
       button: `${strategy.compactMode ? 'px-3 py-1.5 text-sm' : 'px-4 py-2 text-base'} ${isMobile ? 'min-h-[44px] touch-manipulation' : ''} rounded-md font-medium transition-colors duration-200`,
-      imageContainer: `w-full flex flex-col items-center justify-center ${isMobile ? 'touch-manipulation select-none' : ''}`
+      imageContainer: `w-full flex flex-col items-center justify-center ${isMobile ? 'touch-manipulation select-none' : ''}`,
     };
   }, [layoutStrategy, isMobile]);
 
@@ -199,7 +199,7 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
       isMobile,
       isTablet,
       isDesktop,
-      isManual: !!manualMode
+      isManual: !!manualMode,
     });
   }, [layoutMode, layoutStrategy, screenSize, isMobile, isTablet, isDesktop, manualMode]);
 
@@ -211,7 +211,7 @@ export function useResponsiveLayout(): UseResponsiveLayoutReturn {
     isTablet,
     isDesktop,
     setLayoutMode,
-    getResponsiveClasses
+    getResponsiveClasses,
   };
 }
 

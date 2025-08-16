@@ -1,5 +1,5 @@
 import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
-import type { CLSMetric, FCPMetric, LCPMetric, TTFBMetric, Metric } from 'web-vitals';
+import type { CLSMetric, FCPMetric, LCPMetric, TTFBMetric, Metric, INPMetric } from 'web-vitals';
 
 /**
  * Core Web Vitals 指标类型
@@ -122,14 +122,15 @@ const DEFAULT_CONFIG: Required<PerformanceMonitorConfig> = {
 export class PerformanceMonitor {
   private config: Required<PerformanceMonitorConfig>;
   private metrics: Map<CoreWebVitalsMetric, PerformanceMetricData[]> = new Map();
-  private listeners: Map<CoreWebVitalsMetric, Set<(metric: PerformanceMetricData) => void>> = new Map();
+  private listeners: Map<CoreWebVitalsMetric, Set<(metric: PerformanceMetricData) => void>> =
+    new Map();
   private sessionId: string;
   private isInitialized = false;
 
   constructor(config: PerformanceMonitorConfig = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.sessionId = this.generateSessionId();
-    
+
     // 初始化指标存储
     (['CLS', 'INP', 'FCP', 'LCP', 'TTFB'] as CoreWebVitalsMetric[]).forEach(metric => {
       this.metrics.set(metric, []);
@@ -213,11 +214,11 @@ export class PerformanceMonitor {
       // 动态导入 onINP，因为它可能不在所有版本中可用
       const { onINP } = await import('web-vitals');
       if (onINP) {
-        onINP((metric: any) => {
+        onINP((metric: INPMetric) => {
           this.handleMetric('INP', metric);
         });
       }
-    } catch (error) {
+    } catch {
       // INP 不可用，使用自定义的交互延迟监控
       this.initializeCustomInteractionMonitoring();
     }
@@ -238,15 +239,15 @@ export class PerformanceMonitor {
       if (interactionStart > 0) {
         const delay = performance.now() - interactionStart;
         interactions.push(delay);
-        
+
         // 计算 75th percentile 作为 INP 近似值
         if (interactions.length >= 10) {
           const sorted = [...interactions].sort((a, b) => a - b);
           const p75Index = Math.floor(sorted.length * 0.75);
           const inp = sorted[p75Index];
-          
+
           const rating = inp <= 200 ? 'good' : inp <= 500 ? 'needs-improvement' : 'poor';
-          
+
           this.handleMetric('INP', {
             name: 'INP',
             value: inp,
@@ -254,8 +255,9 @@ export class PerformanceMonitor {
             delta: inp,
             id: `inp-${Date.now()}`,
             entries: [],
-          } as any);
-          
+            navigationType: 'navigate'
+          } as Metric);
+
           // 重置数组，保持最近的测量
           interactions.splice(0, interactions.length - 5);
         }
@@ -265,17 +267,21 @@ export class PerformanceMonitor {
 
     // 监听各种交互事件
     ['click', 'keydown', 'touchstart'].forEach(eventType => {
-      window.addEventListener(eventType, () => {
-        interactionStart = performance.now();
-        requestAnimationFrame(measureInteraction);
-      }, { passive: true });
+      window.addEventListener(
+        eventType,
+        () => {
+          interactionStart = performance.now();
+          requestAnimationFrame(measureInteraction);
+        },
+        { passive: true }
+      );
     });
   }
 
   /**
    * 处理性能指标
    */
-  private handleMetric(name: CoreWebVitalsMetric, metric: Metric): void {
+  private handleMetric(name: CoreWebVitalsMetric, metric: Metric | any): void {
     const metricData: PerformanceMetricData = {
       name,
       value: metric.value,
@@ -324,7 +330,9 @@ export class PerformanceMonitor {
       return 'unknown';
     }
 
-    const navigation = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const navigation = window.performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming;
     if (navigation) {
       return navigation.type || 'navigate';
     }
@@ -376,13 +384,13 @@ export class PerformanceMonitor {
     const listeners = this.listeners.get(metric);
     if (listeners) {
       listeners.add(callback);
-      
+
       // 返回取消监听的函数
       return () => {
         listeners.delete(callback);
       };
     }
-    
+
     return () => {};
   }
 
@@ -390,8 +398,9 @@ export class PerformanceMonitor {
    * 添加所有指标监听器
    */
   public onAllMetrics(callback: (data: PerformanceMetricData) => void): () => void {
-    const unsubscribers = (['CLS', 'INP', 'FCP', 'LCP', 'TTFB'] as CoreWebVitalsMetric[])
-      .map(metric => this.onMetric(metric, callback));
+    const unsubscribers = (['CLS', 'INP', 'FCP', 'LCP', 'TTFB'] as CoreWebVitalsMetric[]).map(
+      metric => this.onMetric(metric, callback)
+    );
 
     return () => {
       unsubscribers.forEach(unsubscribe => unsubscribe());
@@ -426,7 +435,13 @@ export class PerformanceMonitor {
   public getStats(): PerformanceStats {
     const stats: PerformanceStats = {
       totalMeasurements: 0,
-      metrics: {} as any,
+      metrics: {
+        CLS: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
+        FCP: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
+        INP: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
+        LCP: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
+        TTFB: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 }
+      },
       overallScore: 0,
       lastUpdated: Date.now(),
     };
@@ -437,12 +452,12 @@ export class PerformanceMonitor {
     (['CLS', 'INP', 'FCP', 'LCP', 'TTFB'] as CoreWebVitalsMetric[]).forEach(metricName => {
       const metricData = this.metrics.get(metricName) || [];
       const values = metricData.map(m => m.value);
-      
+
       if (values.length > 0) {
         const good = metricData.filter(m => m.rating === 'good').length;
         const needsImprovement = metricData.filter(m => m.rating === 'needs-improvement').length;
         const poor = metricData.filter(m => m.rating === 'poor').length;
-        
+
         stats.metrics[metricName] = {
           count: values.length,
           average: values.reduce((a, b) => a + b, 0) / values.length,
@@ -492,7 +507,8 @@ export class PerformanceMonitor {
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
       connectionType: this.getConnectionType(),
       deviceMemory: this.getDeviceMemory(),
-      hardwareConcurrency: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 0 : 0,
+      hardwareConcurrency:
+        typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 0 : 0,
       metrics: allMetrics,
       timestamp: Date.now(),
       sessionId: this.sessionId,
@@ -508,8 +524,15 @@ export class PerformanceMonitor {
       return 'unknown';
     }
 
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-    return connection ? connection.effectiveType || connection.type || 'unknown' : 'unknown';
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
+    return connection
+      ? connection.effectiveType ||
+          connection.type ||
+          'unknown'
+      : 'unknown';
   }
 
   /**
@@ -542,7 +565,7 @@ export class PerformanceMonitor {
    * 清除所有指标数据
    */
   public clearMetrics(): void {
-    this.metrics.forEach(metricList => metricList.length = 0);
+    this.metrics.forEach(metricList => (metricList.length = 0));
   }
 
   /**
@@ -585,7 +608,9 @@ export const getPerformanceMonitor = (config?: PerformanceMonitorConfig): Perfor
 /**
  * 初始化性能监控
  */
-export const initPerformanceMonitoring = (config?: PerformanceMonitorConfig): PerformanceMonitor => {
+export const initPerformanceMonitoring = (
+  config?: PerformanceMonitorConfig
+): PerformanceMonitor => {
   return getPerformanceMonitor(config);
 };
 
@@ -619,9 +644,9 @@ export const generatePerformanceReport = (): PerformanceReport => {
 export const sendPerformanceData = async (endpoint?: string): Promise<void> => {
   const monitor = getPerformanceMonitor();
   const report = monitor.generateReport();
-  
+
   const url = endpoint || '/api/analytics/performance';
-  
+
   try {
     await fetch(url, {
       method: 'POST',

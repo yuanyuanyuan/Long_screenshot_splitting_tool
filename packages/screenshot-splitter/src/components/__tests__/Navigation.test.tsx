@@ -13,8 +13,8 @@ vi.mock('../../utils/navigationPerformanceMonitor', () => ({
   usePerformanceMonitor: vi.fn(() => ({
     recordInteraction: vi.fn(),
     recordUpdate: vi.fn(),
-    startMeasure: vi.fn()
-  }))
+    startMeasure: vi.fn(),
+  })),
 }));
 
 // Mock导航状态Hook
@@ -24,26 +24,26 @@ vi.mock('../../hooks/useNavigationState', () => ({
       { path: '/', name: '首页', icon: '🏠', disabled: false, active: true },
       { path: '/upload', name: '上传', icon: '📤', disabled: false, active: false },
       { path: '/split', name: '分割', icon: '✂️', disabled: true, active: false },
-      { path: '/export', name: '导出', icon: '💾', disabled: true, active: false }
+      { path: '/export', name: '导出', icon: '💾', disabled: true, active: false },
     ],
     navigationMetrics: {
       totalSteps: 4,
       completedSteps: 1,
       currentStepIndex: 0,
-      progressPercentage: 25
+      progressPercentage: 25,
     },
     canGoNext: true,
     canGoPrevious: false,
     getNextAvailableStep: vi.fn(() => '/upload'),
-    getPreviousAvailableStep: vi.fn(() => null)
-  }))
+    getPreviousAvailableStep: vi.fn(() => null),
+  })),
 }));
 
 describe('Navigation组件', () => {
   const mockAppState = {
     originalImage: null,
     imageSlices: [],
-    selectedSlices: new Set()
+    selectedSlices: new Set(),
   };
 
   const defaultProps = {
@@ -51,7 +51,7 @@ describe('Navigation组件', () => {
     currentPath: '/',
     onNavigate: vi.fn(),
     showProgress: true,
-    showTooltips: true
+    showTooltips: true,
   };
 
   beforeEach(() => {
@@ -80,20 +80,20 @@ describe('Navigation组件', () => {
   it('应该处理导航按钮点击', async () => {
     const mockOnNavigate = vi.fn();
     render(<Navigation {...defaultProps} onNavigate={mockOnNavigate} />);
-    
+
     const uploadButton = screen.getByText('上传');
     await userEvent.click(uploadButton);
-    
+
     expect(mockOnNavigate).toHaveBeenCalledWith('/upload');
   });
 
   it('应该阻止禁用按钮的点击', async () => {
     const mockOnNavigate = vi.fn();
     render(<Navigation {...defaultProps} onNavigate={mockOnNavigate} />);
-    
+
     const splitButton = screen.getByText('分割');
     await userEvent.click(splitButton);
-    
+
     expect(mockOnNavigate).not.toHaveBeenCalled();
   });
 

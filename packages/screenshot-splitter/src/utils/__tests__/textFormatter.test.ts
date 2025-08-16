@@ -11,9 +11,9 @@ import {
   getSimplifiedSliceTitle,
   getSliceDimensions,
   getSliceFileSize,
-  type SliceDisplayInfo
-} from './textFormatter';
-import type { ImageSlice } from '../types';
+  type SliceDisplayInfo,
+} from '../textFormatter';
+import type { ImageSlice } from '../../types';
 
 // 模拟数据
 const createMockSliceInfo = (overrides: Partial<SliceDisplayInfo> = {}): SliceDisplayInfo => ({
@@ -21,7 +21,7 @@ const createMockSliceInfo = (overrides: Partial<SliceDisplayInfo> = {}): SliceDi
   width: 800,
   height: 600,
   size: 1024000, // 1MB
-  ...overrides
+  ...overrides,
 });
 
 const createMockImageSlice = (overrides: Partial<ImageSlice> = {}): ImageSlice => ({
@@ -30,7 +30,7 @@ const createMockImageSlice = (overrides: Partial<ImageSlice> = {}): ImageSlice =
   height: 600,
   blob: new Blob(['test'], { type: 'image/png' }),
   url: 'blob:test-url',
-  ...overrides
+  ...overrides,
 });
 
 describe('formatSliceInfo', () => {
@@ -83,14 +83,22 @@ describe('formatSliceInfo', () => {
   });
 
   it('应该在参数无效时抛出错误', () => {
-    expect(() => formatSliceInfo(null as any)).toThrow('slice参数必须是一个对象');
-    expect(() => formatSliceInfo(undefined as any)).toThrow('slice参数必须是一个对象');
-    expect(() => formatSliceInfo('invalid' as any)).toThrow('slice参数必须是一个对象');
+    expect(() => formatSliceInfo(null as unknown as SliceDisplayInfo)).toThrow(
+      'slice参数必须是一个对象'
+    );
+    expect(() => formatSliceInfo(undefined as unknown as SliceDisplayInfo)).toThrow(
+      'slice参数必须是一个对象'
+    );
+    expect(() => formatSliceInfo('invalid' as unknown as SliceDisplayInfo)).toThrow(
+      'slice参数必须是一个对象'
+    );
   });
 
   it('应该在index无效时抛出错误', () => {
     expect(() => formatSliceInfo(createMockSliceInfo({ index: -1 }))).toThrow('index必须是非负数');
-    expect(() => formatSliceInfo(createMockSliceInfo({ index: 'invalid' as any }))).toThrow('index必须是非负数');
+    expect(() =>
+      formatSliceInfo(createMockSliceInfo({ index: 'invalid' as unknown as number }))
+    ).toThrow('index必须是非负数');
   });
 
   it('应该在width无效时抛出错误', () => {
@@ -100,12 +108,16 @@ describe('formatSliceInfo', () => {
 
   it('应该在height无效时抛出错误', () => {
     expect(() => formatSliceInfo(createMockSliceInfo({ height: 0 }))).toThrow('height必须是正数');
-    expect(() => formatSliceInfo(createMockSliceInfo({ height: -100 }))).toThrow('height必须是正数');
+    expect(() => formatSliceInfo(createMockSliceInfo({ height: -100 }))).toThrow(
+      'height必须是正数'
+    );
   });
 
   it('应该在size无效时抛出错误', () => {
     expect(() => formatSliceInfo(createMockSliceInfo({ size: -1 }))).toThrow('size必须是非负数');
-    expect(() => formatSliceInfo(createMockSliceInfo({ size: 'invalid' as any }))).toThrow('size必须是非负数');
+    expect(() =>
+      formatSliceInfo(createMockSliceInfo({ size: 'invalid' as unknown as number }))
+    ).toThrow('size必须是非负数');
   });
 });
 
@@ -121,12 +133,16 @@ describe('formatImageSliceInfo', () => {
   });
 
   it('应该在ImageSlice无效时抛出错误', () => {
-    expect(() => formatImageSliceInfo(null as any)).toThrow('imageSlice参数必须是一个ImageSlice对象');
-    expect(() => formatImageSliceInfo(undefined as any)).toThrow('imageSlice参数必须是一个ImageSlice对象');
+    expect(() => formatImageSliceInfo(null as unknown as ImageSlice)).toThrow(
+      'imageSlice参数必须是一个ImageSlice对象'
+    );
+    expect(() => formatImageSliceInfo(undefined as unknown as ImageSlice)).toThrow(
+      'imageSlice参数必须是一个ImageSlice对象'
+    );
   });
 
   it('应该在blob无效时抛出错误', () => {
-    const invalidSlice = { ...createMockImageSlice(), blob: null as any };
+    const invalidSlice = { ...createMockImageSlice(), blob: null as unknown as Blob };
     expect(() => formatImageSliceInfo(invalidSlice)).toThrow('imageSlice必须包含有效的blob对象');
   });
 });
@@ -136,7 +152,7 @@ describe('formatMultipleSliceInfo', () => {
     const slices = [
       createMockSliceInfo({ index: 0, size: 1024000 }),
       createMockSliceInfo({ index: 1, size: 512000 }),
-      createMockSliceInfo({ index: 2, size: 2048000 })
+      createMockSliceInfo({ index: 2, size: 2048000 }),
     ];
 
     const results = formatMultipleSliceInfo(slices);
@@ -148,14 +164,18 @@ describe('formatMultipleSliceInfo', () => {
   });
 
   it('应该在输入不是数组时抛出错误', () => {
-    expect(() => formatMultipleSliceInfo(null as any)).toThrow('slices参数必须是数组');
-    expect(() => formatMultipleSliceInfo('invalid' as any)).toThrow('slices参数必须是数组');
+    expect(() => formatMultipleSliceInfo(null as unknown as SliceDisplayInfo[])).toThrow(
+      'slices参数必须是数组'
+    );
+    expect(() => formatMultipleSliceInfo('invalid' as unknown as SliceDisplayInfo[])).toThrow(
+      'slices参数必须是数组'
+    );
   });
 
   it('应该在某个切片无效时抛出详细错误', () => {
     const slices = [
       createMockSliceInfo(),
-      createMockSliceInfo({ index: -1 }) // 无效的index
+      createMockSliceInfo({ index: -1 }), // 无效的index
     ];
 
     expect(() => formatMultipleSliceInfo(slices)).toThrow('第2个切片格式化失败');
@@ -167,7 +187,7 @@ describe('formatMultipleImageSliceInfo', () => {
     const imageSlices = [
       createMockImageSlice({ index: 0 }),
       createMockImageSlice({ index: 1 }),
-      createMockImageSlice({ index: 2 })
+      createMockImageSlice({ index: 2 }),
     ];
 
     const results = formatMultipleImageSliceInfo(imageSlices);
@@ -179,7 +199,9 @@ describe('formatMultipleImageSliceInfo', () => {
   });
 
   it('应该在输入不是数组时抛出错误', () => {
-    expect(() => formatMultipleImageSliceInfo(null as any)).toThrow('imageSlices参数必须是数组');
+    expect(() => formatMultipleImageSliceInfo(null as unknown as ImageSlice[])).toThrow(
+      'imageSlices参数必须是数组'
+    );
   });
 });
 
@@ -192,8 +214,12 @@ describe('getSimplifiedSliceTitle', () => {
   });
 
   it('应该在切片信息无效时抛出错误', () => {
-    expect(() => getSimplifiedSliceTitle(null as any)).toThrow('无效的切片信息');
-    expect(() => getSimplifiedSliceTitle({ index: 'invalid' } as any)).toThrow('无效的切片信息');
+    expect(() => getSimplifiedSliceTitle(null as unknown as SliceDisplayInfo)).toThrow(
+      '无效的切片信息'
+    );
+    expect(() =>
+      getSimplifiedSliceTitle({ index: 'invalid' } as unknown as SliceDisplayInfo)
+    ).toThrow('无效的切片信息');
   });
 });
 
@@ -206,8 +232,12 @@ describe('getSliceDimensions', () => {
   });
 
   it('应该在尺寸信息无效时抛出错误', () => {
-    expect(() => getSliceDimensions(null as any)).toThrow('无效的切片尺寸信息');
-    expect(() => getSliceDimensions({ width: 'invalid' } as any)).toThrow('无效的切片尺寸信息');
+    expect(() => getSliceDimensions(null as unknown as SliceDisplayInfo)).toThrow(
+      '无效的切片尺寸信息'
+    );
+    expect(() => getSliceDimensions({ width: 'invalid' } as unknown as SliceDisplayInfo)).toThrow(
+      '无效的切片尺寸信息'
+    );
   });
 });
 
@@ -220,8 +250,12 @@ describe('getSliceFileSize', () => {
   });
 
   it('应该在大小信息无效时抛出错误', () => {
-    expect(() => getSliceFileSize(null as any)).toThrow('无效的切片大小信息');
-    expect(() => getSliceFileSize({ size: 'invalid' } as any)).toThrow('无效的切片大小信息');
+    expect(() => getSliceFileSize(null as unknown as SliceDisplayInfo)).toThrow(
+      '无效的切片大小信息'
+    );
+    expect(() => getSliceFileSize({ size: 'invalid' } as unknown as SliceDisplayInfo)).toThrow(
+      '无效的切片大小信息'
+    );
   });
 });
 

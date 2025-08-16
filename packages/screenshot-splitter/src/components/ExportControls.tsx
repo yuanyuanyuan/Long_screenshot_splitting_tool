@@ -41,11 +41,11 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
   slices,
   onExport,
   disabled = false,
-  className = ''
+  className = '',
 }) => {
   const [exportFormat, setExportFormat] = useState<'pdf' | 'zip'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
-  
+
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     format: 'pdf',
     quality: 0.9,
@@ -53,12 +53,12 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
     pdfOptions: {
       orientation: 'portrait',
       pageSize: 'A4',
-      margin: 20
+      margin: 20,
     },
     zipOptions: {
       compression: 'medium',
-      imageFormat: 'png'
-    }
+      imageFormat: 'png',
+    },
   });
 
   // 处理导出
@@ -70,7 +70,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
       await onExport(exportFormat, {
         ...exportOptions,
         selectedSlices,
-        slices: selectedSlices.map(index => slices[index])
+        slices: selectedSlices.map(index => slices[index]),
       });
     } catch (error) {
       console.error('Export failed:', error);
@@ -97,9 +97,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
 
       {/* 格式选择 */}
       <div className="format-selection mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          导出格式
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">导出格式</label>
         <div className="format-options flex gap-4">
           <label className="flex items-center">
             <input
@@ -107,8 +105,8 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
               value="pdf"
               checked={exportFormat === 'pdf'}
               onChange={() => {
-                setExportFormat('zip');
-                updateExportOptions({ format: 'zip' });
+                setExportFormat('pdf');
+                updateExportOptions({ format: 'pdf' });
               }}
               className="mr-2"
               disabled={disabled}
@@ -118,7 +116,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
               <span className="ml-2 text-xs text-gray-500">(适合打印和阅读)</span>
             </span>
           </label>
-          
+
           <label className="flex items-center">
             <input
               type="radio"
@@ -143,25 +141,21 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
       <div className="basic-settings mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              文件名
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">文件名</label>
             <input
               type="text"
               value={exportOptions.filename}
-              onChange={(e) => updateExportOptions({ filename: e.target.value })}
+              onChange={e => updateExportOptions({ filename: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={disabled}
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              图片质量
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">图片质量</label>
             <select
               value={exportOptions.quality}
-              onChange={(e) => updateExportOptions({ quality: parseFloat(e.target.value) })}
+              onChange={e => updateExportOptions({ quality: parseFloat(e.target.value) })}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={disabled}
             >
@@ -181,9 +175,10 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
           disabled={!canExport}
           className={`
             w-full px-6 py-3 rounded-lg font-medium transition-colors
-            ${canExport
-              ? 'bg-blue-500 hover:bg-blue-600 text-white'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            ${
+              canExport
+                ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }
           `}
         >
@@ -198,9 +193,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
         </button>
 
         {!canExport && selectedSlices.length === 0 && (
-          <p className="text-sm text-red-500 mt-2 text-center">
-            请先选择要导出的切片
-          </p>
+          <p className="text-sm text-red-500 mt-2 text-center">请先选择要导出的切片</p>
         )}
       </div>
     </div>

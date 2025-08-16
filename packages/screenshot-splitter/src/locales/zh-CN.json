@@ -3,7 +3,7 @@
   "header.subtitle": "智能分割长截图，轻松导出多张图片",
   "upload.pageTitle": "上传图片 - 长截图分割工具",
   "upload.pageDescription": "上传需要分割的长截图",
-  "split.pageTitle": "分割设置 - 长截图分割工具", 
+  "split.pageTitle": "分割设置 - 长截图分割工具",
   "split.pageDescription": "设置分割参数和预览效果",
   "export.pageTitle": "导出结果 - 长截图分割工具",
   "export.pageDescription": "下载分割后的图片",

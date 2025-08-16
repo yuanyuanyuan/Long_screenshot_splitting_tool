@@ -35,10 +35,10 @@ export interface SliceDisplayInfo {
 
 /**
  * 格式化切片信息
- * 
+ *
  * @param slice - 切片信息对象
  * @returns 格式化后的切片信息
- * 
+ *
  * @example
  * ```typescript
  * const slice = { index: 0, width: 800, height: 600, size: 1024000 };
@@ -81,16 +81,16 @@ export function formatSliceInfo(slice: SliceDisplayInfo): FormattedSliceInfo {
     title,
     dimensions,
     fileSize,
-    fullText
+    fullText,
   };
 }
 
 /**
  * 从ImageSlice对象格式化切片信息
- * 
+ *
  * @param imageSlice - ImageSlice对象
  * @returns 格式化后的切片信息
- * 
+ *
  * @example
  * ```typescript
  * const imageSlice: ImageSlice = {
@@ -120,16 +120,16 @@ export function formatImageSliceInfo(imageSlice: ImageSlice): FormattedSliceInfo
     index,
     width,
     height,
-    size: blob.size
+    size: blob.size,
   });
 }
 
 /**
  * 批量格式化多个切片信息
- * 
+ *
  * @param slices - 切片信息数组
  * @returns 格式化后的切片信息数组
- * 
+ *
  * @example
  * ```typescript
  * const slices = [
@@ -150,14 +150,16 @@ export function formatMultipleSliceInfo(slices: SliceDisplayInfo[]): FormattedSl
     try {
       return formatSliceInfo(slice);
     } catch (error) {
-      throw new Error(`formatMultipleSliceInfo: 第${arrayIndex + 1}个切片格式化失败: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `formatMultipleSliceInfo: 第${arrayIndex + 1}个切片格式化失败: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   });
 }
 
 /**
  * 批量格式化多个ImageSlice对象
- * 
+ *
  * @param imageSlices - ImageSlice对象数组
  * @returns 格式化后的切片信息数组
  */
@@ -170,17 +172,19 @@ export function formatMultipleImageSliceInfo(imageSlices: ImageSlice[]): Formatt
     try {
       return formatImageSliceInfo(slice);
     } catch (error) {
-      throw new Error(`formatMultipleImageSliceInfo: 第${arrayIndex + 1}个切片格式化失败: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `formatMultipleImageSliceInfo: 第${arrayIndex + 1}个切片格式化失败: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   });
 }
 
 /**
  * 获取简化的切片标题 (仅用于移动端等空间受限场景)
- * 
+ *
  * @param slice - 切片信息对象
  * @returns 简化的标题文本
- * 
+ *
  * @example
  * ```typescript
  * const slice = { index: 0, width: 800, height: 600, size: 1024000 };
@@ -192,16 +196,16 @@ export function getSimplifiedSliceTitle(slice: SliceDisplayInfo): string {
   if (!slice || typeof slice.index !== 'number') {
     throw new Error('getSimplifiedSliceTitle: 无效的切片信息');
   }
-  
+
   return `切片 ${slice.index + 1}`;
 }
 
 /**
  * 获取切片尺寸文本
- * 
+ *
  * @param slice - 切片信息对象
  * @returns 尺寸文本
- * 
+ *
  * @example
  * ```typescript
  * const slice = { index: 0, width: 800, height: 600, size: 1024000 };
@@ -213,16 +217,16 @@ export function getSliceDimensions(slice: SliceDisplayInfo): string {
   if (!slice || typeof slice.width !== 'number' || typeof slice.height !== 'number') {
     throw new Error('getSliceDimensions: 无效的切片尺寸信息');
   }
-  
+
   return `${slice.width} × ${slice.height}`;
 }
 
 /**
  * 获取切片文件大小文本
- * 
+ *
  * @param slice - 切片信息对象
  * @returns 文件大小文本
- * 
+ *
  * @example
  * ```typescript
  * const slice = { index: 0, width: 800, height: 600, size: 1024000 };
@@ -234,7 +238,7 @@ export function getSliceFileSize(slice: SliceDisplayInfo): string {
   if (!slice || typeof slice.size !== 'number') {
     throw new Error('getSliceFileSize: 无效的切片大小信息');
   }
-  
+
   const sizeInKB = Math.round(slice.size / 1024);
   return `${sizeInKB} KB`;
 }

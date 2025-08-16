@@ -27,7 +27,7 @@ export const ImagePreviewWrapper: React.FC<ImagePreviewWrapperProps> = ({
   slices,
   selectedSlices,
   onSelectionChange,
-  className = ''
+  className = '',
 }) => {
   const [renderKey, setRenderKey] = useState(0);
   const [lastSlicesLength, setLastSlicesLength] = useState(0);
@@ -38,9 +38,9 @@ export const ImagePreviewWrapper: React.FC<ImagePreviewWrapperProps> = ({
       console.log('🔄 ImagePreviewWrapper: 切片数据变化，强制重新渲染', {
         oldLength: lastSlicesLength,
         newLength: slices.length,
-        slicesData: slices.map(s => ({ hasUrl: !!s.url, hasBlob: !!s.blob }))
+        slicesData: slices.map(s => ({ hasUrl: Boolean(s.url), hasBlob: Boolean(s.blob) })),
       });
-      
+
       setLastSlicesLength(slices.length);
       setRenderKey(prev => prev + 1);
     }
@@ -49,11 +49,11 @@ export const ImagePreviewWrapper: React.FC<ImagePreviewWrapperProps> = ({
   // 额外的状态验证
   useEffect(() => {
     console.log('🎯 ImagePreviewWrapper: 状态验证', {
-      hasOriginalImage: !!originalImage,
+      hasOriginalImage: Boolean(originalImage),
       slicesCount: slices.length,
       selectedSlicesCount: selectedSlices.length,
       renderKey,
-      slicesValid: slices.every(s => s.url && s.blob)
+      slicesValid: slices.every(s => s.url && s.blob),
     });
   }, [originalImage, slices, selectedSlices, renderKey]);
 

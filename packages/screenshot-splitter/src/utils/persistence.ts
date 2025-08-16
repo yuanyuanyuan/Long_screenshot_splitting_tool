@@ -66,12 +66,12 @@ export function isStorageAvailable(): boolean {
  */
 export function createDebouncedSave(delay: number = 500) {
   let timeoutId: NodeJS.Timeout | null = null;
-  
+
   return function debouncedSave(state: PersistableState) {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    
+
     timeoutId = setTimeout(() => {
       saveState(state);
       timeoutId = null;

@@ -14,7 +14,7 @@ import {
   createResponsiveTextConfig,
   TextDisplayPerformanceMonitor,
   textDisplayCache,
-  optimizeTextDisplayWithCache
+  optimizeTextDisplayWithCache,
 } from './textDisplayOptimizer';
 import type { ResponsiveTextConfig } from './textDisplayOptimizer';
 import { DEFAULT_TEXT_DISPLAY_OPTIONS } from '../components/TextDisplayConfig';
@@ -23,29 +23,29 @@ import type { ImageSlice } from '../types';
 // Mock window对象
 const mockWindow = {
   innerWidth: 1920,
-  innerHeight: 1080
+  innerHeight: 1080,
 };
 
 const mockNavigator = {
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  maxTouchPoints: 0
+  maxTouchPoints: 0,
 };
 
 Object.defineProperty(global, 'window', {
   value: mockWindow,
-  writable: true
+  writable: true,
 });
 
 Object.defineProperty(global, 'navigator', {
   value: mockNavigator,
-  writable: true
+  writable: true,
 });
 
 Object.defineProperty(global, 'performance', {
   value: {
-    now: vi.fn(() => Date.now())
+    now: vi.fn(() => Date.now()),
   },
-  writable: true
+  writable: true,
 });
 
 // 创建模拟ImageSlice
@@ -55,7 +55,7 @@ const createMockImageSlice = (overrides: Partial<ImageSlice> = {}): ImageSlice =
   height: 600,
   blob: new Blob(['test'], { type: 'image/png' }),
   url: 'blob:test-url',
-  ...overrides
+  ...overrides,
 });
 
 describe('DeviceType和DisplayMode常量', () => {
@@ -83,28 +83,29 @@ describe('detectDeviceType', () => {
   it('应该在桌面端返回DESKTOP', () => {
     mockWindow.innerWidth = 1920;
     mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
-    
+
     expect(detectDeviceType()).toBe(DeviceType.DESKTOP);
   });
 
   it('应该在移动端返回MOBILE', () => {
     mockWindow.innerWidth = 375;
-    mockNavigator.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15';
-    
+    mockNavigator.userAgent =
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15';
+
     expect(detectDeviceType()).toBe(DeviceType.MOBILE);
   });
 
   it('应该在平板端返回TABLET', () => {
     mockWindow.innerWidth = 768;
     mockNavigator.userAgent = 'Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X) AppleWebKit/605.1.15';
-    
+
     expect(detectDeviceType()).toBe(DeviceType.TABLET);
   });
 
   it('应该在窄屏桌面端返回MOBILE', () => {
     mockWindow.innerWidth = 600;
     mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
-    
+
     expect(detectDeviceType()).toBe(DeviceType.MOBILE);
   });
 
@@ -112,9 +113,9 @@ describe('detectDeviceType', () => {
     const originalWindow = global.window;
     // @ts-ignore
     delete global.window;
-    
+
     expect(detectDeviceType()).toBe(DeviceType.DESKTOP);
-    
+
     global.window = originalWindow;
   });
 });
@@ -124,9 +125,9 @@ describe('detectTouchDevice', () => {
     mockNavigator.maxTouchPoints = 1;
     Object.defineProperty(global.window, 'ontouchstart', {
       value: {},
-      writable: true
+      writable: true,
     });
-    
+
     expect(detectTouchDevice()).toBe(true);
   });
 
@@ -134,7 +135,7 @@ describe('detectTouchDevice', () => {
     mockNavigator.maxTouchPoints = 0;
     // @ts-ignore
     delete global.window.ontouchstart;
-    
+
     expect(detectTouchDevice()).toBe(false);
   });
 
@@ -142,9 +143,9 @@ describe('detectTouchDevice', () => {
     const originalWindow = global.window;
     // @ts-ignore
     delete global.window;
-    
+
     expect(detectTouchDevice()).toBe(false);
-    
+
     global.window = originalWindow;
   });
 });
@@ -179,7 +180,7 @@ describe('recommendDisplayMode', () => {
 describe('createResponsiveTextConfig', () => {
   it('应该创建默认的响应式配置', () => {
     const config = createResponsiveTextConfig();
-    
+
     expect(config).toHaveProperty('deviceType');
     expect(config).toHaveProperty('displayMode');
     expect(config).toHaveProperty('availableWidth');
@@ -190,11 +191,11 @@ describe('createResponsiveTextConfig', () => {
   it('应该合并自定义配置', () => {
     const customConfig = {
       deviceType: DeviceType.MOBILE,
-      displayMode: DisplayMode.MINIMAL
+      displayMode: DisplayMode.MINIMAL,
     };
-    
+
     const config = createResponsiveTextConfig(customConfig);
-    
+
     expect(config.deviceType).toBe(DeviceType.MOBILE);
     expect(config.displayMode).toBe(DisplayMode.MINIMAL);
   });
@@ -207,12 +208,12 @@ describe('optimizeTextDisplay', () => {
     displayMode: DisplayMode.STANDARD,
     availableWidth: 1920,
     availableHeight: 1080,
-    isTouchDevice: false
+    isTouchDevice: false,
   };
 
   it('应该正确优化桌面端文字显示', () => {
     const result = optimizeTextDisplay(mockSlice, mockConfig, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
     expect(result).toHaveProperty('showTitle', true);
     expect(result).toHaveProperty('showDimensions', true);
     expect(result).toHaveProperty('showFileSize', true);
@@ -230,11 +231,11 @@ describe('optimizeTextDisplay', () => {
       ...mockConfig,
       deviceType: DeviceType.MOBILE,
       displayMode: DisplayMode.MINIMAL,
-      availableWidth: 375
+      availableWidth: 375,
     };
-    
+
     const result = optimizeTextDisplay(mockSlice, mobileConfig, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
     expect(result.cssClasses).toContain('text-display-mobile');
     expect(result.cssClasses).toContain('text-display-minimal');
     expect(result.performanceHints.length).toBeGreaterThan(0);
@@ -245,11 +246,11 @@ describe('optimizeTextDisplay', () => {
       ...mockConfig,
       deviceType: DeviceType.MOBILE,
       displayMode: DisplayMode.MINIMAL,
-      availableWidth: 200
+      availableWidth: 200,
     };
-    
+
     const result = optimizeTextDisplay(mockSlice, narrowConfig, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
     // 移动端最小模式下，文本应该被简化
     expect(result.titleText.length).toBeLessThanOrEqual(10);
   });
@@ -258,11 +259,11 @@ describe('optimizeTextDisplay', () => {
     const limitedOptions = {
       ...DEFAULT_TEXT_DISPLAY_OPTIONS,
       showSliceTitle: false,
-      showDimensions: false
+      showDimensions: false,
     };
-    
+
     const result = optimizeTextDisplay(mockSlice, mockConfig, limitedOptions);
-    
+
     expect(result.showTitle).toBe(false);
     expect(result.showDimensions).toBe(false);
   });
@@ -273,19 +274,19 @@ describe('optimizeMultipleTextDisplay', () => {
     const slices = [
       createMockImageSlice({ index: 0 }),
       createMockImageSlice({ index: 1 }),
-      createMockImageSlice({ index: 2 })
+      createMockImageSlice({ index: 2 }),
     ];
-    
+
     const config: ResponsiveTextConfig = {
       deviceType: DeviceType.DESKTOP,
       displayMode: DisplayMode.STANDARD,
       availableWidth: 1920,
       availableHeight: 1080,
-      isTouchDevice: false
+      isTouchDevice: false,
     };
-    
+
     const results = optimizeMultipleTextDisplay(slices, config, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
     expect(results).toHaveLength(3);
     results.forEach((result, index) => {
       expect(result).toHaveProperty('titleText');
@@ -304,16 +305,16 @@ describe('TextDisplayPerformanceMonitor', () => {
   it('应该正确记录渲染时间', () => {
     monitor.recordRenderTime(100, 105);
     monitor.recordRenderTime(200, 207);
-    
+
     expect(monitor.getAverageRenderTime()).toBe(6);
     expect(monitor.getMaxRenderTime()).toBe(7);
   });
 
   it('应该生成正确的性能报告', () => {
     monitor.recordRenderTime(100, 101); // 1ms - excellent
-    
+
     const report = monitor.getPerformanceReport();
-    
+
     expect(report.averageRenderTime).toBe(1);
     expect(report.maxRenderTime).toBe(1);
     expect(report.sampleCount).toBe(1);
@@ -326,13 +327,13 @@ describe('TextDisplayPerformanceMonitor', () => {
       { renderTime: 0.5, expectedGrade: 'excellent' },
       { renderTime: 3, expectedGrade: 'good' },
       { renderTime: 8, expectedGrade: 'fair' },
-      { renderTime: 15, expectedGrade: 'poor' }
+      { renderTime: 15, expectedGrade: 'poor' },
     ];
-    
+
     testCases.forEach(({ renderTime, expectedGrade }) => {
       const testMonitor = new TextDisplayPerformanceMonitor();
       testMonitor.recordRenderTime(100, 100 + renderTime);
-      
+
       const report = testMonitor.getPerformanceReport();
       expect(report.performanceGrade).toBe(expectedGrade);
     });
@@ -341,7 +342,7 @@ describe('TextDisplayPerformanceMonitor', () => {
   it('应该正确重置监控数据', () => {
     monitor.recordRenderTime(100, 105);
     monitor.reset();
-    
+
     expect(monitor.getAverageRenderTime()).toBe(0);
     expect(monitor.getMaxRenderTime()).toBe(0);
   });
@@ -351,7 +352,7 @@ describe('TextDisplayPerformanceMonitor', () => {
     for (let i = 0; i < 150; i++) {
       monitor.recordRenderTime(i, i + 1);
     }
-    
+
     const report = monitor.getPerformanceReport();
     expect(report.sampleCount).toBeLessThanOrEqual(100);
   });
@@ -364,7 +365,7 @@ describe('textDisplayCache', () => {
     displayMode: DisplayMode.STANDARD,
     availableWidth: 1920,
     availableHeight: 1080,
-    isTouchDevice: false
+    isTouchDevice: false,
   };
 
   beforeEach(() => {
@@ -372,9 +373,17 @@ describe('textDisplayCache', () => {
   });
 
   it('应该正确缓存和获取优化结果', () => {
-    const result1 = optimizeTextDisplayWithCache(mockSlice, mockConfig, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    const result2 = optimizeTextDisplayWithCache(mockSlice, mockConfig, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+    const result1 = optimizeTextDisplayWithCache(
+      mockSlice,
+      mockConfig,
+      DEFAULT_TEXT_DISPLAY_OPTIONS
+    );
+    const result2 = optimizeTextDisplayWithCache(
+      mockSlice,
+      mockConfig,
+      DEFAULT_TEXT_DISPLAY_OPTIONS
+    );
+
     // 第二次调用应该返回相同的结果（从缓存获取）
     expect(result1).toEqual(result2);
   });
@@ -382,17 +391,17 @@ describe('textDisplayCache', () => {
   it('应该为不同的配置生成不同的缓存键', () => {
     const config1 = { ...mockConfig, deviceType: DeviceType.MOBILE };
     const config2 = { ...mockConfig, deviceType: DeviceType.DESKTOP };
-    
+
     const result1 = optimizeTextDisplayWithCache(mockSlice, config1, DEFAULT_TEXT_DISPLAY_OPTIONS);
     const result2 = optimizeTextDisplayWithCache(mockSlice, config2, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
     // 不同配置应该产生不同的结果
     expect(result1.cssClasses).not.toEqual(result2.cssClasses);
   });
 
   it('应该提供缓存统计信息', () => {
     optimizeTextDisplayWithCache(mockSlice, mockConfig, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
     const stats = textDisplayCache.getStats();
     expect(stats.size).toBeGreaterThan(0);
     expect(stats.maxSize).toBeGreaterThan(0);
@@ -407,9 +416,9 @@ describe('边界情况和错误处理', () => {
       displayMode: DisplayMode.STANDARD,
       availableWidth: 1920,
       availableHeight: 1080,
-      isTouchDevice: false
+      isTouchDevice: false,
     };
-    
+
     const results = optimizeMultipleTextDisplay([], config, DEFAULT_TEXT_DISPLAY_OPTIONS);
     expect(results).toHaveLength(0);
   });
@@ -420,11 +429,15 @@ describe('边界情况和错误处理', () => {
       displayMode: DisplayMode.MINIMAL,
       availableWidth: 100,
       availableHeight: 100,
-      isTouchDevice: true
+      isTouchDevice: true,
     };
-    
-    const result = optimizeTextDisplay(createMockImageSlice(), config, DEFAULT_TEXT_DISPLAY_OPTIONS);
-    
+
+    const result = optimizeTextDisplay(
+      createMockImageSlice(),
+      config,
+      DEFAULT_TEXT_DISPLAY_OPTIONS
+    );
+
     expect(result.cssClasses).toContain('text-display-mobile');
     expect(result.cssClasses).toContain('text-display-minimal');
     expect(result.cssClasses).toContain('text-display-touch');
@@ -434,10 +447,10 @@ describe('边界情况和错误处理', () => {
     const originalNavigator = global.navigator;
     // @ts-ignore
     delete global.navigator;
-    
+
     expect(() => detectDeviceType()).not.toThrow();
     expect(detectDeviceType()).toBe(DeviceType.DESKTOP);
-    
+
     global.navigator = originalNavigator;
   });
 });

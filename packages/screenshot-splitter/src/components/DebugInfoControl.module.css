@@ -245,7 +245,7 @@
     max-width: none;
     min-width: auto;
   }
-  
+
   .toggleButton {
     width: 40px;
     height: 40px;
@@ -288,7 +288,7 @@
     background: black;
     border: 2px solid white;
   }
-  
+
   .levelSelect,
   .actionButton {
     border: 2px solid white;

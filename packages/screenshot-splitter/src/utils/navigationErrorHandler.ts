@@ -12,7 +12,7 @@ export enum NavigationErrorType {
   INVALID_STATE = 'INVALID_STATE',
   PROCESSING_ERROR = 'PROCESSING_ERROR',
   NAVIGATION_FAILED = 'NAVIGATION_FAILED',
-  STATE_CORRUPTION = 'STATE_CORRUPTION'
+  STATE_CORRUPTION = 'STATE_CORRUPTION',
 }
 
 // 导航错误接口
@@ -52,10 +52,7 @@ export class NavigationErrorHandler {
   /**
    * 验证导航状态
    */
-  validateNavigationState(
-    currentPath: string,
-    appState: AppState
-  ): NavigationError | null {
+  validateNavigationState(currentPath: string, appState: AppState): NavigationError | null {
     const hasOriginalImage = !!appState.originalImage;
     const hasImageSlices = appState.imageSlices.length > 0;
     const hasSelectedSlices = appState.selectedSlices.size > 0;
@@ -133,11 +130,7 @@ export class NavigationErrorHandler {
   /**
    * 处理处理错误（图片处理失败等）
    */
-  handleProcessingError(
-    currentPath: string,
-    error: Error,
-    appState: AppState
-  ): RecoveryStrategy {
+  handleProcessingError(currentPath: string, error: Error, appState: AppState): RecoveryStrategy {
     const navigationError = this.createError(
       NavigationErrorType.PROCESSING_ERROR,
       'navigation.error.processingFailed',
@@ -153,10 +146,7 @@ export class NavigationErrorHandler {
   /**
    * 处理状态损坏
    */
-  handleStateCorruption(
-    currentPath: string,
-    reason: string
-  ): RecoveryStrategy {
+  handleStateCorruption(currentPath: string, reason: string): RecoveryStrategy {
     const error = this.createError(
       NavigationErrorType.STATE_CORRUPTION,
       'navigation.error.stateCorruption',
@@ -173,10 +163,7 @@ export class NavigationErrorHandler {
    * 检查是否需要重置状态
    */
   shouldResetState(errorType: NavigationErrorType): boolean {
-    const resetTypes = [
-      NavigationErrorType.STATE_CORRUPTION,
-      NavigationErrorType.INVALID_STATE
-    ];
+    const resetTypes = [NavigationErrorType.STATE_CORRUPTION, NavigationErrorType.INVALID_STATE];
     return resetTypes.includes(errorType);
   }
 
@@ -198,9 +185,7 @@ export class NavigationErrorHandler {
    * 获取最近的错误
    */
   getLastError(): NavigationError | null {
-    return this.errorHistory.length > 0 
-      ? this.errorHistory[this.errorHistory.length - 1] 
-      : null;
+    return this.errorHistory.length > 0 ? this.errorHistory[this.errorHistory.length - 1] : null;
   }
 
   /**
@@ -210,7 +195,7 @@ export class NavigationErrorHandler {
     const recentErrors = this.errorHistory
       .slice(-threshold)
       .filter(error => error.type === errorType);
-    
+
     return recentErrors.length >= threshold;
   }
 
@@ -229,13 +214,13 @@ export class NavigationErrorHandler {
       expectedState,
       actualState,
       timestamp: Date.now(),
-      recoveryAction: details
+      recoveryAction: details,
     };
   }
 
   private recordError(error: NavigationError): void {
     this.errorHistory.push(error);
-    
+
     // 限制历史记录大小
     if (this.errorHistory.length > this.maxHistorySize) {
       this.errorHistory = this.errorHistory.slice(-this.maxHistorySize);
@@ -253,7 +238,7 @@ export class NavigationErrorHandler {
         return {
           redirectTo: '/upload',
           showMessage: true,
-          messageKey: 'navigation.error.missingImage'
+          messageKey: 'navigation.error.missingImage',
         };
 
       case NavigationErrorType.MISSING_SLICES:
@@ -261,20 +246,20 @@ export class NavigationErrorHandler {
           return {
             redirectTo: '/split',
             showMessage: true,
-            messageKey: 'navigation.error.missingSlices'
+            messageKey: 'navigation.error.missingSlices',
           };
         }
         return {
           redirectTo: '/upload',
           showMessage: true,
-          messageKey: 'navigation.error.missingImage'
+          messageKey: 'navigation.error.missingImage',
         };
 
       case NavigationErrorType.PROCESSING_ERROR:
         return {
           redirectTo: '/upload',
           showMessage: true,
-          messageKey: 'navigation.error.processingFailed'
+          messageKey: 'navigation.error.processingFailed',
         };
 
       case NavigationErrorType.STATE_CORRUPTION:
@@ -283,7 +268,7 @@ export class NavigationErrorHandler {
           redirectTo: '/',
           clearState: true,
           showMessage: true,
-          messageKey: 'navigation.error.invalidState'
+          messageKey: 'navigation.error.invalidState',
         };
 
       case NavigationErrorType.NAVIGATION_FAILED:
@@ -291,7 +276,7 @@ export class NavigationErrorHandler {
         return {
           redirectTo: '/',
           showMessage: true,
-          messageKey: 'navigation.error.navigationFailed'
+          messageKey: 'navigation.error.navigationFailed',
         };
     }
   }

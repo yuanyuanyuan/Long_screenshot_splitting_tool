@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { SEO_CONFIG, type SEOConfigType, type SupportedLanguage, type PageKey } from '../seo.config';
+import {
+  SEO_CONFIG,
+  type SEOConfigType,
+  type SupportedLanguage,
+  type PageKey,
+} from '../seo.config';
 
 describe('SEO配置文件测试', () => {
   describe('基础配置验证', () => {
@@ -18,7 +23,7 @@ describe('SEO配置文件测试', () => {
       expect(SEO_CONFIG.socialMedia).toHaveProperty('twitter');
       expect(SEO_CONFIG.socialMedia).toHaveProperty('facebook');
       expect(SEO_CONFIG.socialMedia).toHaveProperty('linkedin');
-      
+
       expect(typeof SEO_CONFIG.socialMedia.twitter).toBe('string');
       expect(typeof SEO_CONFIG.socialMedia.facebook).toBe('string');
       expect(typeof SEO_CONFIG.socialMedia.linkedin).toBe('string');
@@ -27,7 +32,7 @@ describe('SEO配置文件测试', () => {
     it('应该包含分析工具配置', () => {
       expect(SEO_CONFIG.analytics).toHaveProperty('googleAnalyticsId');
       expect(SEO_CONFIG.analytics).toHaveProperty('googleSearchConsoleId');
-      
+
       expect(typeof SEO_CONFIG.analytics.googleAnalyticsId).toBe('string');
       expect(typeof SEO_CONFIG.analytics.googleSearchConsoleId).toBe('string');
     });
@@ -60,7 +65,9 @@ describe('SEO配置文件测试', () => {
       const longTailKeywords = SEO_CONFIG.keywords.longTail;
       expect(Array.isArray(longTailKeywords)).toBe(true);
       expect(longTailKeywords.length).toBeGreaterThan(0);
-      expect(longTailKeywords.some(keyword => keyword.includes('如何') || keyword.includes('怎么'))).toBe(true);
+      expect(
+        longTailKeywords.some(keyword => keyword.includes('如何') || keyword.includes('怎么'))
+      ).toBe(true);
     });
   });
 
@@ -91,13 +98,14 @@ describe('SEO配置文件测试', () => {
       Object.values(SEO_CONFIG.pages).forEach(pageConfig => {
         expect(pageConfig).toHaveProperty('priority');
         expect(pageConfig).toHaveProperty('changeFrequency');
-        
+
         expect(typeof pageConfig.priority).toBe('number');
         expect(pageConfig.priority).toBeGreaterThan(0);
         expect(pageConfig.priority).toBeLessThanOrEqual(1);
-        
-        expect(['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'])
-          .toContain(pageConfig.changeFrequency);
+
+        expect(['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never']).toContain(
+          pageConfig.changeFrequency
+        );
       });
     });
 
@@ -109,13 +117,13 @@ describe('SEO配置文件测试', () => {
   describe('结构化数据配置验证', () => {
     it('应该包含组织信息', () => {
       expect(SEO_CONFIG.structuredData).toHaveProperty('organization');
-      
+
       const org = SEO_CONFIG.structuredData.organization;
       expect(org).toHaveProperty('name');
       expect(org).toHaveProperty('url');
       expect(org).toHaveProperty('logo');
       expect(org).toHaveProperty('description');
-      
+
       expect(typeof org.name).toBe('string');
       expect(typeof org.url).toBe('string');
       expect(typeof org.logo).toBe('string');
@@ -124,14 +132,14 @@ describe('SEO配置文件测试', () => {
 
     it('应该包含Web应用信息', () => {
       expect(SEO_CONFIG.structuredData).toHaveProperty('webApplication');
-      
+
       const webApp = SEO_CONFIG.structuredData.webApplication;
       expect(webApp).toHaveProperty('name');
       expect(webApp).toHaveProperty('description');
       expect(webApp).toHaveProperty('applicationCategory');
       expect(webApp).toHaveProperty('operatingSystem');
       expect(webApp).toHaveProperty('browserRequirements');
-      
+
       expect(webApp.applicationCategory).toBe('UtilitiesApplication');
       expect(webApp.operatingSystem).toBe('Any');
     });
@@ -147,10 +155,10 @@ describe('SEO配置文件测试', () => {
     it('SupportedLanguage类型应该只包含支持的语言', () => {
       const zhCN: SupportedLanguage = 'zh-CN';
       const en: SupportedLanguage = 'en';
-      
+
       expect(zhCN).toBe('zh-CN');
       expect(en).toBe('en');
-      
+
       // TypeScript编译时会检查这些类型，运行时我们验证值
       expect(['zh-CN', 'en']).toContain(zhCN);
       expect(['zh-CN', 'en']).toContain(en);
@@ -158,7 +166,7 @@ describe('SEO配置文件测试', () => {
 
     it('PageKey类型应该包含所有页面键', () => {
       const pageKeys: PageKey[] = ['home', 'upload', 'split', 'export'];
-      
+
       pageKeys.forEach(key => {
         expect(SEO_CONFIG.pages).toHaveProperty(key);
       });
@@ -177,7 +185,7 @@ describe('SEO配置文件测试', () => {
         'keywords',
         'defaultImages',
         'pages',
-        'structuredData'
+        'structuredData',
       ];
 
       requiredTopLevelKeys.forEach(key => {
@@ -217,9 +225,9 @@ describe('SEO配置文件测试', () => {
       const allKeywords = [
         ...SEO_CONFIG.keywords.primary,
         ...SEO_CONFIG.keywords.secondary,
-        ...SEO_CONFIG.keywords.longTail
+        ...SEO_CONFIG.keywords.longTail,
       ];
-      
+
       const uniqueKeywords = new Set(allKeywords);
       expect(uniqueKeywords.size).toBe(allKeywords.length);
     });

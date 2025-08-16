@@ -13,8 +13,8 @@ export default defineConfig({
     poolOptions: {
       forks: {
         // 限制最大进程数，根据系统CPU核心数调整
-        maxForks: 2
-      }
+        maxForks: 2,
+      },
     },
     // 设置测试超时时间
     testTimeout: 10000,
@@ -35,16 +35,16 @@ export default defineConfig({
         'src/vite-env.d.ts',
         'dist/',
         'dist-single/',
-        'coverage/'
+        'coverage/',
       ],
       thresholds: {
         global: {
           branches: 70,
           functions: 70,
           lines: 70,
-          statements: 70
-        }
-      }
-    }
+          statements: 70,
+        },
+      },
+    },
   },
 });

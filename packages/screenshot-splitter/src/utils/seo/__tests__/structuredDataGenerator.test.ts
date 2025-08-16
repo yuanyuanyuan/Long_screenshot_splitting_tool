@@ -5,17 +5,7 @@ import {
   generatePageStructuredData,
   validateStructuredData,
 } from '../structuredDataGenerator';
-import type {
-  WebApplicationSchema,
-  SoftwareApplicationSchema,
-  BreadcrumbSchema,
-  FAQSchema,
-  HowToSchema,
-  StructuredDataType,
-  PageType,
-  Language,
-  SEOContext,
-} from '../../../types/seo.types';
+import type { PageType, Language, SEOContext } from '../../../types/seo.types';
 
 describe('StructuredDataGenerator', () => {
   let generator: StructuredDataGenerator;
@@ -320,12 +310,10 @@ describe('StructuredDataGenerator', () => {
 
   describe('综合结构化数据生成', () => {
     it('应该根据指定类型生成结构化数据', () => {
-      const result = generator.generateStructuredData(
-        'home',
-        'zh-CN',
-        {},
-        ['webApp', 'breadcrumb']
-      );
+      const result = generator.generateStructuredData('home', 'zh-CN', {}, [
+        'webApp',
+        'breadcrumb',
+      ]);
 
       expect(result).toHaveLength(2);
       expect(result[0]['@type']).toBe('WebApplication');
@@ -340,11 +328,19 @@ describe('StructuredDataGenerator', () => {
 
       // 首页：SoftwareApplication + Breadcrumb + FAQ
       expect(homeData).toHaveLength(3);
-      expect(homeData.map(d => d['@type'])).toEqual(['SoftwareApplication', 'BreadcrumbList', 'FAQPage']);
+      expect(homeData.map(d => d['@type'])).toEqual([
+        'SoftwareApplication',
+        'BreadcrumbList',
+        'FAQPage',
+      ]);
 
       // 上传页：WebApplication + Breadcrumb + HowTo
       expect(uploadData).toHaveLength(3);
-      expect(uploadData.map(d => d['@type'])).toEqual(['WebApplication', 'BreadcrumbList', 'HowTo']);
+      expect(uploadData.map(d => d['@type'])).toEqual([
+        'WebApplication',
+        'BreadcrumbList',
+        'HowTo',
+      ]);
 
       // 分割页：WebApplication + Breadcrumb
       expect(splitData).toHaveLength(2);
@@ -566,14 +562,14 @@ describe('StructuredDataGenerator', () => {
   describe('性能和内存测试', () => {
     it('应该能够处理大量数据生成', () => {
       const startTime = Date.now();
-      
+
       for (let i = 0; i < 100; i++) {
         generator.generatePageStructuredData('home', 'zh-CN', { sliceCount: i });
       }
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // 应该在合理时间内完成（1秒内）
       expect(duration).toBeLessThan(1000);
     });
@@ -581,14 +577,14 @@ describe('StructuredDataGenerator', () => {
     it('应该能够处理大量验证操作', () => {
       const data = generator.generatePageStructuredData('home', 'zh-CN');
       const startTime = Date.now();
-      
+
       for (let i = 0; i < 100; i++) {
         data.forEach(item => generator.validateStructuredData(item));
       }
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // 验证操作应该很快（500ms内）
       expect(duration).toBeLessThan(500);
     });

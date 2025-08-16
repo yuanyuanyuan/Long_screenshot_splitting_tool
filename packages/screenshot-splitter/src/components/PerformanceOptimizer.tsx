@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { 
-  PerformanceMonitor, 
-  getPerformanceMonitor, 
+import {
+  PerformanceMonitor,
+  getPerformanceMonitor,
   onWebVitals,
   type PerformanceMetricData,
   type PerformanceStats,
-  type CoreWebVitalsMetric
+  type CoreWebVitalsMetric,
 } from '../utils/analytics/performanceMonitor';
-import { 
-  useBatchLazyLoading, 
+import {
+  useBatchLazyLoading,
   useLazyImage,
   useLazyLoadingPerformance,
-  type LazyLoadingOptions
+  type LazyLoadingOptions,
 } from '../hooks/useLazyLoading';
 
 /**
@@ -89,14 +89,18 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   stats,
   latestMetrics,
   lazyLoadingPerformance,
-  showDebugInfo
+  showDebugInfo,
 }) => {
   const getRatingColor = (rating: string): string => {
     switch (rating) {
-      case 'good': return '#10b981'; // green-500
-      case 'needs-improvement': return '#f59e0b'; // amber-500
-      case 'poor': return '#ef4444'; // red-500
-      default: return '#6b7280'; // gray-500
+      case 'good':
+        return '#10b981'; // green-500
+      case 'needs-improvement':
+        return '#f59e0b'; // amber-500
+      case 'poor':
+        return '#ef4444'; // red-500
+      default:
+        return '#6b7280'; // gray-500
     }
   };
 
@@ -115,41 +119,49 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
   };
 
   return (
-    <div className="performance-metrics" style={{
-      position: 'fixed',
-      top: '10px',
-      right: '10px',
-      background: 'rgba(0, 0, 0, 0.8)',
-      color: 'white',
-      padding: '12px',
-      borderRadius: '8px',
-      fontSize: '12px',
-      fontFamily: 'monospace',
-      zIndex: 9999,
-      minWidth: '200px',
-      maxWidth: '300px'
-    }}>
+    <div
+      className="performance-metrics"
+      style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: 'rgba(0, 0, 0, 0.8)',
+        color: 'white',
+        padding: '12px',
+        borderRadius: '8px',
+        fontSize: '12px',
+        fontFamily: 'monospace',
+        zIndex: 9999,
+        minWidth: '200px',
+        maxWidth: '300px',
+      }}
+    >
       <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
         性能指标 (评分: {Math.round(stats.overallScore)}/100)
       </div>
-      
+
       {/* Core Web Vitals */}
       <div style={{ marginBottom: '8px' }}>
         <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Core Web Vitals:</div>
         {(['CLS', 'INP', 'FCP', 'LCP', 'TTFB'] as CoreWebVitalsMetric[]).map(metric => {
           const latest = latestMetrics.get(metric);
           const metricStats = stats.metrics[metric];
-          
+
           return (
-            <div key={metric} style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              marginBottom: '2px'
-            }}>
+            <div
+              key={metric}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '2px',
+              }}
+            >
               <span>{metric}:</span>
-              <span style={{ 
-                color: latest ? getRatingColor(latest.rating) : '#6b7280'
-              }}>
+              <span
+                style={{
+                  color: latest ? getRatingColor(latest.rating) : '#6b7280',
+                }}
+              >
                 {latest ? formatValue(metric, latest.value) : 'N/A'}
                 {showDebugInfo && metricStats.count > 0 && (
                   <span style={{ color: '#9ca3af', marginLeft: '4px' }}>
@@ -168,7 +180,9 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>懒加载性能:</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
             <span>已加载:</span>
-            <span>{lazyLoadingPerformance.loadedCount}/{lazyLoadingPerformance.totalCount}</span>
+            <span>
+              {lazyLoadingPerformance.loadedCount}/{lazyLoadingPerformance.totalCount}
+            </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
             <span>平均加载时间:</span>
@@ -176,9 +190,11 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
             <span>错误率:</span>
-            <span style={{ 
-              color: lazyLoadingPerformance.errorRate > 0.1 ? '#ef4444' : '#10b981'
-            }}>
+            <span
+              style={{
+                color: lazyLoadingPerformance.errorRate > 0.1 ? '#ef4444' : '#10b981',
+              }}
+            >
               {(lazyLoadingPerformance.errorRate * 100).toFixed(1)}%
             </span>
           </div>
@@ -203,17 +219,14 @@ const MetricsDisplay: React.FC<MetricsDisplayProps> = ({
 export const PerformanceOptimizer: React.FC<{
   config?: PerformanceOptimizerConfig;
   children?: React.ReactNode;
-}> = ({ 
-  config = {}, 
-  children 
-}) => {
+}> = ({ config = {}, children }) => {
   const {
     enablePerformanceMonitoring = true,
     enableLazyLoading = true,
     showMetrics = process.env.NODE_ENV === 'development',
     showDebugInfo = process.env.NODE_ENV === 'development',
     performanceConfig = {},
-    thresholds = {}
+    thresholds = {},
   } = config;
 
   // 状态管理
@@ -223,7 +236,7 @@ export const PerformanceOptimizer: React.FC<{
     latestMetrics: new Map(),
     lazyLoadingPerformance: null,
     isMonitoring: false,
-    error: null
+    error: null,
   });
 
   // 性能监控初始化
@@ -238,15 +251,15 @@ export const PerformanceOptimizer: React.FC<{
         enableInDevelopment: true,
         ...performanceConfig,
         thresholds: {
-          ...thresholds
-        }
+          ...thresholds,
+        },
       });
 
       setState(prev => ({
         ...prev,
         monitor,
         isMonitoring: true,
-        error: null
+        error: null,
       }));
 
       // 监听性能指标
@@ -254,11 +267,11 @@ export const PerformanceOptimizer: React.FC<{
         setState(prev => {
           const newLatestMetrics = new Map(prev.latestMetrics);
           newLatestMetrics.set(metric.name, metric);
-          
+
           return {
             ...prev,
             latestMetrics: newLatestMetrics,
-            stats: monitor.getStats()
+            stats: monitor.getStats(),
           };
         });
       });
@@ -267,7 +280,7 @@ export const PerformanceOptimizer: React.FC<{
       const statsInterval = setInterval(() => {
         setState(prev => ({
           ...prev,
-          stats: monitor.getStats()
+          stats: monitor.getStats(),
         }));
       }, 5000);
 
@@ -280,7 +293,7 @@ export const PerformanceOptimizer: React.FC<{
       setState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Unknown error',
-        isMonitoring: false
+        isMonitoring: false,
       }));
     }
   }, [enablePerformanceMonitoring, performanceConfig, thresholds]);
@@ -297,12 +310,12 @@ export const PerformanceOptimizer: React.FC<{
         errorCount: lazyLoadingPerformanceHook.metrics.failedImages,
         averageLoadTime: lazyLoadingPerformanceHook.metrics.averageLoadTime,
         errorRate: report.failureRate / 100,
-        successRate: report.successRate / 100
+        successRate: report.successRate / 100,
       };
-      
+
       setState(prev => ({
         ...prev,
-        lazyLoadingPerformance: performanceData
+        lazyLoadingPerformance: performanceData,
       }));
     }
   }, [enableLazyLoading, lazyLoadingPerformanceHook]);
@@ -340,17 +353,19 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
 
   // 性能监控
   const [performanceStats, setPerformanceStats] = useState<PerformanceStats | null>(null);
-  const [latestMetrics, setLatestMetrics] = useState<Map<CoreWebVitalsMetric, PerformanceMetricData>>(new Map());
-  
+  const [latestMetrics, setLatestMetrics] = useState<
+    Map<CoreWebVitalsMetric, PerformanceMetricData>
+  >(new Map());
+
   // 懒加载性能监控
   const lazyLoadingPerformanceHook = useLazyLoadingPerformance();
-  
+
   // 转换性能数据格式
   const lazyLoadingPerformance = useMemo(() => {
     if (!enableLazyLoading || !lazyLoadingPerformanceHook) {
       return null;
     }
-    
+
     const report = lazyLoadingPerformanceHook.getPerformanceReport();
     return {
       totalCount: lazyLoadingPerformanceHook.metrics.totalImages,
@@ -358,7 +373,7 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
       errorCount: lazyLoadingPerformanceHook.metrics.failedImages,
       averageLoadTime: lazyLoadingPerformanceHook.metrics.averageLoadTime,
       errorRate: report.failureRate / 100,
-      successRate: report.successRate / 100
+      successRate: report.successRate / 100,
     };
   }, [enableLazyLoading, lazyLoadingPerformanceHook]);
 
@@ -369,14 +384,14 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
     }
 
     const monitor = getPerformanceMonitor(performanceConfig);
-    
+
     const unsubscribe = onWebVitals((metric: PerformanceMetricData) => {
       setLatestMetrics(prev => {
         const newMap = new Map(prev);
         newMap.set(metric.name, metric);
         return newMap;
       });
-      
+
       setPerformanceStats(monitor.getStats());
     });
 
@@ -391,41 +406,44 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
     if (!enablePerformanceMonitoring) {
       return null;
     }
-    
+
     const monitor = getPerformanceMonitor();
     return monitor.generateReport();
   }, [enablePerformanceMonitoring]);
 
   // 发送性能数据
-  const sendPerformanceData = useCallback(async (endpoint?: string) => {
-    if (!enablePerformanceMonitoring) {
-      return;
-    }
-    
-    const monitor = getPerformanceMonitor();
-    const report = monitor.generateReport();
-    
-    const url = endpoint || performanceConfig.analyticsEndpoint || '/api/analytics/performance';
-    
-    try {
-      await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(report),
-      });
-    } catch (error) {
-      console.error('Failed to send performance data:', error);
-    }
-  }, [enablePerformanceMonitoring, performanceConfig.analyticsEndpoint]);
+  const sendPerformanceData = useCallback(
+    async (endpoint?: string) => {
+      if (!enablePerformanceMonitoring) {
+        return;
+      }
+
+      const monitor = getPerformanceMonitor();
+      const report = monitor.generateReport();
+
+      const url = endpoint || performanceConfig.analyticsEndpoint || '/api/analytics/performance';
+
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(report),
+        });
+      } catch (error) {
+        console.error('Failed to send performance data:', error);
+      }
+    },
+    [enablePerformanceMonitoring, performanceConfig.analyticsEndpoint]
+  );
 
   // 清除性能数据
   const clearPerformanceData = useCallback(() => {
     if (!enablePerformanceMonitoring) {
       return;
     }
-    
+
     const monitor = getPerformanceMonitor();
     monitor.clearMetrics();
     setPerformanceStats(monitor.getStats());
@@ -439,13 +457,13 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
     getPerformanceReport,
     sendPerformanceData,
     clearPerformanceData,
-    
+
     // 懒加载
     lazyLoadingPerformance: enableLazyLoading ? lazyLoadingPerformance : null,
-    
+
     // 状态
     isPerformanceMonitoringEnabled: enablePerformanceMonitoring,
-    isLazyLoadingEnabled: enableLazyLoading
+    isLazyLoadingEnabled: enableLazyLoading,
   };
 };
 
@@ -471,11 +489,11 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   placeholder,
   onLoad,
   onError,
-  lazyOptions = {}
+  lazyOptions = {},
 }) => {
   const { imgProps, containerRef, isLoaded, hasError } = useLazyImage(src, {
     ...lazyOptions,
-    placeholder: placeholder || lazyOptions.placeholder
+    placeholder: placeholder || lazyOptions.placeholder,
   });
 
   // 处理加载完成事件
@@ -493,38 +511,42 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   }, [hasError, onError, src]);
 
   return (
-    <div ref={containerRef as React.RefObject<HTMLDivElement>} className={className} style={style}>
+    <div ref={containerRef as any} className={className} style={style}>
       {isLoaded ? (
-        <img 
+        <img
           {...imgProps}
-          alt={alt} 
-          style={{ 
+          alt={alt}
+          style={{
             ...imgProps.style,
-            width: '100%', 
-            height: '100%', 
-            objectFit: 'cover' 
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
           }}
         />
       ) : hasError ? (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f3f4f6',
-          color: '#6b7280',
-          minHeight: '100px'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f3f4f6',
+            color: '#6b7280',
+            minHeight: '100px',
+          }}
+        >
           加载失败
         </div>
       ) : (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: placeholder || '#f3f4f6',
-          color: '#6b7280',
-          minHeight: '100px'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: placeholder || '#f3f4f6',
+            color: '#6b7280',
+            minHeight: '100px',
+          }}
+        >
           加载中...
         </div>
       )}
@@ -551,7 +573,7 @@ export const BatchLazyLoader: React.FC<BatchLazyLoaderProps> = ({
   items,
   renderItem,
   className,
-  style
+  style,
 }) => {
   const { items: lazyItems } = useBatchLazyLoading(
     items.map(item => item.src),
@@ -563,10 +585,11 @@ export const BatchLazyLoader: React.FC<BatchLazyLoaderProps> = ({
       {items.map((item, index) => {
         const lazyItem = lazyItems[index];
         const isLoaded = lazyItem ? lazyItem.isLoaded : false;
-        const error = lazyItem && lazyItem.hasError ? lazyItem.error || new Error('Unknown error') : null;
-        
+        const error =
+          lazyItem && lazyItem.hasError ? new Error('Unknown error') : null;
+
         return (
-          <div key={item.id} ref={lazyItem?.ref as React.RefObject<HTMLDivElement>}>
+          <div key={item.id} ref={lazyItem?.ref as any}>
             {renderItem(item, isLoaded, error)}
           </div>
         );

@@ -33,11 +33,11 @@ const DEFAULT_OPTIONS: Required<ZIPExportOptions> = {
  */
 export class ZIPExporter {
   private options: Required<ZIPExportOptions>;
-  
+
   constructor(options: ZIPExportOptions = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
   }
-  
+
   /**
    * 导出图片切片为ZIP
    */
@@ -48,24 +48,24 @@ export class ZIPExporter {
     onProgress?: (progress: number) => void
   ): Promise<void> {
     try {
-      const selectedSlices = imageSlices.filter(slice => 
-        selectedIndices.has(slice.index)
-      ).sort((a, b) => a.index - b.index);
-      
+      const selectedSlices = imageSlices
+        .filter(slice => selectedIndices.has(slice.index))
+        .sort((a, b) => a.index - b.index);
+
       if (selectedSlices.length === 0) {
         throw new Error('没有选中的图片切片');
       }
-      
+
       const zip = new JSZip();
-      
+
       for (let i = 0; i < selectedSlices.length; i++) {
         const slice = selectedSlices[i];
-        
+
         try {
           const imageFileName = this.generateFileName(slice, i);
           const processedBlob = await this.processImageFormat(slice.blob);
           zip.file(imageFileName, processedBlob);
-          
+
           if (onProgress) {
             const progress = Math.round(((i + 1) / selectedSlices.length) * 80);
             onProgress(progress);
@@ -75,40 +75,40 @@ export class ZIPExporter {
           continue;
         }
       }
-      
+
       if (onProgress) {
         onProgress(85);
       }
-      
+
       const zipBlob = await zip.generateAsync({
         type: 'blob',
         compression: 'DEFLATE',
         compressionOptions: {
-          level: this.options.compressionLevel
-        }
+          level: this.options.compressionLevel,
+        },
       });
-      
+
       if (onProgress) {
         onProgress(95);
       }
-      
+
       const zipFileName = fileName.endsWith('.zip') ? fileName : `${fileName}.zip`;
       this.downloadBlob(zipBlob, zipFileName);
-      
+
       if (onProgress) {
         onProgress(100);
       }
-      
+
       console.log(`ZIP导出完成: ${zipFileName}`);
     } catch (error) {
       console.error('ZIP导出失败:', error);
       throw error;
     }
   }
-  
+
   private generateFileName(slice: ImageSlice, sequenceIndex: number): string {
     const extension = this.getFileExtension(slice.blob.type);
-    
+
     switch (this.options.fileNameFormat) {
       case 'index':
         return `${this.options.fileNamePrefix}_${slice.index}.${extension}`;
@@ -120,7 +120,7 @@ export class ZIPExporter {
         return `${this.options.fileNamePrefix}_${sequenceIndex + 1}.${extension}`;
     }
   }
-  
+
   private getFileExtension(mimeType: string): string {
     switch (this.options.imageFormat) {
       case 'jpeg':
@@ -136,70 +136,75 @@ export class ZIPExporter {
         return 'jpg';
     }
   }
-  
+
   private async processImageFormat(blob: Blob): Promise<Blob> {
     if (this.options.imageFormat === 'original') {
       return blob;
     }
-    
+
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
-      
+
       img.onload = () => {
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        
+
         if (ctx) {
           ctx.drawImage(img, 0, 0);
-          
+
           const outputFormat = this.options.imageFormat === 'jpeg' ? 'image/jpeg' : 'image/png';
-          const quality = this.options.imageFormat === 'jpeg' ? this.options.jpegQuality : undefined;
-          
-          canvas.toBlob((convertedBlob) => {
-            if (convertedBlob) {
-              resolve(convertedBlob);
-            } else {
-              reject(new Error('图片格式转换失败'));
-            }
-          }, outputFormat, quality);
+          const quality =
+            this.options.imageFormat === 'jpeg' ? this.options.jpegQuality : undefined;
+
+          canvas.toBlob(
+            convertedBlob => {
+              if (convertedBlob) {
+                resolve(convertedBlob);
+              } else {
+                reject(new Error('图片格式转换失败'));
+              }
+            },
+            outputFormat,
+            quality
+          );
         } else {
           reject(new Error('无法获取Canvas上下文'));
         }
-        
+
         URL.revokeObjectURL(img.src);
       };
-      
+
       img.onerror = () => {
         URL.revokeObjectURL(img.src);
         reject(new Error('图片加载失败'));
       };
-      
+
       img.src = URL.createObjectURL(blob);
     });
   }
-  
+
   private downloadBlob(blob: Blob, fileName: string): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = fileName;
     link.style.display = 'none';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     setTimeout(() => {
       URL.revokeObjectURL(url);
     }, 1000);
   }
-  
+
   updateOptions(options: Partial<ZIPExportOptions>): void {
     this.options = { ...this.options, ...options };
   }
-  
+
   getOptions(): Required<ZIPExportOptions> {
     return { ...this.options };
   }

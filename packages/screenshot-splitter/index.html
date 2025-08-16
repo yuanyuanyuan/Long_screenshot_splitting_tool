@@ -14,12 +14,12 @@
         const cdnLibs = [
           {
             test: () => typeof React === 'undefined',
-            src: 'https://unpkg.com/react@18/umd/react.production.min.js'
+            src: 'https://unpkg.com/react@18/umd/react.production.min.js',
           },
           {
             test: () => typeof ReactDOM === 'undefined',
-            src: 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js'
-          }
+            src: 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+          },
         ];
 
         cdnLibs.forEach(lib => {
@@ -34,8 +34,8 @@
     </script>
 
     <!-- 预加载CDN资源 -->
-    <link rel="preconnect" href="https://unpkg.com">
-    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
   </head>
   <body>
     <div id="root"></div>

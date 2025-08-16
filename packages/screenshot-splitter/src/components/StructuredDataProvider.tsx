@@ -1,15 +1,10 @@
 import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { 
-  generatePageStructuredData, 
-  validateStructuredData 
+import {
+  generatePageStructuredData,
+  validateStructuredData,
 } from '../utils/seo/structuredDataGenerator';
-import type { 
-  StructuredDataType, 
-  PageType, 
-  Language, 
-  SEOContext 
-} from '../types/seo.types';
+import type { StructuredDataType, PageType, Language, SEOContext } from '../types/seo.types';
 
 /**
  * 结构化数据上下文接口
@@ -55,7 +50,7 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
   onValidationWarning,
 }) => {
   const [context, setContext] = React.useState<SEOContext>(initialContext);
-  
+
   // 生成结构化数据
   const structuredData = useMemo(() => {
     try {
@@ -102,11 +97,11 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
   useEffect(() => {
     if (enableValidation && structuredData.length > 0) {
       const validation = validateData();
-      
+
       if (!validation.isValid && onValidationError) {
         onValidationError(validation.errors);
       }
-      
+
       if (validation.warnings.length > 0 && onValidationWarning) {
         onValidationWarning(validation.warnings);
       }
@@ -114,12 +109,15 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
   }, [structuredData, enableValidation, validateData, onValidationError, onValidationWarning]);
 
   // 上下文值
-  const contextValue = useMemo(() => ({
-    structuredData,
-    updateContext,
-    validateData,
-    regenerateData,
-  }), [structuredData, updateContext, validateData, regenerateData]);
+  const contextValue = useMemo(
+    () => ({
+      structuredData,
+      updateContext,
+      validateData,
+      regenerateData,
+    }),
+    [structuredData, updateContext, validateData, regenerateData]
+  );
 
   return (
     <StructuredDataContext.Provider value={contextValue}>
@@ -130,7 +128,7 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
             key={`structured-data-${index}`}
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(data, null, 2)
+              __html: JSON.stringify(data, null, 2),
             }}
           />
         ))}
@@ -203,24 +201,28 @@ export const StructuredDataDebug: React.FC<StructuredDataDebugProps> = ({
           <div className={`status ${validation.isValid ? 'valid' : 'invalid'}`}>
             状态: {validation.isValid ? '✅ 有效' : '❌ 无效'}
           </div>
-          
+
           {validation.errors.length > 0 && (
             <div className="errors">
               <h5>错误:</h5>
               <ul>
                 {validation.errors.map((error, index) => (
-                  <li key={index} className="error">{error}</li>
+                  <li key={index} className="error">
+                    {error}
+                  </li>
                 ))}
               </ul>
             </div>
           )}
-          
+
           {validation.warnings.length > 0 && (
             <div className="warnings">
               <h5>警告:</h5>
               <ul>
                 {validation.warnings.map((warning, index) => (
-                  <li key={index} className="warning">{warning}</li>
+                  <li key={index} className="warning">
+                    {warning}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -246,15 +248,14 @@ export const StructuredDataDebug: React.FC<StructuredDataDebugProps> = ({
         <div className="raw-data">
           <h4>原始数据</h4>
           <pre>
-            <code>
-              {JSON.stringify(structuredData, null, 2)}
-            </code>
+            <code>{JSON.stringify(structuredData, null, 2)}</code>
           </pre>
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .structured-data-debug {
           background: #f5f5f5;
           border: 1px solid #ddd;
@@ -343,8 +344,9 @@ export const StructuredDataDebug: React.FC<StructuredDataDebugProps> = ({
           padding: 8px;
           border-radius: 4px;
         }
-        `
-      }} />
+        `,
+        }}
+      />
     </div>
   );
 };
@@ -380,19 +382,14 @@ export const StructuredDataIndicator: React.FC<StructuredDataIndicatorProps> = (
 
   return (
     <div className={`structured-data-indicator ${className}`}>
-      {showCount && (
-        <span className="count">
-          📊 {structuredData.length} 个结构化数据
-        </span>
-      )}
+      {showCount && <span className="count">📊 {structuredData.length} 个结构化数据</span>}
       {showStatus && isValid !== null && (
-        <span className={`status ${isValid ? 'valid' : 'invalid'}`}>
-          {isValid ? '✅' : '❌'}
-        </span>
+        <span className={`status ${isValid ? 'valid' : 'invalid'}`}>{isValid ? '✅' : '❌'}</span>
       )}
-      
-      <style dangerouslySetInnerHTML={{
-        __html: `
+
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .structured-data-indicator {
           position: fixed;
           bottom: 20px;
@@ -415,8 +412,9 @@ export const StructuredDataIndicator: React.FC<StructuredDataIndicatorProps> = (
         .status {
           font-size: 14px;
         }
-        `
-      }} />
+        `,
+        }}
+      />
     </div>
   );
 };

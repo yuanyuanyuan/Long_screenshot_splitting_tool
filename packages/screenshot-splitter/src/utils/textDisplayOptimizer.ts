@@ -13,10 +13,10 @@ import type { ImageSlice } from '../types';
 export const DeviceType = {
   MOBILE: 'mobile',
   TABLET: 'tablet',
-  DESKTOP: 'desktop'
+  DESKTOP: 'desktop',
 } as const;
 
-export type DeviceType = typeof DeviceType[keyof typeof DeviceType];
+export type DeviceType = (typeof DeviceType)[keyof typeof DeviceType];
 
 /**
  * 显示模式
@@ -25,10 +25,10 @@ export const DisplayMode = {
   MINIMAL: 'minimal',
   COMPACT: 'compact',
   STANDARD: 'standard',
-  DETAILED: 'detailed'
+  DETAILED: 'detailed',
 } as const;
 
-export type DisplayMode = typeof DisplayMode[keyof typeof DisplayMode];
+export type DisplayMode = (typeof DisplayMode)[keyof typeof DisplayMode];
 
 /**
  * 响应式文字显示配置
@@ -91,20 +91,20 @@ function getTextLengthLimits(deviceType: DeviceType, displayMode: DisplayMode): 
       title: 8,
       dimensions: 12,
       fileSize: 8,
-      fullText: 25
+      fullText: 25,
     },
     [DeviceType.TABLET]: {
       title: 12,
       dimensions: 16,
       fileSize: 10,
-      fullText: 35
+      fullText: 35,
     },
     [DeviceType.DESKTOP]: {
       title: 20,
       dimensions: 25,
       fileSize: 15,
-      fullText: 50
-    }
+      fullText: 50,
+    },
   };
 
   const limits = baseLimits[deviceType];
@@ -114,14 +114,14 @@ function getTextLengthLimits(deviceType: DeviceType, displayMode: DisplayMode): 
     [DisplayMode.MINIMAL]: 0.6,
     [DisplayMode.COMPACT]: 0.8,
     [DisplayMode.STANDARD]: 1.0,
-    [DisplayMode.DETAILED]: 1.5
+    [DisplayMode.DETAILED]: 1.5,
   }[displayMode];
 
   return {
     title: Math.floor(limits.title * modeMultiplier),
     dimensions: Math.floor(limits.dimensions * modeMultiplier),
     fileSize: Math.floor(limits.fileSize * modeMultiplier),
-    fullText: Math.floor(limits.fullText * modeMultiplier)
+    fullText: Math.floor(limits.fullText * modeMultiplier),
   };
 }
 
@@ -132,7 +132,7 @@ function truncateText(text: string, maxLength: number, suffix: string = '...'): 
   if (text.length <= maxLength) {
     return text;
   }
-  
+
   const truncateLength = Math.max(1, maxLength - suffix.length);
   return text.substring(0, truncateLength) + suffix;
 }
@@ -208,7 +208,7 @@ export function optimizeTextDisplay(
   // 完整文本优化
   if (showFullText) {
     fullText = truncateText(fullText, limits.fullText);
-    
+
     // 移动端进一步简化
     if (config.deviceType === DeviceType.MOBILE) {
       fullText = fullText
@@ -222,7 +222,7 @@ export function optimizeTextDisplay(
   // 添加响应式CSS类名
   cssClasses.push(`text-display-${config.deviceType}`);
   cssClasses.push(`text-display-${config.displayMode}`);
-  
+
   if (config.isTouchDevice) {
     cssClasses.push('text-display-touch');
   }
@@ -249,7 +249,7 @@ export function optimizeTextDisplay(
     fileSizeText,
     fullText,
     cssClasses,
-    performanceHints
+    performanceHints,
   };
 }
 
@@ -274,10 +274,10 @@ export function detectDeviceType(): DeviceType {
 
   const width = window.innerWidth;
   const userAgent = navigator.userAgent?.toLowerCase() || '';
-  
+
   // 检查是否为移动设备
   const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-  
+
   if (isMobile || width < 768) {
     return DeviceType.MOBILE;
   } else if (width < 1024) {
@@ -310,7 +310,7 @@ export function recommendDisplayMode(
   const baseRecommendation: Record<DeviceType, DisplayMode> = {
     [DeviceType.MOBILE]: DisplayMode.COMPACT,
     [DeviceType.TABLET]: DisplayMode.STANDARD,
-    [DeviceType.DESKTOP]: DisplayMode.DETAILED
+    [DeviceType.DESKTOP]: DisplayMode.DETAILED,
   };
 
   let recommended = baseRecommendation[deviceType];
@@ -354,7 +354,7 @@ export function createResponsiveTextConfig(
     availableWidth,
     availableHeight,
     isTouchDevice,
-    ...customConfig
+    ...customConfig,
   };
 }
 
@@ -371,7 +371,7 @@ export class TextDisplayPerformanceMonitor {
   recordRenderTime(startTime: number, endTime: number): void {
     const renderTime = endTime - startTime;
     this.renderTimes.push(renderTime);
-    
+
     // 保持样本数量在限制内
     if (this.renderTimes.length > this.maxSamples) {
       this.renderTimes.shift();
@@ -383,7 +383,7 @@ export class TextDisplayPerformanceMonitor {
    */
   getAverageRenderTime(): number {
     if (this.renderTimes.length === 0) return 0;
-    
+
     const sum = this.renderTimes.reduce((acc, time) => acc + time, 0);
     return sum / this.renderTimes.length;
   }
@@ -406,7 +406,7 @@ export class TextDisplayPerformanceMonitor {
   } {
     const averageRenderTime = this.getAverageRenderTime();
     const maxRenderTime = this.getMaxRenderTime();
-    
+
     let performanceGrade: 'excellent' | 'good' | 'fair' | 'poor';
     if (averageRenderTime < 1) {
       performanceGrade = 'excellent';
@@ -422,7 +422,7 @@ export class TextDisplayPerformanceMonitor {
       averageRenderTime,
       maxRenderTime,
       sampleCount: this.renderTimes.length,
-      performanceGrade
+      performanceGrade,
     };
   }
 
@@ -448,13 +448,13 @@ export function useTextDisplayOptimizer(
   customConfig?: Partial<ResponsiveTextConfig>
 ) {
   const config = createResponsiveTextConfig(customConfig);
-  
+
   // 优化文字显示
   const optimizedDisplays = optimizeMultipleTextDisplay(slices, config, options);
-  
+
   // 性能监控
   const startTime = performance.now();
-  
+
   // 在实际使用时记录渲染时间
   const recordRenderTime = () => {
     const endTime = performance.now();
@@ -465,7 +465,7 @@ export function useTextDisplayOptimizer(
     optimizedDisplays,
     config,
     recordRenderTime,
-    performanceMonitor: textDisplayPerformanceMonitor
+    performanceMonitor: textDisplayPerformanceMonitor,
   };
 }
 
@@ -509,7 +509,7 @@ class TextDisplayCache {
     result: OptimizedTextDisplay
   ): void {
     const key = this.generateCacheKey(slice, config, options);
-    
+
     // 如果缓存已满，删除最旧的条目
     if (this.cache.size >= this.maxCacheSize) {
       const firstKey = this.cache.keys().next().value;
@@ -517,7 +517,7 @@ class TextDisplayCache {
         this.cache.delete(firstKey);
       }
     }
-    
+
     this.cache.set(key, result);
   }
 
@@ -540,7 +540,7 @@ class TextDisplayCache {
     return {
       size: this.cache.size,
       maxSize: this.maxCacheSize,
-      hitRate: 0 // 需要额外的计数器来计算命中率
+      hitRate: 0, // 需要额外的计数器来计算命中率
     };
   }
 }
@@ -566,9 +566,9 @@ export function optimizeTextDisplayWithCache(
 
   // 计算优化结果
   const result = optimizeTextDisplay(slice, config, options);
-  
+
   // 存入缓存
   textDisplayCache.set(slice, config, options, result);
-  
+
   return result;
 }

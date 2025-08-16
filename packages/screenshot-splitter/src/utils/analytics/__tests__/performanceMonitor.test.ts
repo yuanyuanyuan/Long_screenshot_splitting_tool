@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { 
-  getPerformanceMonitor, 
-  onWebVitals, 
+import {
+  getPerformanceMonitor,
+  onWebVitals,
   type PerformanceMetricData,
-  type CoreWebVitalsMetric 
+  type CoreWebVitalsMetric,
 } from '../performanceMonitor';
 
 // Mock web-vitals
@@ -40,7 +40,7 @@ describe('PerformanceMonitor', () => {
         enableInDevelopment: true,
         sampleRate: 0.5,
       };
-      
+
       const monitor = getPerformanceMonitor(config);
       expect(monitor).toBeDefined();
     });
@@ -50,17 +50,17 @@ describe('PerformanceMonitor', () => {
     it('should register a callback for web vitals metrics', () => {
       const callback = vi.fn();
       const unsubscribe = onWebVitals(callback);
-      
+
       expect(typeof unsubscribe).toBe('function');
     });
 
     it('should call the callback when metrics are received', async () => {
       const callback = vi.fn();
-      
+
       // 简化测试，只验证回调函数被正确注册
       const unsubscribe = onWebVitals(callback);
       expect(typeof unsubscribe).toBe('function');
-      
+
       // 验证回调函数存在
       expect(callback).toBeDefined();
     });
@@ -68,7 +68,7 @@ describe('PerformanceMonitor', () => {
     it('should return an unsubscribe function', () => {
       const callback = vi.fn();
       const unsubscribe = onWebVitals(callback);
-      
+
       expect(typeof unsubscribe).toBe('function');
       expect(() => unsubscribe()).not.toThrow();
     });
@@ -83,7 +83,7 @@ describe('PerformanceMonitor', () => {
 
     it('should provide getStats method', () => {
       const stats = monitor.getStats();
-      
+
       expect(stats).toBeDefined();
       expect(typeof stats.overallScore).toBe('number');
       expect(typeof stats.metrics).toBe('object');
@@ -93,7 +93,7 @@ describe('PerformanceMonitor', () => {
 
     it('should provide generateReport method', () => {
       const report = monitor.generateReport();
-      
+
       expect(report).toBeDefined();
       expect(typeof report.timestamp).toBe('number');
       expect(Array.isArray(report.metrics)).toBe(true);
@@ -105,7 +105,7 @@ describe('PerformanceMonitor', () => {
 
     it('should track metrics over time', () => {
       const initialStats = monitor.getStats();
-      
+
       // The monitor should handle metrics internally
       expect(initialStats.totalMeasurements).toBeGreaterThanOrEqual(0);
     });
@@ -144,16 +144,16 @@ describe('PerformanceMonitor', () => {
     });
 
     it('should respect development mode configuration', () => {
-      const monitor = getPerformanceMonitor({ 
+      const monitor = getPerformanceMonitor({
         enabled: true,
-        enableInDevelopment: false 
+        enableInDevelopment: false,
       });
       expect(monitor).toBeDefined();
     });
 
     it('should respect sample rate configuration', () => {
-      const monitor = getPerformanceMonitor({ 
-        sampleRate: 0.1 
+      const monitor = getPerformanceMonitor({
+        sampleRate: 0.1,
       });
       expect(monitor).toBeDefined();
     });
@@ -163,7 +163,7 @@ describe('PerformanceMonitor', () => {
         thresholds: {
           LCP: { good: 2000, poor: 4000 },
           CLS: { good: 0.1, poor: 0.25 },
-        }
+        },
       });
       expect(monitor).toBeDefined();
     });
@@ -173,7 +173,7 @@ describe('PerformanceMonitor', () => {
     it('should collect Core Web Vitals metrics', () => {
       const monitor = getPerformanceMonitor();
       const stats = monitor.getStats();
-      
+
       expect(stats.metrics).toBeDefined();
       expect(stats.metrics.CLS).toBeDefined();
       expect(stats.metrics.INP).toBeDefined();
@@ -185,7 +185,7 @@ describe('PerformanceMonitor', () => {
     it('should generate performance reports', () => {
       const monitor = getPerformanceMonitor();
       const report = monitor.generateReport();
-      
+
       expect(report.timestamp).toBeGreaterThan(0);
       expect(Array.isArray(report.metrics)).toBe(true);
       expect(typeof report.sessionId).toBe('string');
@@ -194,10 +194,10 @@ describe('PerformanceMonitor', () => {
 
     it('should clear metrics when requested', () => {
       const monitor = getPerformanceMonitor();
-      
+
       // Clear metrics should not throw
       expect(() => monitor.clearMetrics()).not.toThrow();
-      
+
       // Stats should still be available after clearing
       const stats = monitor.getStats();
       expect(stats).toBeDefined();

@@ -17,7 +17,7 @@
     "build:screenshot-splitter:spa": "pnpm --filter screenshot-splitter build:spa",
     "build:screenshot-splitter:single": "pnpm --filter screenshot-splitter build:single",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --ignore-pattern '**/*.test.*' --ignore-pattern '**/__tests__/**'",
     "lint:packages": "pnpm --filter \"./packages/*\" lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
