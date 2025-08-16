@@ -27,7 +27,7 @@ function AppContent() {
       setOriginalImage: actions.setOriginalImage
     }
   });
-  const { t, currentLanguage, changeLanguage, isLoading: i18nLoading } = useI18nContext();
+  const { t, isLoading: i18nLoading } = useI18nContext();
   const { currentPath, push } = useRouter();
   const [isExporting, setIsExporting] = useState(false);
   const [forceRender, setForceRender] = useState(0);

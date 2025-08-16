@@ -1,4 +1,3 @@
-import React from 'react';
 import { useI18nContext } from '../hooks/useI18nContext';
 
 /**

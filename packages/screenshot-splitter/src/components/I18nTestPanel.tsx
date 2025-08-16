@@ -12,8 +12,8 @@ interface I18nTestPanelProps {
 }
 
 const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
-  const { currentLanguage, switchLanguage } = useI18nContext();
-  const { generateCoverageReport, testAllKeys } = useI18nCoverageTest();
+  const { currentLanguage, changeLanguage } = useI18nContext();
+  const { generateCoverageReport } = useI18nCoverageTest();
   const [testResults, setTestResults] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(show);
 
@@ -36,7 +36,7 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
 
   // 切换语言并重新测试
   const handleLanguageSwitch = (lang: string) => {
-    switchLanguage(lang);
+    changeLanguage(lang);
     setTimeout(() => runTest(), 500);
   };
 
