@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { I18nHookReturn } from '../types';
+import { LanguageDetector } from '../utils/languageDetector';
 
 // 支持的语言
 const SUPPORTED_LANGUAGES = ['zh-CN', 'en'] as const;
@@ -47,10 +48,16 @@ function getSavedLanguage(): SupportedLanguage {
   return getDefaultLanguage();
 }
 
-// 保存语言设置到localStorage
+// 保存语言设置到localStorage（集成智能检测器）
 function saveLanguage(language: SupportedLanguage) {
   try {
+    // 使用智能检测器保存偏好
+    LanguageDetector.saveLanguagePreference(language);
+    
+    // 保持向后兼容
     localStorage.setItem('app-language', language);
+    
+    console.log(`[I18n] 语言偏好已保存: ${language}`);
   } catch (error) {
     console.warn('[I18n] 无法保存语言设置:', error);
   }

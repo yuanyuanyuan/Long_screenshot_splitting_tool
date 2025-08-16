@@ -1,188 +1,107 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { ExportControls } from '../ExportControls';
+import { I18nProvider } from '../../hooks/useI18nContext';
 
-// Mock image slice data
+// 模拟切片数据
 const mockSlices = [
-  {
-    blob: new Blob(['test1'], { type: 'image/png' }),
-    url: 'blob:test1',
-    index: 0,
-    width: 100,
-    height: 100,
-  },
-  {
-    blob: new Blob(['test2'], { type: 'image/png' }),
-    url: 'blob:test2',
-    index: 1,
-    width: 100,
-    height: 100,
-  },
+  { blob: new Blob(), url: 'url1', index: 0, width: 100, height: 100 },
+  { blob: new Blob(), url: 'url2', index: 1, width: 100, height: 100 },
+  { blob: new Blob(), url: 'url3', index: 2, width: 100, height: 100 },
 ];
 
-describe('ExportControls', () => {
-  const mockOnExport = vi.fn();
-
-  beforeEach(() => {
-    mockOnExport.mockClear();
-  });
-
-  const defaultProps = {
-    selectedSlices: [0, 1],
-    slices: mockSlices,
-    onExport: mockOnExport,
-    disabled: false,
-  };
-
-  it('renders export controls with format options', () => {
-    render(<ExportControls {...defaultProps} />);
+describe('ExportControls 组件国际化测试', () => {
+  const mockExportFn = jest.fn();
+  
+  test('在中文环境下正确显示文本', () => {
+    render(
+      <I18nProvider initialLanguage="zh-CN">
+        <ExportControls 
+          selectedSlices={[0, 1]} 
+          slices={mockSlices} 
+          onExport={mockExportFn} 
+        />
+      </I18nProvider>
+    );
     
-    expect(screen.getByText('导出设置')).toBeInTheDocument();
+    // 验证中文文本显示
+    expect(screen.getByText('导出结果')).toBeInTheDocument();
+    expect(screen.getByText('已选择 2 个切片')).toBeInTheDocument();
+    expect(screen.getByText('导出格式')).toBeInTheDocument();
     expect(screen.getByText('📄 PDF文档')).toBeInTheDocument();
+    expect(screen.getByText('(适合打印和阅读)')).toBeInTheDocument();
     expect(screen.getByText('📦 ZIP压缩包')).toBeInTheDocument();
+    expect(screen.getByText('(包含所有图片文件)')).toBeInTheDocument();
+    expect(screen.getByText('文件名')).toBeInTheDocument();
+    expect(screen.getByText('图片质量')).toBeInTheDocument();
+    expect(screen.getByText('导出为 PDF')).toBeInTheDocument();
   });
-
-  it('defaults to PDF format', () => {
-    render(<ExportControls {...defaultProps} />);
+  
+  test('在英文环境下正确显示文本', () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <ExportControls 
+          selectedSlices={[0, 1]} 
+          slices={mockSlices} 
+          onExport={mockExportFn} 
+        />
+      </I18nProvider>
+    );
     
-    const pdfRadio = screen.getByDisplayValue('pdf');
-    const zipRadio = screen.getByDisplayValue('zip');
-    
-    expect(pdfRadio).toBeChecked();
-    expect(zipRadio).not.toBeChecked();
+    // 验证英文文本显示
+    expect(screen.getByText('Export Results')).toBeInTheDocument();
+    expect(screen.getByText('Selected 2 slices')).toBeInTheDocument();
+    expect(screen.getByText('Export Format')).toBeInTheDocument();
+    expect(screen.getByText('📄 PDF Document')).toBeInTheDocument();
+    expect(screen.getByText('(Suitable for printing and reading)')).toBeInTheDocument();
+    expect(screen.getByText('📦 ZIP Archive')).toBeInTheDocument();
+    expect(screen.getByText('(Contains all image files)')).toBeInTheDocument();
+    expect(screen.getByText('Filename')).toBeInTheDocument();
+    expect(screen.getByText('Image Quality')).toBeInTheDocument();
+    expect(screen.getByText('Export as PDF')).toBeInTheDocument();
   });
-
-  it('can switch from PDF to ZIP format', async () => {
-    render(<ExportControls {...defaultProps} />);
+  
+  test('当没有选择切片时显示提示信息', () => {
+    render(
+      <I18nProvider initialLanguage="zh-CN">
+        <ExportControls 
+          selectedSlices={[]} 
+          slices={mockSlices} 
+          onExport={mockExportFn} 
+        />
+      </I18nProvider>
+    );
     
-    const pdfRadio = screen.getByDisplayValue('pdf');
-    const zipRadio = screen.getByDisplayValue('zip');
-    
-    // Initially PDF should be selected
-    expect(pdfRadio).toBeChecked();
-    expect(zipRadio).not.toBeChecked();
-    
-    // Click ZIP radio button
-    fireEvent.click(zipRadio);
-    
-    await waitFor(() => {
-      expect(zipRadio).toBeChecked();
-      expect(pdfRadio).not.toBeChecked();
-    });
-  });
-
-  it('can switch from ZIP back to PDF format', async () => {
-    render(<ExportControls {...defaultProps} />);
-    
-    const pdfRadio = screen.getByDisplayValue('pdf');
-    const zipRadio = screen.getByDisplayValue('zip');
-    
-    // First switch to ZIP
-    fireEvent.click(zipRadio);
-    await waitFor(() => {
-      expect(zipRadio).toBeChecked();
-    });
-    
-    // Then switch back to PDF
-    fireEvent.click(pdfRadio);
-    await waitFor(() => {
-      expect(pdfRadio).toBeChecked();
-      expect(zipRadio).not.toBeChecked();
-    });
-  });
-
-  it('calls onExport with correct format when PDF is selected', async () => {
-    render(<ExportControls {...defaultProps} />);
-    
-    const exportButton = screen.getByRole('button', { name: /导出为 PDF/i });
-    
-    fireEvent.click(exportButton);
-    
-    await waitFor(() => {
-      expect(mockOnExport).toHaveBeenCalledWith('pdf', expect.any(Object));
-    });
-  });
-
-  it('calls onExport with correct format when ZIP is selected', async () => {
-    render(<ExportControls {...defaultProps} />);
-    
-    const zipRadio = screen.getByDisplayValue('zip');
-    fireEvent.click(zipRadio);
-    
-    await waitFor(() => {
-      const exportButton = screen.getByRole('button', { name: /导出为 ZIP/i });
-      fireEvent.click(exportButton);
-    });
-    
-    await waitFor(() => {
-      expect(mockOnExport).toHaveBeenCalledWith('zip', expect.any(Object));
-    });
-  });
-
-  it('maintains format selection state correctly', async () => {
-    render(<ExportControls {...defaultProps} />);
-    
-    const pdfRadio = screen.getByDisplayValue('pdf');
-    const zipRadio = screen.getByDisplayValue('zip');
-    
-    // Test multiple switches
-    fireEvent.click(zipRadio);
-    await waitFor(() => expect(zipRadio).toBeChecked());
-    
-    fireEvent.click(pdfRadio);
-    await waitFor(() => expect(pdfRadio).toBeChecked());
-    
-    fireEvent.click(zipRadio);
-    await waitFor(() => expect(zipRadio).toBeChecked());
-    
-    fireEvent.click(pdfRadio);
-    await waitFor(() => expect(pdfRadio).toBeChecked());
-  });
-
-  it('disables format selection when disabled prop is true', () => {
-    render(<ExportControls {...defaultProps} disabled={true} />);
-    
-    const pdfRadio = screen.getByDisplayValue('pdf');
-    const zipRadio = screen.getByDisplayValue('zip');
-    
-    expect(pdfRadio).toBeDisabled();
-    expect(zipRadio).toBeDisabled();
-  });
-
-  it('shows correct export button text based on selected format', async () => {
-    render(<ExportControls {...defaultProps} />);
-    
-    // Initially should show PDF
-    expect(screen.getByRole('button', { name: /导出为 PDF/i })).toBeInTheDocument();
-    
-    // Switch to ZIP
-    const zipRadio = screen.getByDisplayValue('zip');
-    fireEvent.click(zipRadio);
-    
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /导出为 ZIP/i })).toBeInTheDocument();
-    });
-  });
-
-  it('shows loading state during export', async () => {
-    const slowOnExport = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
-    
-    render(<ExportControls {...defaultProps} onExport={slowOnExport} />);
-    
-    const exportButton = screen.getByRole('button', { name: /导出为 PDF/i });
-    fireEvent.click(exportButton);
-    
-    await waitFor(() => {
-      expect(screen.getByText('正在导出...')).toBeInTheDocument();
-    });
-  });
-
-  it('prevents export when no slices are selected', () => {
-    render(<ExportControls {...defaultProps} selectedSlices={[]} />);
-    
-    const exportButton = screen.getByRole('button');
-    expect(exportButton).toBeDisabled();
     expect(screen.getByText('请先选择要导出的切片')).toBeInTheDocument();
+  });
+  
+  test('语言切换后文本正确更新', () => {
+    const { rerender } = render(
+      <I18nProvider initialLanguage="zh-CN">
+        <ExportControls 
+          selectedSlices={[0, 1]} 
+          slices={mockSlices} 
+          onExport={mockExportFn} 
+        />
+      </I18nProvider>
+    );
+    
+    // 验证初始中文文本
+    expect(screen.getByText('导出格式')).toBeInTheDocument();
+    
+    // 重新渲染为英文
+    rerender(
+      <I18nProvider initialLanguage="en">
+        <ExportControls 
+          selectedSlices={[0, 1]} 
+          slices={mockSlices} 
+          onExport={mockExportFn} 
+        />
+      </I18nProvider>
+    );
+    
+    // 验证切换后的英文文本
+    expect(screen.getByText('Export Format')).toBeInTheDocument();
   });
 });

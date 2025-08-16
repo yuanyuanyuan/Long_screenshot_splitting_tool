@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useI18nContext } from '../hooks/useI18nContext';
 
 interface ImageSlice {
   blob: Blob;
@@ -43,6 +44,8 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
   disabled = false,
   className = '',
 }) => {
+  const { t } = useI18nContext();
+  
   const [exportFormat, setExportFormat] = useState<'pdf' | 'zip'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
 
@@ -89,15 +92,15 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
   return (
     <div className={`export-controls ${className}`}>
       <div className="export-header mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">导出设置</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('export.title')}</h3>
         <p className="text-sm text-gray-600">
-          已选择 {selectedSlices.length} 个切片，选择导出格式和参数
+          {t('export.selectedSlicesInfo', { count: selectedSlices.length })}
         </p>
       </div>
 
       {/* 格式选择 */}
       <div className="format-selection mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">导出格式</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t('export.formatLabel')}</label>
         <div className="format-options flex gap-4">
           <label className="flex items-center">
             <input
@@ -112,8 +115,8 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
               disabled={disabled}
             />
             <span className="flex items-center">
-              📄 PDF文档
-              <span className="ml-2 text-xs text-gray-500">(适合打印和阅读)</span>
+              {t('export.pdfOption')}
+              <span className="ml-2 text-xs text-gray-500">{t('export.pdfDescription')}</span>
             </span>
           </label>
 
@@ -130,8 +133,8 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
               disabled={disabled}
             />
             <span className="flex items-center">
-              📦 ZIP压缩包
-              <span className="ml-2 text-xs text-gray-500">(包含所有图片文件)</span>
+              {t('export.zipOption')}
+              <span className="ml-2 text-xs text-gray-500">{t('export.zipDescription')}</span>
             </span>
           </label>
         </div>
@@ -141,7 +144,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
       <div className="basic-settings mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">文件名</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('export.filenameLabel')}</label>
             <input
               type="text"
               value={exportOptions.filename}
@@ -152,17 +155,17 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">图片质量</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('export.qualityLabel')}</label>
             <select
               value={exportOptions.quality}
               onChange={e => updateExportOptions({ quality: parseFloat(e.target.value) })}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={disabled}
             >
-              <option value={1.0}>最高质量</option>
-              <option value={0.9}>高质量</option>
-              <option value={0.8}>中等质量</option>
-              <option value={0.7}>较低质量</option>
+              <option value={1.0}>{t('export.qualityHighest')}</option>
+              <option value={0.9}>{t('export.qualityHigh')}</option>
+              <option value={0.8}>{t('export.qualityMedium')}</option>
+              <option value={0.7}>{t('export.qualityLow')}</option>
             </select>
           </div>
         </div>
@@ -185,15 +188,15 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
           {isExporting ? (
             <span className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              正在导出...
+              {t('export.exporting')}
             </span>
           ) : (
-            `导出为 ${exportFormat.toUpperCase()}`
+            t('export.exportAs', { format: exportFormat.toUpperCase() })
           )}
         </button>
 
         {!canExport && selectedSlices.length === 0 && (
-          <p className="text-sm text-red-500 mt-2 text-center">请先选择要导出的切片</p>
+          <p className="text-sm text-red-500 mt-2 text-center">{t('export.pleaseSelectSlices')}</p>
         )}
       </div>
     </div>

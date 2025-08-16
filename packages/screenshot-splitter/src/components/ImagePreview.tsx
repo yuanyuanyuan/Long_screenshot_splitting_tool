@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useI18nContext } from '../hooks/useI18nContext';
 
 interface ImageSlice {
   blob: Blob;
@@ -29,6 +30,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   onSelectionChange,
   className = '',
 }) => {
+  const { t } = useI18nContext();
+  
   // 移除tab切换，直接显示切片预览
   const [selectAll, setSelectAll] = useState(false);
 
@@ -86,8 +89,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       <div className={`image-preview ${className}`}>
         <div className="no-content text-center py-8 text-gray-500">
           <div className="text-4xl mb-4">🖼️</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">暂无图片预览</h3>
-          <p className="text-gray-600">请先上传一张图片进行处理</p>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('preview.noPreview')}</h3>
+          <p className="text-gray-600">{t('preview.uploadFirst')}</p>
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4 text-xs text-red-600 bg-red-50 p-2 rounded">
               调试: 原图={originalImage ? '有' : '无'}, 切片={slices?.length || 0}个
@@ -105,8 +108,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       {/* 简化的控制栏 - 只保留全选功能 */}
       <div className="preview-controls flex justify-between items-center mb-4 p-4 bg-gray-50 rounded">
         <div className="preview-title">
-          <h3 className="text-lg font-semibold text-gray-800">切片预览 ({slices.length}个)</h3>
-          <p className="text-sm text-gray-600">点击切片进行选择，选中的切片将用于导出</p>
+          <h3 className="text-lg font-semibold text-gray-800">{t('preview.slicePreview', { count: slices.length })}</h3>
+          <p className="text-sm text-gray-600">{t('preview.selectInstruction')}</p>
         </div>
 
         <div className="selection-controls">
@@ -114,7 +117,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
             onClick={handleSelectAll}
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
           >
-            {selectAll ? '取消全选' : '全选'} ({selectedSlices.length}/{slices.length})
+            {selectAll ? t('preview.deselectAll') : t('preview.selectAll')} ({selectedSlices.length}/{slices.length})
           </button>
         </div>
       </div>
@@ -136,7 +139,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
               onClick={() => handleSliceSelect(index)}
             >
               <div className="slice-header flex justify-between items-center mb-2">
-                <span className="slice-number text-sm font-medium">切片 {index + 1}</span>
+                <span className="slice-number text-sm font-medium">{t('preview.sliceNumber', { number: index + 1 })}</span>
                 <div className="selection-indicator">
                   {selectedSlices.includes(index) ? (
                     <span className="text-blue-500">✓</span>
@@ -149,10 +152,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
               <div className="slice-image-container">
                 <img
                   src={slice.url}
-                  alt={`切片 ${index + 1}`}
+                  alt={t('preview.sliceNumber', { number: index + 1 })}
                   className="w-full h-auto border rounded"
                   onError={e => {
-                    console.error('图片加载失败:', slice.url);
+                    console.error(`${t('preview.imageLoadError')}: ${slice.url}`);
                     e.currentTarget.style.display = 'none';
                   }}
                 />
@@ -168,7 +171,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         {selectedSlices.length > 0 && (
           <div className="selection-summary mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
             <p className="text-sm text-blue-700">
-              已选择 {selectedSlices.length} 个切片，可以进行导出操作
+              {t('preview.selectionSummary', { count: selectedSlices.length })}
             </p>
           </div>
         )}

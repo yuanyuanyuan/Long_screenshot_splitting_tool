@@ -4,6 +4,7 @@
  */
 
 import React, { useCallback, useState, useRef } from 'react';
+import { useI18nContext } from '../hooks/useI18nContext';
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void;
@@ -18,10 +19,11 @@ interface FileUploaderProps {
 export const FileUploader: React.FC<FileUploaderProps> = ({
   onFileSelect,
   disabled = false,
-  maxFileSize = 10 * 1024 * 1024, // 10MB
+  maxFileSize = 30 * 1024 * 1024, // 30MB
   supportedFormats = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
   className = '',
 }) => {
+  const { t } = useI18nContext();
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,16 +32,17 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   const validateFile = useCallback(
     (file: File): string | null => {
       if (file.size > maxFileSize) {
-        return `文件大小不能超过 ${Math.round(maxFileSize / 1024 / 1024)}MB`;
+        return t('upload.fileSizeError', { size: Math.round(maxFileSize / 1024 / 1024) });
       }
 
       if (!supportedFormats.includes(file.type)) {
-        return `不支持的文件格式，请上传 ${supportedFormats.map(f => f.split('/')[1]).join(', ')} 格式的图片`;
+        const formats = supportedFormats.map(f => f.split('/')[1]).join(', ');
+        return t('upload.fileTypeError', { formats });
       }
 
       return null;
     },
-    [maxFileSize, supportedFormats]
+    [maxFileSize, supportedFormats, t]
   );
 
   // 处理文件选择
@@ -124,11 +127,13 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
         <div className="upload-text">
           <p className="text-lg font-medium text-gray-700 mb-2">
-            {isDragOver ? '释放文件以上传' : '拖拽图片到此处或点击选择'}
+            {isDragOver ? t('upload.dropToUpload') : t('upload.dragText')}
           </p>
           <p className="text-sm text-gray-500">
-            支持 {supportedFormats.map(f => f.split('/')[1].toUpperCase()).join(', ')} 格式， 最大{' '}
-            {Math.round(maxFileSize / 1024 / 1024)}MB
+            {t('upload.supportedFormats', { 
+              formats: supportedFormats.map(f => f.split('/')[1].toUpperCase()).join(', '),
+              maxSize: Math.round(maxFileSize / 1024 / 1024)
+            })}
           </p>
         </div>
 

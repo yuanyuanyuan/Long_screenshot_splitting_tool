@@ -39,12 +39,12 @@ export interface NavigationMetrics {
   progressPercentage: number;
 }
 
-// 默认导航项
+// 默认导航项 - 使用键名，实际显示文本通过国际化处理
 const DEFAULT_NAVIGATION_ITEMS: NavigationItem[] = [
-  { path: '/', name: '首页', icon: '🏠' },
-  { path: '/upload', name: '上传', icon: '📤' },
-  { path: '/split', name: '分割', icon: '✂️' },
-  { path: '/export', name: '导出', icon: '💾' },
+  { path: '/', name: 'navigation.home', icon: '🏠' },
+  { path: '/upload', name: 'navigation.upload', icon: '📤' },
+  { path: '/split', name: 'navigation.split', icon: '✂️' },
+  { path: '/export', name: 'navigation.export', icon: '💾' },
 ];
 
 /**
