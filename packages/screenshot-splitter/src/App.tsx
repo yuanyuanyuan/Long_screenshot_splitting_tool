@@ -19,7 +19,13 @@ import {
 
 function App() {
   const { state, actions, getStateSnapshot } = useAppState();
-  const { processImage, progress, isProcessing } = useImageProcessor({ state, actions });
+  const { processImage, progress, isProcessing } = useImageProcessor({ 
+    state, 
+    actions: {
+      ...actions,
+      setOriginalImage: actions.setOriginalImage
+    }
+  });
   const { t, currentLanguage, changeLanguage, isLoading: i18nLoading } = useI18n();
   const { currentPath, push } = useRouter();
   const [isExporting, setIsExporting] = useState(false);
@@ -141,6 +147,12 @@ function App() {
   const handleFileSelect = async (file: File) => {
     try {
       await processImage(file);
+      
+      // 如果当前在上传页面，处理完成后自动跳转到分割页面
+      if (currentPath === '/upload') {
+        console.log('[App] 图片处理完成，从上传页面跳转到分割页面');
+        push('/split');
+      }
     } catch (error) {
       // 使用导航错误处理器处理处理错误
       console.error('[App] 图片处理失败:', error);

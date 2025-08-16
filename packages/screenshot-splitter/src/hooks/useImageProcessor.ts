@@ -11,6 +11,7 @@ interface UseImageProcessorProps {
     setProcessing: (isProcessing: boolean) => void;
     setFileName: (name: string) => void;
     setWorker: (worker: Worker | null) => void;
+    setOriginalImage: (image: HTMLImageElement | null) => void;
     processingComplete: () => void;
   };
 }
@@ -99,6 +100,23 @@ export function useImageProcessor({
       // 设置处理状态
       actions.setProcessing(true);
       actions.setFileName(file.name.replace(/\.[^/.]+$/, '') || '分割结果');
+
+      // 创建并设置原始图片
+      const img = new Image();
+      const imageUrl = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        console.log('[ImageProcessor] 原始图片加载完成，设置到状态中');
+        actions.setOriginalImage(img);
+        URL.revokeObjectURL(imageUrl); // 清理临时URL
+      };
+      
+      img.onerror = (error) => {
+        console.error('[ImageProcessor] 原始图片加载失败:', error);
+        URL.revokeObjectURL(imageUrl);
+      };
+      
+      img.src = imageUrl;
 
       // 确保Worker已创建
       createWorker();
