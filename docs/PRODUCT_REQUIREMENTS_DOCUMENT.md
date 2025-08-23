@@ -103,7 +103,7 @@ graph TD
 1. **工具独立性**:
    - 每个工具都是独立的React应用，有自己的路由、状态管理、构建配置
    - 可以单独开发、测试、部署，不影响其他工具
-   - 支持独立的single-file构建，用于离线环境
+   - 支持CDN资源配置，提高静态资源加载性能
 
 2. **自动化集成**:
    - 新工具通过配置文件自动注册到工具集合页
@@ -179,7 +179,7 @@ graph TD
    ```bash
    pnpm build:all
    # 构建所有工具 + 工具集合页面
-   # 输出: dist/ (SPA版本) + dist-single/ (单文件版本)
+   # 输出: dist/ (构建产物)
    ```
 
 2. **单工具构建 (Individual Tool Build)**  
@@ -385,7 +385,7 @@ async function buildSingleTool(toolId) {
   // 1. 构建工具本身
   // 2. 包含必要的共享组件
   // 3. 生成独立可部署的包
-  // 4. 同时生成single-file版本
+  // 4. 配置CDN资源地址
 }
 
 // tools/build-scripts/build-registry.js  

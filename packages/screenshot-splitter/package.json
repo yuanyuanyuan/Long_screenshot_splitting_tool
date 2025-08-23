@@ -9,7 +9,6 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "dist-single",
     "component.config.js"
   ],
   "keywords": [
@@ -24,14 +23,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:spa": "tsc -b && vite build --mode spa",
-    "build:single": "tsc -b && BUILD_MODE=singlefile vite build --mode singlefile --outDir dist-single",
     "lint": "eslint .",
       "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --ignore-pattern '**/*.test.*' --ignore-pattern '**/__tests__/**'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
     "preview:spa": "vite preview --mode spa",
-    "preview:single": "vite preview --mode singlefile",
     "type-check": "tsc --noEmit",
     "test": "NODE_OPTIONS='--max-old-space-size=2048' vitest",
     "test:run": "NODE_OPTIONS='--max-old-space-size=2048' vitest run",
@@ -82,7 +79,6 @@
     "typescript-eslint": "^8.39.0",
     "vite": "^4.5.0",
     "vite-plugin-externals": "^0.6.2",
-    "vite-plugin-singlefile": "^2.3.0",
     "vitest": "^3.2.4"
   }
 }

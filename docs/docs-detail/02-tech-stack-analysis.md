@@ -37,8 +37,7 @@ graph TD
     end
     
     subgraph Build & Deployment
-        D -- "build:spa" --> I[SPA Bundle];
-        D -- "build:single" --> J[Single HTML File];
+        D -- "build" --> I[SPA Bundle];
     end
 
     A --> E;
@@ -56,28 +55,26 @@ graph TD
 ```javascript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { viteSingleFile } from 'vite-plugin-singlefile';
 import { viteExternalsPlugin } from 'vite-plugin-externals';
 
-export function createBaseConfig(options = {}) {
-  const { mode = 'spa' } = options;
-  const isSingleFile = mode === 'singlefile';
+export function createBaseConfig() {
+  // 资源配置模式
+  const useCDN = !!process.env.VITE_ASSETS_BASE_URL;
 
   return defineConfig({
     plugins: [
       react(),
-      ...(isSingleFile ? [
-        viteExternalsPlugin({ /* ...cdn config... */ }),
-        viteSingleFile()
+      ...(useCDN ? [
+        viteExternalsPlugin({ /* ...cdn config... */ })
       ] : [])
     ],
     build: {
-      // ... build options based on mode
+      // ... build options
     }
   });
 }
 ```
-这段代码是项目双模式构建能力的关键。通过动态加载 `vite-plugin-singlefile` 和 `vite-plugin-externals` 插件，Vite 能够根据 `mode` 参数生成完全不同形态的产物。
+这段代码是项目构建能力的关键。通过动态加载 `vite-plugin-externals` 插件，Vite 能够优化构建产物。
 
 ## 4. 配置示例
 
@@ -88,9 +85,8 @@ export function createBaseConfig(options = {}) {
 import { defineConfig } from 'vite';
 import { createBaseConfig } from '../../vite.config.base.js';
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   const baseConfig = createBaseConfig({
-    mode,
     component: 'screenshot-splitter',
     // ... other specific settings
   });
@@ -103,8 +99,8 @@ export default defineConfig(({ mode }) => {
 ## 5. 最佳实践
 
 *   **统一版本**: 在根 `package.json` 的 `devDependencies` 中锁定核心工具（Vite, TypeScript, ESLint）的版本，确保所有包在一致的环境下开发和构建。
-*   **利用 Vite 插件**: 积极利用 Vite 强大的插件生态。例如，使用 `vite-plugin-externals` 在 `singlefile` 模式下剥离大型库（如React），通过 CDN 加载，显著减小最终文件体积。
-*   **环境变量**: 通过 `define` 配置项注入构建时环境变量（如 `__BUILD_MODE__`），使应用代码能够感知当前的构建模式，并据此执行不同的逻辑（例如，在 singlefile 模式下禁用某些需要服务器支持的功能）。
+*   **利用 Vite 插件**: 积极利用 Vite 强大的插件生态。例如，使用 `vite-plugin-externals` 来剥离大型库（如React），通过 CDN 加载，显著减小最终文件体积。
+*   **环境变量**: 通过 `define` 配置项注入构建时环境变量（如 `VITE_ASSETS_BASE_URL`），使应用代码能够根据配置使用CDN资源地址。
 *   **路径别名**: 充分利用 `resolve.alias` 来简化跨包导入。这不仅使代码更易读，还解耦了组件的实际文件路径，便于未来重构。
 
 ## 6. 案例分析
@@ -113,10 +109,8 @@ export default defineConfig(({ mode }) => {
 
 传统的 SPA 应用无法满足此需求，因为它需要托管 JS 和 CSS 文件。但得益于本项目的技术栈设计，我们可以轻松应对：
 
-1.  **执行构建**: 运行 `pnpm build:screenshot-splitter:single` 命令。
-2.  **获取产物**: Vite 会在 `dist-single` 目录下生成一个独立的 `index.html` 文件。
-3.  **嵌入使用**:
-    *   将这个 HTML 文件的内容直接复制粘贴到目标静态网站的任意位置。
-    *   或者，使用 `<iframe>` 标签来加载这个 HTML 文件。
+1.  **执行构建**: 运行 `pnpm build:screenshot-splitter` 命令。
+2.  **获取产物**: Vite 会在 `dist` 目录下生成构建产物。
+3.  **配置CDN**: 设置环境变量 `VITE_ASSETS_BASE_URL` 来使用CDN资源，提高加载性能。
 
-这个案例完美地展示了 `Vite` + `vite-plugin-singlefile` 组合的威力，它为组件的分发和集成提供了极大的灵活性，是该项目技术选型的一大亮点。
+这个案例展示了 `Vite` 构建系统的威力，它为组件的分发和集成提供了极大的灵活性，是该项目技术选型的一大亮点。

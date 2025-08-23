@@ -1,12 +1,13 @@
-# 双模式构建Monorepo系统
+SuperClaude init# 单模式构建Monorepo系统
 
-一个基于pnpm workspace的现代化前端项目架构，支持双模式构建（SPA多文件 + 单文件HTML）和组件独立部署。
+一个基于pnpm workspace的现代化前端项目架构，专注于SPA多文件构建和组件独立部署。
 
 ## 🚀 项目特性
 
 ### 核心功能
 - **🏗️ Monorepo架构**: 基于pnpm workspace的多包管理
-- **🔄 双模式构建**: 支持SPA模式和单文件HTML模式
+- **🔄 SPA模式构建**: 专注于SPA多文件构建模式
+- **🌐 资源配置化**: 支持配置化的资源基础URL，便于CDN部署
 - **🧩 组件独立化**: 每个组件可独立构建、运行和部署
 - **⚡ 自动化部署**: GitHub Actions自动化部署到GitHub Pages
 - **🔧 性能优化**: 完整的性能优化工具套件
@@ -96,23 +97,17 @@ pnpm dev:shared-components
 # 构建所有组件（SPA模式）
 pnpm build
 
-# 构建单文件HTML模式
-pnpm build:singlefile
-
 # 构建特定组件
 pnpm build:screenshot-splitter
 
-# 构建特定组件的单文件版本
-BUILD_MODE=singlefile pnpm build:screenshot-splitter
+# 使用自定义资源基础URL构建
+VITE_ASSETS_BASE_URL=https://cdn.example.com/path/ pnpm build
 ```
 
 ### 预览构建结果
 ```bash
 # 预览SPA模式
-pnpm preview:spa
-
-# 预览单文件模式
-pnpm preview:singlefile
+pnpm preview
 
 # 预览特定组件
 pnpm preview:screenshot-splitter
@@ -121,9 +116,10 @@ pnpm preview:screenshot-splitter
 ## 🔧 配置说明
 
 ### 环境变量
-- `BUILD_MODE`: 构建模式，可选值：`spa`（默认）、`singlefile`
+- `BUILD_MODE`: 构建模式，固定值：`spa`
 - `COMPONENT`: 指定构建的组件名称
 - `NODE_ENV`: 环境模式，可选值：`development`、`production`
+- `VITE_ASSETS_BASE_URL`: 资源基础URL，用于配置CDN地址（可选）
 
 ### 构建模式详解
 
@@ -132,12 +128,9 @@ pnpm preview:screenshot-splitter
 - 支持代码分割和懒加载
 - 适合现代浏览器和服务器部署
 - 文件结构：`index.html` + `assets/` 目录
-
-#### 单文件模式
-- 生成单个HTML文件
-- 所有资源内联到HTML中
-- 适合离线使用和简单部署
-- 文件结构：单个 `index.html` 文件
+- **资源配置**: 支持通过 `VITE_ASSETS_BASE_URL` 或 `ASSETS_BASE_URL` 环境变量配置资源基础地址
+- 默认使用相对路径，配置后使用绝对路径引用资源
+- 支持CDN部署，资源URL自动处理路径分隔符
 
 ### 组件配置
 每个组件都有独立的 `component.config.js` 配置文件：

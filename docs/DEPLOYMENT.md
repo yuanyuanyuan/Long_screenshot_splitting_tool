@@ -1,6 +1,6 @@
 # 部署指南
 
-本文档详细介绍了双模式构建Monorepo系统的部署流程和最佳实践。
+本文档详细介绍了单模式构建Monorepo系统的部署流程和最佳实践。
 
 ## 📋 目录
 
@@ -86,8 +86,11 @@ jobs:
       - name: Build SPA mode
         run: pnpm build
         
-      - name: Build singlefile mode
-        run: pnpm build:singlefile
+      - name: Configure assets base URL
+        run: |
+          if [ -n \"${{ secrets.ASSETS_BASE_URL }}\" ]; then
+            echo \"VITE_ASSETS_BASE_URL=${{ secrets.ASSETS_BASE_URL }}\" >> $GITHUB_ENV
+          fi
         
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -127,11 +130,7 @@ module.exports = {
   build: {
     spa: {
       enabled: true,
-      outputDir: 'dist/spa'
-    },
-    singlefile: {
-      enabled: true,
-      outputDir: 'dist/singlefile'
+      outputDir: 'dist'
     }
   },
   
@@ -140,8 +139,21 @@ module.exports = {
     'screenshot-splitter': {
       enabled: true,
       path: '/screenshot-splitter/',
-      spa: true,
-      singlefile: true
+      spa: true
+    }
+  },
+  
+  // 资源配置
+  assets: {
+    baseUrl: process.env.VITE_ASSETS_BASE_URL || '',
+    cdn: {
+      enabled: false,
+      domain: 'cdn.example.com',
+      paths: {
+        js: '/js/',
+        css: '/css/',
+        images: '/images/'
+      }
     }
   }
 };
@@ -157,12 +169,11 @@ pnpm install
 # 运行测试
 pnpm test
 
-# 构建所有模式
-pnpm build:all
+# 构建所有组件
+pnpm build
 
 # 验证构建结果
-pnpm preview:spa
-pnpm preview:singlefile
+pnpm preview
 ```
 
 ### 2. 部署到GitHub Pages

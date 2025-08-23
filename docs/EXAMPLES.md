@@ -46,26 +46,20 @@ pnpm dev:screenshot-splitter
 
 #### 2.1 基础构建
 ```bash
-# 构建所有组件（SPA模式）
+# 构建所有组件
 pnpm build
-
-# 构建单文件HTML模式
-pnpm build:singlefile
 
 # 构建特定组件
 pnpm build:screenshot-splitter
 
-# 构建特定组件的单文件版本
-BUILD_MODE=singlefile pnpm build:screenshot-splitter
+# 使用CDN资源配置构建
+VITE_ASSETS_BASE_URL=https://cdn.example.com/path/ pnpm build
 ```
 
 #### 2.2 预览构建结果
 ```bash
-# 预览SPA模式
-pnpm preview:spa
-
-# 预览单文件模式
-pnpm preview:singlefile
+# 预览构建结果
+pnpm preview
 
 # 预览特定组件
 pnpm preview:screenshot-splitter
@@ -119,10 +113,9 @@ module.exports = {
       entry: 'src/main.tsx',
       template: 'public/index.html'
     },
-    singlefile: {
-      enabled: true,
-      inlineAssets: true,
-      removeViteModuleLoader: true
+    assets: {
+      baseUrl: process.env.VITE_ASSETS_BASE_URL || '',
+      cdnEnabled: !!process.env.VITE_ASSETS_BASE_URL
     }
   },
   
@@ -564,17 +557,9 @@ pnpm test
 # 构建项目
 echo "🏗️ 构建项目..."
 if [ "$COMPONENT" = "all" ]; then
-  if [ "$MODE" = "singlefile" ]; then
-    NODE_ENV=$ENV pnpm build:singlefile
-  else
-    NODE_ENV=$ENV pnpm build
-  fi
+  NODE_ENV=$ENV pnpm build
 else
-  if [ "$MODE" = "singlefile" ]; then
-    NODE_ENV=$ENV BUILD_MODE=singlefile pnpm build:$COMPONENT
-  else
-    NODE_ENV=$ENV pnpm build:$COMPONENT
-  fi
+  NODE_ENV=$ENV pnpm build:$COMPONENT
 fi
 
 # 部署

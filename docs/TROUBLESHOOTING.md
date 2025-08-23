@@ -1,6 +1,6 @@
 # 故障排除指南
 
-本文档提供了双模式构建Monorepo系统常见问题的解决方案和调试技巧。
+本文档提供了单模式构建Monorepo系统常见问题的解决方案和调试技巧。
 
 ## 📋 目录
 
@@ -134,33 +134,6 @@ export default defineConfig({
 });
 ```
 
-### 3. 单文件模式构建失败
-
-#### 问题描述
-```bash
-Error: vite-plugin-singlefile: Failed to inline assets
-```
-
-#### 解决方案
-```bash
-# 检查资源大小
-ls -la packages/*/dist/assets/
-
-# 如果资源过大，启用压缩
-BUILD_MODE=singlefile COMPRESS_ASSETS=true pnpm build
-
-# 或者排除大文件
-# vite.config.js
-export default defineConfig({
-  plugins: [
-    singlefile({
-      removeViteModuleLoader: true,
-      inlinePattern: ['**/*.css', '**/*.js'],
-      excludePattern: ['**/*.woff2', '**/*.png']
-    })
-  ]
-});
-```
 
 ### 4. 内存不足错误
 

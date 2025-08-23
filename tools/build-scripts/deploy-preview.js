@@ -190,22 +190,16 @@ function createPreviewServer(distDir, port = 8080) {
 async function main() {
   const args = process.argv.slice(2);
   const component = args[0] || 'screenshot-splitter';
-  const mode = args[1] || 'spa';
-  const port = parseInt(args[2]) || 8080;
+  const port = parseInt(args[1]) || 8080;
   
   // 确定构建目录
-  let distDir;
-  if (mode === 'single') {
-    distDir = join(rootDir, `packages/${component}/dist-single`);
-  } else {
-    distDir = join(rootDir, `packages/${component}/dist`);
-  }
+  const distDir = join(rootDir, `packages/${component}/dist`);
   
   // 检查构建目录是否存在
   if (!existsSync(distDir)) {
     logError(`构建目录不存在: ${distDir}`);
     logInfo('请先运行构建命令:');
-    logInfo(`  pnpm run build:${component}:${mode}`);
+    logInfo(`  pnpm run build:${component}`);
     process.exit(1);
   }
   
@@ -215,7 +209,6 @@ async function main() {
   server.listen(port, () => {
     logSuccess(`部署预览服务器已启动！`);
     logInfo(`组件: ${component}`);
-    logInfo(`模式: ${mode}`);
     logInfo(`目录: ${distDir}`);
     logInfo(`地址: http://localhost:${port}`);
     logInfo('');

@@ -1,7 +1,5 @@
-
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { viteSingleFile } from 'vite-plugin-singlefile';
 import { viteExternalsPlugin } from 'vite-plugin-externals';
 import { resolve } from 'path';
 import { getOptimizedExternalsConfig } from './tools/build-scripts/cdn-config.js';
@@ -9,10 +7,11 @@ import { getOptimizedExternalsConfig } from './tools/build-scripts/cdn-config.js
 /**
  * 创建基础Vite配置
  * @param {Object} options - 配置选项
- * @param {string} options.mode - 构建模式 ('spa' | 'singlefile')
+ * @param {string} options.mode - 构建模式 ('spa')
  * @param {string} options.component - 组件名称
  * @param {string} options.root - 项目根目录
  * @param {Object} options.env - 环境变量
+ * @param {string} options.assetsBaseUrl - 资源基础URL
  * @returns {Object} Vite配置对象
  */
 export function createBaseConfig(options = {}) {
@@ -22,10 +21,10 @@ export function createBaseConfig(options = {}) {
     root = process.cwd(),
     env = {},
     base = './',
-    outDir = 'dist'
+    outDir = 'dist',
+    assetsBaseUrl = ''
   } = options;
 
-  const isSingleFile = mode === 'singlefile';
   const isProduction = process.env.NODE_ENV === 'production';
 
   console.log(`🔧 创建Vite配置 - 模式: ${mode}, 组件: ${component || '主应用'}`);
@@ -34,10 +33,10 @@ export function createBaseConfig(options = {}) {
     // 基础配置
     root,
     base,
-    mode: mode === 'singlefile' ? 'production' : mode,
+    mode: mode,
     
-    // 单文件模式下不复制public目录，避免生成不必要的workers目录
-    publicDir: isSingleFile ? false : 'public',
+    // 复制public目录
+    publicDir: 'public',
     
     // 环境变量
     define: {
@@ -57,22 +56,7 @@ export function createBaseConfig(options = {}) {
         babel: {
           plugins: isProduction ? [] : []
         }
-      }),
-      
-      // 单文件模式插件
-      ...(isSingleFile ? [
-        // CDN外部库支持
-        viteExternalsPlugin(getOptimizedExternalsConfig({
-          includeReact: true,
-          includeLodash: false,
-          includeDateFns: false
-        })),
-        viteSingleFile({
-          removeViteModuleLoader: true,
-          useRecommendedBuildConfig: true,
-          inlinePattern: ['**/*.css', '**/*.js']
-        })
-      ] : [])
+      })
     ],
 
     // 构建配置
@@ -82,30 +66,14 @@ export function createBaseConfig(options = {}) {
       sourcemap: !isProduction,
       minify: isProduction ? 'esbuild' : false,
       
-      // 单文件模式特殊配置
-      ...(isSingleFile && {
-        cssCodeSplit: false,
-        assetsInlineLimit: Number.MAX_SAFE_INTEGER,
-        rollupOptions: {
-          inlineDynamicImports: true,
-          output: {
-            assetFileNames: 'assets/[name].[ext]',
-            chunkFileNames: 'assets/[name].js',
-            entryFileNames: 'assets/[name].js'
-          }
-        }
-      }),
-
       // SPA模式配置
-      ...(!isSingleFile && {
-        rollupOptions: {
-          output: {
-            manualChunks: {
-              vendor: ['react', 'react-dom']
-            }
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom']
           }
         }
-      })
+      }
     },
 
     // 开发服务器配置
@@ -143,7 +111,7 @@ export function createBaseConfig(options = {}) {
       },
       preprocessorOptions: {
         scss: {
-          additionalData: `@import "@/styles/variables.scss";`
+          additionalData: `@import \"@/styles/variables.scss\";`
         }
       }
     },
@@ -157,25 +125,16 @@ export function createBaseConfig(options = {}) {
     // 实验性功能
     experimental: {
       renderBuiltUrl(filename, { hostType }) {
-        if (hostType === 'js') {
+        if (assetsBaseUrl) {
+          // 使用配置的资源基础URL
+          return `${assetsBaseUrl.replace(/\/$/, '')}/${filename.replace(/^\//, '')}`;
+        } else if (hostType === 'js') {
           return { js: `/${filename}` };
         } else {
           return { relative: true };
         }
       }
     }
-  });
-}
-
-/**
- * 创建单文件模式配置
- * @param {Object} options - 配置选项
- * @returns {Object} 单文件模式Vite配置
- */
-export function createSingleFileConfig(options = {}) {
-  return createBaseConfig({
-    ...options,
-    mode: 'singlefile'
   });
 }
 

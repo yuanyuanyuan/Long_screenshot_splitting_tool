@@ -1,16 +1,9 @@
 /**
- * 环境变量配置管理
- */
-
-/**
  * 获取构建模式
- * @returns {string} 构建模式 ('spa' | 'singlefile')
+ * @returns {string} 构建模式 ('development' | 'production')
  */
 export function getBuildMode() {
-  return process.env.VITE_BUILD_MODE || 
-         process.env.BUILD_MODE || 
-         process.env.MODE || 
-         'spa';
+  return process.env.BUILD_MODE || 'development';
 }
 
 /**
@@ -18,9 +11,7 @@ export function getBuildMode() {
  * @returns {string} 组件名称
  */
 export function getComponentName() {
-  return process.env.VITE_COMPONENT || 
-         process.env.COMPONENT || 
-         '';
+  return process.env.COMPONENT_NAME || '';
 }
 
 /**
@@ -37,14 +28,6 @@ export function getBuildEnv() {
  */
 export function isProduction() {
   return getBuildEnv() === 'production';
-}
-
-/**
- * 检查是否为单文件模式
- * @returns {boolean}
- */
-export function isSingleFileMode() {
-  return getBuildMode() === 'singlefile';
 }
 
 /**
@@ -77,6 +60,29 @@ export function getBasePath(component = '') {
 }
 
 /**
+ * 获取资源基础URL
+ * @returns {string} 资源基础URL
+ */
+export function getAssetsBaseUrl() {
+  return process.env.VITE_ASSETS_BASE_URL || 
+         process.env.ASSETS_BASE_URL || 
+         '';
+}
+
+/**
+ * 获取完整的资源URL
+ * @param {string} assetPath - 资源路径
+ * @returns {string} 完整的资源URL
+ */
+export function getAssetUrl(assetPath) {
+  const baseUrl = getAssetsBaseUrl();
+  if (baseUrl) {
+    return `${baseUrl.replace(/\/$/, '')}/${assetPath.replace(/^\//, '')}`;
+  }
+  return assetPath;
+}
+
+/**
  * 获取完整的构建配置
  * @param {Object} options - 额外选项
  * @returns {Object} 完整的构建配置
@@ -91,9 +97,9 @@ export function getBuildConfig(options = {}) {
     component,
     env,
     isProduction: isProduction(),
-    isSingleFile: isSingleFileMode(),
     outDir: getOutputDir(component),
     base: getBasePath(component),
+    assetsBaseUrl: getAssetsBaseUrl(),
     ...options
   };
 }
@@ -110,5 +116,5 @@ export function printBuildInfo() {
   console.log(`   组件: ${config.component || '主应用'}`);
   console.log(`   输出目录: ${config.outDir}`);
   console.log(`   基础路径: ${config.base}`);
-  console.log(`   单文件模式: ${config.isSingleFile ? '是' : '否'}`);
+  console.log(`   资源基础URL: ${config.assetsBaseUrl || '(默认相对路径)'}`);
 }

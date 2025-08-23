@@ -2,9 +2,8 @@
 
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync, rmSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -47,7 +46,7 @@ function runCommand(command, options = {}) {
   const { cwd = rootDir, silent = false } = options;
   
   if (!silent) {
-    log(`执行命令: ${command}`, 'blue');
+    log(`执行命令: ${command }`, 'blue');
   }
   
   try {
@@ -68,8 +67,7 @@ function cleanBuildDirs() {
   
   const dirsToClean = [
     'dist',
-    'packages/screenshot-splitter/dist',
-    'packages/screenshot-splitter/dist-single'
+    'packages/screenshot-splitter/dist'
   ];
   
   dirsToClean.forEach(dir => {
@@ -105,32 +103,25 @@ function lintCheck() {
   if (!result.success) {
     logWarning('ESLint检查发现问题，但继续构建...');
     // 不阻止构建，只是警告
-  } else {
+ } else {
     logSuccess('ESLint检查通过');
   }
   return true;
 }
 
 // 构建单个组件
-function buildComponent(componentName, modes = ['spa', 'single']) {
+function buildComponent(componentName) {
   logStep('BUILD', `构建组件: ${componentName}`);
   
-  const results = {};
+  const result = runCommand(`pnpm run build:${componentName}`);
   
-  for (const mode of modes) {
-    log(`构建模式: ${mode}`, 'magenta');
-    
-    const result = runCommand(`pnpm run build:${componentName}:${mode}`);
-    results[mode] = result.success;
-    
-    if (result.success) {
-      logSuccess(`${componentName} (${mode}模式) 构建成功`);
-    } else {
-      logError(`${componentName} (${mode}模式) 构建失败`);
-    }
+  if (result.success) {
+    logSuccess(`${componentName} 构建成功`);
+  } else {
+    logError(`${componentName} 构建失败`);
   }
   
-  return results;
+  return { success: result.success };
 }
 
 // 构建所有组件
@@ -148,14 +139,14 @@ function buildAll() {
 }
 
 // 生成构建报告
-function generateBuildReport(results) {
+function generateBuildReport(results ) {
   logStep('REPORT', '生成构建报告...');
   
   log('\n📊 构建报告', 'bright');
   log('=' * 50, 'blue');
   
   Object.entries(results).forEach(([component, modes]) => {
-    log(`\n🔧 ${component}:`, 'cyan');
+    log(`\n${component}:`, 'cyan');
     Object.entries(modes).forEach(([mode, success]) => {
       const status = success ? '✅ 成功' : '❌ 失败';
       log(`  ${mode}: ${status}`);
@@ -186,26 +177,18 @@ async function main() {
         
       case 'build':
         const component = args[1];
-        const mode = args[2];
         
-        if (component && mode) {
-          // 构建特定组件的特定模式
-          const results = buildComponent(component, [mode]);
-          if (!results[mode]) process.exit(1);
-        } else if (component) {
-          // 构建特定组件的所有模式
+        if (component) {
+          // 构建特定组件
           const results = buildComponent(component);
-          const hasFailure = Object.values(results).some(success => !success);
-          if (hasFailure) process.exit(1);
+          if (!results.success) process.exit(1);
         } else {
           // 构建所有组件
           const results = buildAll();
           generateBuildReport(results);
           
           // 检查是否有构建失败
-          const hasFailure = Object.values(results).some(modes => 
-            Object.values(modes).some(success => !success)
-          );
+          const hasFailure = Object.values(results).some(result => !result.success);
           if (hasFailure) process.exit(1);
         }
         break;
@@ -218,9 +201,7 @@ async function main() {
         const fullResults = buildAll();
         generateBuildReport(fullResults);
         
-        const hasFullFailure = Object.values(fullResults).some(modes => 
-          Object.values(modes).some(success => !success)
-        );
+        const hasFullFailure = Object.values(fullResults).some(result => !result.success);
         if (hasFullFailure) process.exit(1);
         
         logSuccess('🎉 完整构建流程完成！');
@@ -232,7 +213,6 @@ async function main() {
         log('  node build-manager.js check          # 类型和代码检查');
         log('  node build-manager.js build          # 构建所有组件');
         log('  node build-manager.js build <组件>    # 构建特定组件');
-        log('  node build-manager.js build <组件> <模式> # 构建特定组件的特定模式');
         log('  node build-manager.js full           # 完整构建流程');
         break;
     }
