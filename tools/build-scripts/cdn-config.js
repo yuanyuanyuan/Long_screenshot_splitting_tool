@@ -3,33 +3,69 @@
  */
 
 /**
- * CDN库配置
+ * CDN库配置（包含主备CDN）
  */
 export const CDN_LIBS = {
   // React生态
   react: {
     global: 'React',
-    url: 'https://unpkg.com/react@18/umd/react.production.min.js',
-    dev: 'https://unpkg.com/react@18/umd/react.development.js'
+    url: 'https://unpkg.com/react@19/umd/react.production.min.js',
+    fallback: 'https://cdn.jsdelivr.net/npm/react@19/umd/react.production.min.js',
+    dev: 'https://unpkg.com/react@19/umd/react.development.js',
+    devFallback: 'https://cdn.jsdelivr.net/npm/react@19/umd/react.development.js'
   },
   'react-dom': {
     global: 'ReactDOM',
-    url: 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
-    dev: 'https://unpkg.com/react-dom@18/umd/react-dom.development.js'
+    url: 'https://unpkg.com/react-dom@19/umd/react-dom.production.min.js',
+    fallback: 'https://cdn.jsdelivr.net/npm/react-dom@19/umd/react-dom.production.min.js',
+    dev: 'https://unpkg.com/react-dom@19/umd/react-dom.development.js',
+    devFallback: 'https://cdn.jsdelivr.net/npm/react-dom@19/umd/react-dom.development.js'
   },
   
   // 工具库
   lodash: {
     global: '_',
-    url: 'https://unpkg.com/lodash@4/lodash.min.js'
+    url: 'https://unpkg.com/lodash@4/lodash.min.js',
+    fallback: 'https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js'
   },
   
   // 日期处理
   'date-fns': {
     global: 'dateFns',
-    url: 'https://unpkg.com/date-fns@2/index.js'
+    url: 'https://unpkg.com/date-fns@2/index.js',
+    fallback: 'https://cdn.jsdelivr.net/npm/date-fns@2/index.js'
   }
 };
+
+/**
+ * 获取CDN脚本URL（包含fallback机制）
+ * @param {boolean} isDev - 是否为开发环境
+ * @returns {Array<{primary: string, fallback: string}>} CDN URL配置数组
+ */
+export function getCdnScriptsWithFallback(isDev = false) {
+  return Object.values(CDN_LIBS).map(config => {
+    const primary = isDev && config.dev ? config.dev : config.url;
+    const fallback = isDev && config.devFallback ? config.devFallback : config.fallback;
+    
+    return {
+      primary,
+      fallback: fallback || primary // 如果没有fallback，使用主URL
+    };
+  });
+}
+
+/**
+ * 生成带fallback的HTML脚本标签
+ * @param {boolean} isDev - 是否为开发环境
+ * @returns {string} HTML脚本标签字符串
+ */
+export function generateCdnScriptTagsWithFallback(isDev = false) {
+  const scripts = getCdnScriptsWithFallback(isDev);
+  
+  return scripts.map(({ primary, fallback }) => 
+    `<script crossorigin src="${primary}" onerror="this.src='${fallback}'"></script>`
+  ).join('\n    ');
+}
 
 /**
  * 获取外部库映射配置

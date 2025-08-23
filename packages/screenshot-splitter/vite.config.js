@@ -13,7 +13,6 @@ const buildConfig = getBuildConfig({
 export default createAutoConfig({
   root: import.meta.dirname,
   component: 'screenshot-splitter',
-  outDir: buildConfig.outDir,
   base: buildConfig.base,
   env: {
     COMPONENT_NAME: 'screenshot-splitter',

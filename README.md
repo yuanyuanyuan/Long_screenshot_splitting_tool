@@ -171,7 +171,7 @@ module.exports = {
 2. **配置完成后**
    - 推送代码到main分支
    - 自动构建和部署
-   - 访问 `https://your-username.github.io/Long_screenshot_splitting_tool/`
+   - 访问 `https://yuanyuanyuan.github.io/Long_screenshot_splitting_tool/`
 
 ### 手动部署
 ```bash
@@ -383,4 +383,4 @@ node --version  # 需要 >= 18
 
 ---
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by [Stark Yuan]**
