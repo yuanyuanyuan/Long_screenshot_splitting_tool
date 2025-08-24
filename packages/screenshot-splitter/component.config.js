@@ -46,9 +46,17 @@ export const componentConfig = {
     // 独立部署路径
     paths: {
       spa: '/',
-      single: '/components/screenshot-splitter/',
       standalone: '/screenshot-splitter/',
     },
+
+    // 资源路径配置
+    assets: {
+      basePath: '/assets/',
+      jsPath: 'https://yuanyuanyuan.github.io/Long_screenshot_splitting_tool/assets/',
+      cssPath: 'https://yuanyuanyuan.github.io/Long_screenshot_splitting_tool/assets/',
+      modulePreload: true,
+      crossorigin: 'anonymous'
+    }
   },
 
   // 功能特性

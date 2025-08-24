@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:spa": "tsc -b && vite build --mode spa",
+    "build:spa": "tsc -b && vite build --mode spa && node scripts/process-html-assets.js",
     "lint": "eslint .",
       "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --ignore-pattern '**/*.test.*' --ignore-pattern '**/__tests__/**'",
     "format": "prettier --write .",
