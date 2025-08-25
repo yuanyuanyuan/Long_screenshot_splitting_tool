@@ -15,6 +15,7 @@ export { SharedStateManager, sharedStateManager };
 
 // 导出组件
 export { CopyrightInfo, defaultCopyrightConfig } from './components/CopyrightInfo/CopyrightInfo';
+export { Button } from './components/Button/Button';
 
 // 导出类型
 export type {

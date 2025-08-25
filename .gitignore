@@ -126,3 +126,6 @@ tools/*/build/
 
 .codebuddy
 packages/screenshot-splitter/dist-single/index.html
+
+*storybook.log
+storybook-static

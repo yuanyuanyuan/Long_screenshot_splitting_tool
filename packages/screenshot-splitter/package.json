@@ -52,6 +52,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-helmet-async": "^2.0.5",
+    "shared-components": "workspace:*",
+    "ui-library": "workspace:*",
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {

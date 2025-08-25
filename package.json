@@ -7,11 +7,10 @@
   "scripts": {
     "dev": "node tools/build-scripts/dev-server.js",
     "dev:screenshot-splitter": "node tools/build-scripts/dev-server.js --package screenshot-splitter",
-    "build": "node tools/build-scripts/build-manager.js build",
+    "build": "pnpm --filter \"./packages/*\" build",
     "build:clean": "node tools/build-scripts/build-manager.js clean",
     "build:check": "node tools/build-scripts/build-manager.js check",
     "build:full": "node tools/build-scripts/build-manager.js full",
-    "build": "pnpm --filter \"./packages/*\" build",
     "build:screenshot-splitter": "pnpm --filter screenshot-splitter build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --ignore-pattern '**/*.test.*' --ignore-pattern '**/__tests__/**'",
