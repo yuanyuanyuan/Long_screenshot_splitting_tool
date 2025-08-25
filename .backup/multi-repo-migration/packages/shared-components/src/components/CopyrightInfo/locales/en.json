@@ -1,0 +1,8 @@
+{
+  "copyright": "© {year} {author}. All rights reserved.",
+  "contact": "Contact: {email}",
+  "website": "Website: {url}",
+  "poweredBy": "Powered by {toolName}",
+  "license": "Licensed under {license}",
+  "attribution": "Attribution required: {attributionText}"
+}
