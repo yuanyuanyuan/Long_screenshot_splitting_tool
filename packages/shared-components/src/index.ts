@@ -7,8 +7,14 @@
 export * from './interfaces/ComponentInterface';
 
 // 导出管理器
-export { ComponentCommunicationManager, communicationManager } from './managers/ComponentCommunicationManager';
-export { SharedStateManager, sharedStateManager } from './managers/SharedStateManager';
+import { ComponentCommunicationManager, communicationManager } from './managers/ComponentCommunicationManager';
+import { SharedStateManager, sharedStateManager } from './managers/SharedStateManager';
+
+export { ComponentCommunicationManager, communicationManager };
+export { SharedStateManager, sharedStateManager };
+
+// 导出组件
+export { CopyrightInfo, defaultCopyrightConfig } from './components/CopyrightInfo/CopyrightInfo';
 
 // 导出类型
 export type {

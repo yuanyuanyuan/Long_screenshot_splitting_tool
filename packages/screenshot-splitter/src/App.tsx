@@ -17,6 +17,7 @@ import {
   handleProcessingError,
   type NavigationError,
 } from './utils/navigationErrorHandler';
+import { CopyrightInfo } from '../../shared-components/dist/components/CopyrightInfo/CopyrightInfo';
 
 function AppContent() {
   const { state, actions, getStateSnapshot } = useAppState();
@@ -448,7 +449,26 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="app-container">
-        <header className="text-center py-8 mb-8">
+        <header className="text-center py-8 mb-8 relative">
+          {/* 右上角版权信息 */}
+          <div className="absolute top-4 right-4 z-10">
+            <CopyrightInfo
+              author="Tencent"
+              email="contact@example.com"
+              website="https://example.com"
+              toolName="Screenshot Splitter Tool"
+              license="MIT License"
+              attributionText="Please include attribution when sharing"
+              showCopyrightSymbol={true}
+              showContactInfo={true}
+              showWebsiteLink={true}
+              showPoweredBy={true}
+              showLicense={false}
+              showAttribution={false}
+              language="en"
+            />
+          </div>
+          
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">{t('header.title')}</h1>
           <p className="text-lg text-gray-600 mb-6">{t('header.subtitle')}</p>
         </header>
