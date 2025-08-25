@@ -1,6 +1,6 @@
-SuperClaude init# 单模式构建Monorepo系统
+SuperClaude init# 🚀 Awesome Tools - 现代化前端工具集
 
-一个基于pnpm workspace的现代化前端项目架构，专注于SPA多文件构建和组件独立部署。
+一个基于pnpm workspace的现代化前端工具集，包含长截图分割工具等实用组件，专注于组件化开发和独立部署。
 
 ## 🚀 项目特性
 
@@ -26,7 +26,7 @@ SuperClaude init# 单模式构建Monorepo系统
 ## 📁 项目结构
 
 ```
-Long_screenshot_splitting_tool/
+awesome-tools/
 ├── packages/                          # 组件包目录
 │   ├── screenshot-splitter/           # 长截图分割工具
 │   │   ├── src/                      # 源代码
@@ -74,7 +74,7 @@ Long_screenshot_splitting_tool/
 ```bash
 # 克隆项目
 git clone <repository-url>
-cd Long_screenshot_splitting_tool
+cd awesome-tools
 
 # 安装依赖
 pnpm install
@@ -142,8 +142,8 @@ module.exports = {
   description: '将长截图分割成多个部分的工具',
   version: '1.0.0',
   author: 'Your Name',
-  homepage: 'https://your-username.github.io/Long_screenshot_splitting_tool/screenshot-splitter/',
-  repository: 'https://github.com/your-username/Long_screenshot_splitting_tool',
+  homepage: 'https://your-username.github.io/awesome-tools/screenshot-splitter/',
+  repository: 'https://github.com/your-username/awesome-tools',
   keywords: ['screenshot', 'split', 'image', 'tool'],
   category: 'utility',
   tags: ['图片处理', '工具'],
@@ -164,7 +164,7 @@ module.exports = {
 2. **配置完成后**
    - 推送代码到main分支
    - 自动构建和部署
-   - 访问 `https://yuanyuanyuan.github.io/Long_screenshot_splitting_tool/`
+   - 访问 `https://yuanyuanyuan.github.io/awesome-tools/`
 
 ### 手动部署
 ```bash
@@ -369,9 +369,9 @@ node --version  # 需要 >= 18
 
 ## 🔗 相关链接
 
-- [项目仓库](https://github.com/your-username/Long_screenshot_splitting_tool)
-- [在线演示](https://your-username.github.io/Long_screenshot_splitting_tool/)
-- [问题反馈](https://github.com/your-username/Long_screenshot_splitting_tool/issues)
+- [项目仓库](https://github.com/your-username/awesome-tools)
+- [在线演示](https://your-username.github.io/awesome-tools/)
+- [问题反馈](https://github.com/your-username/awesome-tools/issues)
 - [更新日志](CHANGELOG.md)
 
 ---

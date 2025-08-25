@@ -90,7 +90,7 @@ jobs:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>组件库 - Dual Build Monorepo System</title>
+            <title>组件库 - Awesome Tools</title>
             <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -231,7 +231,7 @@ jobs:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Dual Build Monorepo System</title>
+            <title>Awesome Tools</title>
             <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -286,14 +286,14 @@ jobs:
         </head>
         <body>
             <div class="container">
-                <h1>🚀 Dual Build Monorepo System</h1>
+                <h1>🚀 Awesome Tools</h1>
                 <div class="description">
                     支持双模式构建的现代化组件库系统<br>
                     提供SPA和单文件两种构建模式，满足不同的使用场景
                 </div>
                 <div class="nav-links">
                     <a href="./components/" class="nav-link">📦 浏览组件库</a>
-                    <a href="https://github.com/your-username/your-repo" class="nav-link">📚 查看源码</a>
+                    <a href="https://github.com/your-username/awesome-tools" class="nav-link">📚 查看源码</a>
                 </div>
             </div>
         </body>

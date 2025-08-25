@@ -17,7 +17,7 @@ import {
   handleProcessingError,
   type NavigationError,
 } from './utils/navigationErrorHandler';
-import { CopyrightInfo } from '../../shared-components/dist/components/CopyrightInfo/CopyrightInfo';
+import { CopyrightInfo } from 'shared-components';
 
 function AppContent() {
   const { state, actions, getStateSnapshot } = useAppState();

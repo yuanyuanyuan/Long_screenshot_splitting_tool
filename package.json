@@ -1,5 +1,5 @@
 {
-  "name": "dual-build-monorepo-system",
+  "name": "awesome-tools",
   "version": "1.0.0",
   "description": "支持双模式构建的Monorepo系统，包含长截图分割工具等组件",
   "private": true,

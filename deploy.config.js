@@ -24,7 +24,7 @@ export default {
       features: ['图片处理', '自动分割', '手动调整'],
       demoUrl: '/screenshot-splitter/',
       singleFileUrl: '/screenshot-splitter/screenshot-splitter.html',
-      sourceUrl: 'https://github.com/your-repo/tree/main/packages/screenshot-splitter',
+      sourceUrl: 'https://github.com/awesome-tools/tree/main/packages/screenshot-splitter',
       documentationUrl: '/docs/screenshot-splitter'
     },
     {
@@ -34,7 +34,7 @@ export default {
       independentDeploy: false,
       description: '共享组件库',
       features: ['组件通信', '状态管理', '生命周期管理'],
-      sourceUrl: 'https://github.com/your-repo/tree/main/packages/shared-components',
+      sourceUrl: 'https://github.com/awesome-tools/tree/main/packages/shared-components',
       documentationUrl: '/docs/shared-components'
     }
   ],
@@ -96,7 +96,7 @@ export default {
       apiEndpoint: 'https://staging-api.your-domain.com'
     },
     production: {
-      baseUrl: 'https://your-username.github.io/your-repo',
+      baseUrl: 'https://your-username.github.io/awesome-tools',
       apiEndpoint: 'https://api.your-domain.com'
     }
   },

@@ -32,6 +32,22 @@ export default tseslint.config([
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // 包边界检查规则
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/shared-components/src/**'],
+              message: '请使用包名导入: import { Component } from "shared-components"'
+            },
+            {
+              group: ['**/ui-library/src/**'],
+              message: '请使用包名导入: import { Component } from "ui-library"'
+            }
+          ]
+        }
+      ],
     },
   },
 ]);
