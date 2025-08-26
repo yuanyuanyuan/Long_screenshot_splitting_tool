@@ -219,7 +219,7 @@ export const useI18nCoverageTest = () => {
         if (translation === key) {
           missing.push(key);
         }
-      } catch (error) {
+      } catch {
         missing.push(key);
       }
     });
@@ -244,7 +244,7 @@ export const useI18nCoverageTest = () => {
         if (translation === key) {
           missing.push(key);
         }
-      } catch (error) {
+      } catch {
         missing.push(key);
       }
     });

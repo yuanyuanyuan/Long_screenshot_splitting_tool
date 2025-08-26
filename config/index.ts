@@ -3,38 +3,6 @@
  * 导出所有配置模块，提供统一的配置访问接口
  */
 
-// 导入所有配置模块
-import { defaultAppConfig, getAppConfig, type AppConfig } from './app/app.config';
-import { routeConfig, navigationConfig, getRouteConfig, type RouteConfig, type NavigationConfig } from './app/routing.config';
-import { 
-  deploymentConfig, 
-  getDeploymentConfig, 
-  getAssetUrl, 
-  getRouteUrl,
-  type DeploymentConfig 
-} from './build/deployment.config';
-import { 
-  environmentConfig, 
-  getEnvironmentConfig, 
-  getCurrentEnvironment,
-  type Environment,
-  type EnvironmentConfig 
-} from './env/environment.config';
-import { 
-  APP_INFO,
-  SUPPORTED_FILE_TYPES,
-  FILE_SIZE_LIMITS,
-  UI_CONSTANTS,
-  SPLIT_CONSTANTS,
-  EXPORT_FORMATS,
-  QUALITY_SETTINGS,
-  STORAGE_KEYS,
-  EVENT_NAMES,
-  ERROR_CODES,
-  HTTP_STATUS,
-  REGEX_PATTERNS
-} from './constants/app.constants';
-
 // 重新导出所有配置
 export { defaultAppConfig as appConfig, getAppConfig, type AppConfig } from './app/app.config';
 export { routeConfig, navigationConfig, getRouteConfig, type RouteConfig, type NavigationConfig } from './app/routing.config';
@@ -66,6 +34,35 @@ export {
   HTTP_STATUS,
   REGEX_PATTERNS
 } from './constants/app.constants';
+
+// 导入用于创建统一配置对象
+import { defaultAppConfig } from './app/app.config';
+import { routeConfig, navigationConfig } from './app/routing.config';
+import { deploymentConfig } from './build/deployment.config';
+import { environmentConfig } from './env/environment.config';
+import { 
+  APP_INFO,
+  SUPPORTED_FILE_TYPES,
+  FILE_SIZE_LIMITS,
+  UI_CONSTANTS,
+  SPLIT_CONSTANTS,
+  EXPORT_FORMATS,
+  QUALITY_SETTINGS,
+  STORAGE_KEYS,
+  EVENT_NAMES,
+  ERROR_CODES,
+  HTTP_STATUS,
+  REGEX_PATTERNS
+} from './constants/app.constants';
+import { 
+  getAssetUrl, 
+  getRouteUrl,
+  getEnvironmentConfig,
+  getDeploymentConfig,
+  getCurrentEnvironment,
+  getAppConfig,
+  getRouteConfig
+} from './build/deployment.config';
 
 /**
  * 统一配置对象

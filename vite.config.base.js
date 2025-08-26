@@ -1,8 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { viteExternalsPlugin } from 'vite-plugin-externals';
 import { resolve } from 'path';
-import { getOptimizedExternalsConfig } from './tools/build-scripts/cdn-config.js';
 
 /**
  * 创建基础Vite配置
@@ -111,7 +109,7 @@ export function createBaseConfig(options = {}) {
       },
       preprocessorOptions: {
         scss: {
-          additionalData: `@import \"@/styles/variables.scss\";`
+          additionalData: `@import "@/styles/variables.scss";`
         }
       }
     },

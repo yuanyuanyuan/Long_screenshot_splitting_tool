@@ -304,19 +304,19 @@ ${buildError.originalError ? `\n原始错误:\n${buildError.originalError.stack 
   /**
    * 监听构建过程并自动处理错误
    */
-  watchBuildProcess(buildCommand: string): void {
-    const { spawn } = require('child_process');
+  async watchBuildProcess(buildCommand: string): Promise<void> {
+    const { spawn } = await import('child_process');
     
     console.log(`🔧 开始监听构建过程: ${buildCommand}`);
     
     const child = spawn(buildCommand, { shell: true, stdio: 'pipe' });
     
-    child.stdout.on('data', (data: Buffer) => {
+    child.stdout?.on('data', (data: Buffer) => {
       const output = data.toString();
       console.log(output);
     });
     
-    child.stderr.on('data', (data: Buffer) => {
+    child.stderr?.on('data', (data: Buffer) => {
       const errorOutput = data.toString();
       const buildError = this.handleBuildError(errorOutput);
       

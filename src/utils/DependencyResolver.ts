@@ -52,8 +52,8 @@ export class DependencyResolver {
             fallbackUsed: path !== primaryPath,
           };
         }
-      } catch (error) {
-        this.log(`✗ 路径 ${path} 解析失败: ${error}`);
+      } catch (err) {
+        this.log(`✗ 路径 ${path} 解析失败: ${err}`);
         continue;
       }
     }
@@ -100,9 +100,14 @@ export class DependencyResolver {
         }
       }
       
-      // 对于npm包，尝试require.resolve
-      return require.resolve(dependencyName);
-    } catch (error) {
+      // 对于npm包，尝试动态导入解析
+      try {
+        await import(dependencyName);
+        return dependencyName;
+      } catch {
+        return null;
+      }
+    } catch {
       return null;
     }
   }
