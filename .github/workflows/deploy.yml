@@ -51,17 +51,16 @@ jobs:
       
     - name: 构建应用
     - name: 构建应用
-      - name: 构建应用
-        run: npm run build
-        env:
-          NODE_ENV: production
-          GITHUB_PAGES: true
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          VITE_BASE_PATH: ${{ github.event.repository.name }}
-          # 配置资源URL
-          VITE_USE_ABSOLUTE_URLS: true
-          VITE_ASSETS_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-          VITE_DEPLOY_ENV: production
+      run: npm run build
+      env:
+        NODE_ENV: production
+        GITHUB_PAGES: true
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        VITE_BASE_PATH: ${{ github.event.repository.name }}
+        # 配置资源URL
+        VITE_USE_ABSOLUTE_URLS: true
+        VITE_ASSETS_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        VITE_DEPLOY_ENV: production
         
     - name: 准备部署目录
       run: |
