@@ -1,8 +1,15 @@
 /**
- * SEO配置文件
+ * SEO配置文件 (Legacy Support)
  * 包含网站的基础SEO信息和配置
+ * 
+ * @deprecated This file will be migrated to seo.config.json
+ * Use SEOConfigManager for new implementations
  */
 
+import { seoConfigManager } from '../utils/seo/SEOConfigManager';
+import type { SEOConfig } from '../types/seo.types';
+
+// Legacy configuration object for backward compatibility
 export const SEO_CONFIG = {
   // 网站基础信息
   siteName: '长截图分割工具',
@@ -87,3 +94,105 @@ export type SEOConfigType = typeof SEO_CONFIG;
 export type SupportedLanguage = (typeof SEO_CONFIG.supportedLanguages)[number];
 export type PageKey = keyof typeof SEO_CONFIG.pages;
 export type ChangeFrequency = (typeof SEO_CONFIG.pages)[PageKey]['changeFrequency'];
+
+/**
+ * Backward compatibility utilities
+ * These functions provide access to the new JSON-based configuration system
+ * while maintaining compatibility with existing code
+ */
+
+/**
+ * Initialize the new SEO configuration system
+ * Call this function during application startup
+ */
+export async function initializeSEOConfig(): Promise<void> {
+  try {
+    const result = await seoConfigManager.loadConfig({
+      validateOnly: false,
+      force: false,
+    });
+    
+    if (!result.success) {
+      console.warn('SEO configuration failed to load:', result.errors);
+      console.info('Falling back to legacy configuration');
+    } else {
+      console.info('SEO configuration loaded successfully');
+    }
+  } catch (error) {
+    console.error('Failed to initialize SEO configuration:', error);
+    console.info('Using legacy configuration as fallback');
+  }
+}
+
+/**
+ * Get the current SEO configuration with fallback to legacy
+ */
+export function getCurrentSEOConfig(): SEOConfig | typeof SEO_CONFIG {
+  try {
+    const stats = seoConfigManager.getStats();
+    if (stats.loaded) {
+      return seoConfigManager.getConfig();
+    }
+  } catch (error) {
+    console.warn('Failed to get current SEO config, using legacy fallback');
+  }
+  
+  // Return legacy configuration as fallback
+  return SEO_CONFIG as any;
+}
+
+/**
+ * Migration utility to convert legacy config to new format
+ * This can be used for testing or manual migration
+ */
+export function migrateLegacyConfig(): Partial<SEOConfig> {
+  return {
+    version: '1.0.0',
+    site: {
+      name: {
+        'zh-CN': SEO_CONFIG.siteName,
+        'en': 'Long Screenshot Splitter'
+      },
+      url: SEO_CONFIG.siteUrl,
+      defaultLanguage: SEO_CONFIG.defaultLanguage as 'zh-CN',
+      supportedLanguages: SEO_CONFIG.supportedLanguages as ['zh-CN', 'en']
+    },
+    socialMedia: SEO_CONFIG.socialMedia,
+    analytics: SEO_CONFIG.analytics,
+    keywords: {
+      primary: {
+        'zh-CN': SEO_CONFIG.keywords.primary,
+        'en': [
+          'long screenshot splitter',
+          'screenshot cutter', 
+          'image splitting tool',
+          'online screenshot tool',
+          'free image processing'
+        ]
+      },
+      secondary: {
+        'zh-CN': SEO_CONFIG.keywords.secondary,
+        'en': [
+          'long image cutter',
+          'screenshot processing',
+          'image editing',
+          'online tool',
+          'image splitter'
+        ]
+      },
+      longTail: {
+        'zh-CN': SEO_CONFIG.keywords.longTail,
+        'en': [
+          'how to split long screenshots',
+          'cut long screenshots online',
+          'free online image splitting tool',
+          'mobile screenshot splitting method',
+          'web screenshot splitting tool'
+        ]
+      }
+    },
+    defaultImages: SEO_CONFIG.defaultImages,
+    // Note: pages and structuredData would need more complex migration
+    // This is a simplified example
+  } as unknown as Partial<SEOConfig>;
+}

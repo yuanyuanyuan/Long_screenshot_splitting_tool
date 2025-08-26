@@ -126,3 +126,6 @@ export interface NavigationActionResult {
   allowRetry?: boolean;
   suggestedPath?: string;
 }
+
+// SEO Types
+export * from './seo.types';

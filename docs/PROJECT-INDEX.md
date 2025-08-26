@@ -40,6 +40,14 @@ long-screenshot-splitter/
 │   ├── 📁 integration/        # 集成测试
 │   └── 📁 e2e/               # 端到端测试
 ├── 📁 docs/                   # 项目文档
+│   ├── 📄 PROJECT-INDEX.md          # 项目导航 (本文档)
+│   ├── 📄 API-REFERENCE.md          # API 接口文档
+│   ├── 📄 ARCHITECTURE.md           # 系统架构文档
+│   ├── 📄 DEVELOPMENT-GUIDE.md      # 开发指南
+│   ├── 📄 TESTING-GUIDE.md          # 测试指南
+│   ├── 📄 AGILE-WORKFLOW-SEO-MOBILE.md  # SEO & 移动端敏捷工作流
+│   ├── 📄 IMPLEMENTATION-TASKS.md   # 实施任务分解
+│   └── 📄 IMPLEMENTATION-ROADMAP.md # 实施路线图
 └── 📁 .github/                # GitHub Actions
     └── 📁 workflows/          # CI/CD 工作流
 ```

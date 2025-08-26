@@ -3,6 +3,7 @@ import { useAppState } from './hooks/useAppState';
 import { useImageProcessor } from './hooks/useImageProcessor';
 import { useI18nContext, I18nProvider } from './hooks/useI18nContext';
 import { useRouter } from './hooks/useRouter';
+import { useViewport, createResponsiveClasses } from './hooks/useViewport';
 import { FileUploader } from './components/FileUploader';
 import { ImagePreview } from './components/ImagePreview';
 import { ExportControls } from './components/ExportControls';
@@ -18,6 +19,7 @@ import {
   type NavigationError,
 } from './utils/navigationErrorHandler';
 import { CopyrightInfo } from 'shared-components';
+import './styles/responsive.css';
 
 function AppContent() {
   const { state, actions, getStateSnapshot } = useAppState();
@@ -229,8 +231,12 @@ function AppContent() {
     switch (currentPath) {
       case '/upload':
         return (
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          <section className={`mb-8 ${
+            viewport.isMobile ? 'mb-4' : 'mb-8'
+          }`}>
+            <h2 className={`font-bold text-gray-800 text-center ${
+              viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
+            }`}>
               {t('upload.title')}
             </h2>
             <FileUploader
@@ -245,23 +251,37 @@ function AppContent() {
         // 增强状态验证：检查是否有原始图片和切片
         if (!state.originalImage || state.imageSlices.length === 0) {
           return (
-            <div className="text-center py-12 bg-white rounded-lg shadow-sm mx-4">
-              <div className="max-w-md mx-auto">
-                <div className="text-6xl mb-4">📤</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className={`text-center bg-white rounded-lg shadow-sm mobile-center ${
+              viewport.isMobile ? 'py-8 mx-2' : 'py-12 mx-4'
+            }`}>
+              <div className={viewport.isMobile ? 'max-w-sm mx-auto px-4' : 'max-w-md mx-auto'}>
+                <div className={`mb-4 ${
+                  viewport.isMobile ? 'text-4xl' : 'text-6xl'
+                }`}>📤</div>
+                <h3 className={`font-semibold text-gray-800 mb-2 ${
+                  viewport.isMobile ? 'text-lg' : 'text-xl'
+                }`}>
                   {t('split.validation.title')}
                 </h3>
-                <p className="text-gray-600 mb-6">{t('split.validation.message')}</p>
+                <p className={`text-gray-600 mb-6 mobile-text ${
+                  viewport.isMobile ? 'text-sm' : ''
+                }`}>
+                  {t('split.validation.message')}
+                </p>
                 <div className="space-y-3">
                   <button
                     onClick={() => push('/upload')}
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className={`w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium btn-touch ${
+                      viewport.isMobile ? 'px-4 py-3 text-sm' : 'px-6 py-3'
+                    }`}
                   >
                     {t('split.validation.goUpload')}
                   </button>
                   <button
                     onClick={() => push('/')}
-                    className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    className={`w-full bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors btn-touch ${
+                      viewport.isMobile ? 'px-4 py-3 text-sm' : 'px-6 py-3'
+                    }`}
                   >
                     {t('split.validation.goHome')}
                   </button>
@@ -271,8 +291,12 @@ function AppContent() {
           );
         }
         return (
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          <section className={`mb-8 ${
+            viewport.isMobile ? 'mb-4' : 'mb-8'
+          }`}>
+            <h2 className={`font-bold text-gray-800 text-center ${
+              viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
+            }`}>
               {t('split.title')}
             </h2>
             <ImagePreview
@@ -358,8 +382,12 @@ function AppContent() {
         }
 
         return (
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          <section className={`mb-8 ${
+            viewport.isMobile ? 'mb-4' : 'mb-8'
+          }`}>
+            <h2 className={`font-bold text-gray-800 text-center ${
+              viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
+            }`}>
               {t('export.title')}
             </h2>
             <ExportControls
@@ -446,17 +474,40 @@ function AppContent() {
     }
   };
 
+  const viewport = useViewport();
+  const appContainerClasses = createResponsiveClasses('app-container', viewport);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="app-container">
-        <header className="text-center py-8 mb-8 relative">
-          {/* 右上角版权信息 */}
-          <div className="absolute top-4 right-4 z-10">
+      <div className={`${appContainerClasses} mobile-stack`}>
+        <header className={`text-center py-8 mb-8 relative ${
+          viewport.isMobile ? 'py-4 mb-4' : 'py-8 mb-8'
+        }`}>
+          {/* Responsive copyright positioning */}
+          <div className={`absolute z-10 ${
+            viewport.isMobile 
+              ? 'top-2 right-2' 
+              : 'top-4 right-4'
+          }`}>
             <CopyrightInfo />
           </div>
           
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">{t('header.title')}</h1>
-          <p className="text-lg text-gray-600 mb-6">{t('header.subtitle')}</p>
+          <h1 className={`font-bold text-gray-800 mb-4 ${
+            viewport.isMobile 
+              ? 'text-2xl' 
+              : viewport.isTablet 
+              ? 'text-3xl' 
+              : 'text-4xl'
+          }`}>
+            {t('header.title')}
+          </h1>
+          <p className={`text-gray-600 mb-6 ${
+            viewport.isMobile 
+              ? 'text-base px-4' 
+              : 'text-lg'
+          }`}>
+            {t('header.subtitle')}
+          </p>
         </header>
 
         {/* 导航组件 */}
@@ -468,10 +519,14 @@ function AppContent() {
           }}
         />
 
-        <main>
-          {/* 错误消息提示 */}
+        <main className={`flex-1 ${viewport.isMobile ? 'px-2' : ''}`}>
+          {/* Responsive error message */}
           {showErrorMessage && navigationError && (
-            <div className="fixed top-4 right-4 z-50 max-w-md">
+            <div className={`fixed z-50 ${
+              viewport.isMobile 
+                ? 'top-2 left-2 right-2' 
+                : 'top-4 right-4 max-w-md'
+            }`}>
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
@@ -487,7 +542,9 @@ function AppContent() {
                     <div className="mt-3">
                       <button
                         type="button"
-                        className="text-sm bg-red-100 text-red-800 rounded px-2 py-1 hover:bg-red-200 transition-colors"
+                        className={`text-sm bg-red-100 text-red-800 rounded px-2 py-1 hover:bg-red-200 transition-colors btn-touch ${
+                          viewport.isTouch ? 'min-h-12 px-4' : ''
+                        }`}
                         onClick={() => setShowErrorMessage(false)}
                       >
                         {t('navigation.error.dismiss')}

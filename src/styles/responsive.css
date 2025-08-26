@@ -1,0 +1,255 @@
+/* Mobile-First Responsive Design System */
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS (Mobile-First Strategy)
+   ========================================================================== */
+
+:root {
+  /* Breakpoint variables */
+  --breakpoint-xs: 320px;   /* Extra small devices */
+  --breakpoint-sm: 640px;   /* Small tablets */  
+  --breakpoint-md: 768px;   /* Medium tablets */
+  --breakpoint-lg: 1024px;  /* Laptops */
+  --breakpoint-xl: 1280px;  /* Desktops */
+  --breakpoint-2xl: 1536px; /* Large desktops */
+
+  /* Touch targets */
+  --touch-target-min: 44px;
+  --touch-target-optimal: 48px;
+  
+  /* Mobile spacing scale */
+  --spacing-xs: 0.25rem;  /* 4px */
+  --spacing-sm: 0.5rem;   /* 8px */
+  --spacing-md: 0.75rem;  /* 12px */
+  --spacing-lg: 1rem;     /* 16px */
+  --spacing-xl: 1.5rem;   /* 24px */
+  --spacing-2xl: 2rem;    /* 32px */
+}
+
+/* ==========================================================================
+   RESPONSIVE UTILITY CLASSES
+   ========================================================================== */
+
+/* Container utilities */
+.container-fluid {
+  width: 100%;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+/* Responsive flex utilities */
+.flex-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.flex-tablet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Responsive grid utilities */
+.grid-mobile {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.grid-tablet {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.grid-desktop {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xl);
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINT MIXINS (via CSS classes)
+   ========================================================================== */
+
+/* Mobile-first responsive visibility */
+.hide-mobile { display: none; }
+.show-mobile { display: block; }
+
+.hide-tablet { display: block; }
+.show-tablet { display: none; }
+
+.hide-desktop { display: block; }
+.show-desktop { display: none; }
+
+/* Responsive text alignment */
+.text-mobile-center { text-align: center; }
+.text-mobile-left { text-align: left; }
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINT STYLES
+   ========================================================================== */
+
+/* Extra Small devices (phones, less than 640px) - MOBILE FIRST BASE */
+/* All base styles are mobile-first by default */
+
+/* Small devices (landscape phones, tablets 640px and up) */
+@media (min-width: 640px) {
+  .container-fluid {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+  
+  .container {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+  
+  .flex-mobile {
+    flex-direction: row;
+    gap: var(--spacing-lg);
+  }
+  
+  .flex-tablet {
+    flex-direction: row;
+    gap: var(--spacing-xl);
+  }
+  
+  .hide-tablet { display: none; }
+  .show-tablet { display: block; }
+  
+  .text-mobile-center { text-align: left; }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .grid-tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xl);
+  }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+  .container-fluid {
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+  
+  .container {
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+  
+  .grid-desktop {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-2xl);
+  }
+  
+  .hide-desktop { display: none; }
+  .show-desktop { display: block; }
+}
+
+/* Extra large devices (large desktops, 1280px and up) */
+@media (min-width: 1280px) {
+  .container-fluid {
+    padding-left: var(--spacing-2xl);
+    padding-right: var(--spacing-2xl);
+  }
+  
+  .container {
+    padding-left: var(--spacing-2xl);
+    padding-right: var(--spacing-2xl);
+  }
+}
+
+/* ==========================================================================
+   MOBILE-SPECIFIC UTILITIES
+   ========================================================================== */
+
+/* Touch-friendly button sizing */
+.btn-touch {
+  min-height: var(--touch-target-optimal);
+  min-width: var(--touch-target-optimal);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+/* Mobile-optimized form controls */
+.input-mobile {
+  font-size: 16px; /* Prevents zoom on iOS */
+  min-height: var(--touch-target-optimal);
+  padding: var(--spacing-md);
+}
+
+/* Mobile-friendly modal/overlay */
+.modal-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+/* Mobile-optimized spacing */
+.space-mobile-sm { margin: var(--spacing-sm) 0; }
+.space-mobile-md { margin: var(--spacing-md) 0; }
+.space-mobile-lg { margin: var(--spacing-lg) 0; }
+
+/* Responsive text sizes */
+.text-responsive {
+  font-size: 0.875rem; /* 14px mobile */
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .text-responsive {
+    font-size: 1rem; /* 16px tablet+ */
+  }
+}
+
+/* ==========================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .flex-mobile,
+  .flex-tablet,
+  .grid-mobile,
+  .grid-tablet,
+  .grid-desktop {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .container {
+    border: 2px solid currentColor;
+  }
+  
+  .btn-touch {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .modal-mobile {
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+}

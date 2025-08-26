@@ -1,0 +1,334 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://screenshot-splitter.com/schemas/seo-config.schema.json",
+  "title": "SEO Configuration Schema",
+  "description": "Schema for SEO configuration validation",
+  "type": "object",
+  "required": ["version", "site", "pages", "structuredData"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version in semver format"
+    },
+    "site": {
+      "type": "object",
+      "required": ["name", "url", "defaultLanguage", "supportedLanguages"],
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/multilangString"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "enum": ["zh-CN", "en"]
+        },
+        "supportedLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["zh-CN", "en"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "socialMedia": {
+      "type": "object",
+      "properties": {
+        "twitter": {
+          "type": "string",
+          "pattern": "^@[a-zA-Z0-9_]{1,15}$"
+        },
+        "facebook": {
+          "type": "string",
+          "minLength": 1
+        },
+        "linkedin": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "googleAnalyticsId": {
+          "type": "string",
+          "pattern": "^G-[A-Z0-9]+$"
+        },
+        "googleSearchConsoleId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "keywords": {
+      "type": "object",
+      "required": ["primary"],
+      "properties": {
+        "primary": {
+          "$ref": "#/definitions/multilangStringArray"
+        },
+        "secondary": {
+          "$ref": "#/definitions/multilangStringArray"
+        },
+        "longTail": {
+          "$ref": "#/definitions/multilangStringArray"
+        }
+      },
+      "additionalProperties": false
+    },
+    "defaultImages": {
+      "type": "object",
+      "properties": {
+        "ogImage": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "twitterImage": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "favicon": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "appleTouchIcon": {
+          "type": "string",
+          "pattern": "^/"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pages": {
+      "type": "object",
+      "patternProperties": {
+        "^(home|upload|split|export)$": {
+          "$ref": "#/definitions/pageConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "structuredData": {
+      "type": "object",
+      "required": ["organization", "webApplication"],
+      "properties": {
+        "organization": {
+          "type": "object",
+          "required": ["name", "url", "description"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "logo": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": {
+              "$ref": "#/definitions/multilangString"
+            }
+          },
+          "additionalProperties": false
+        },
+        "webApplication": {
+          "type": "object",
+          "required": ["name", "description", "applicationCategory", "operatingSystem"],
+          "properties": {
+            "name": {
+              "$ref": "#/definitions/multilangString"
+            },
+            "description": {
+              "$ref": "#/definitions/multilangString"
+            },
+            "applicationCategory": {
+              "type": "string",
+              "enum": ["UtilitiesApplication", "MultimediaApplication", "ProductivityApplication"]
+            },
+            "operatingSystem": {
+              "type": "string",
+              "minLength": 1
+            },
+            "browserRequirements": {
+              "type": "string",
+              "minLength": 1
+            },
+            "features": {
+              "$ref": "#/definitions/multilangStringArray"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/lengthValidation"
+        },
+        "description": {
+          "$ref": "#/definitions/lengthValidation"
+        },
+        "keywords": {
+          "$ref": "#/definitions/countValidation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "enableImageLazyLoading": {
+          "type": "boolean"
+        },
+        "enableResourcePreloading": {
+          "type": "boolean"
+        },
+        "enableCriticalCSS": {
+          "type": "boolean"
+        },
+        "optimizeForMobile": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "multilangString": {
+      "type": "object",
+      "required": ["zh-CN", "en"],
+      "properties": {
+        "zh-CN": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "multilangStringArray": {
+      "type": "object",
+      "required": ["zh-CN", "en"],
+      "properties": {
+        "zh-CN": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "en": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "pageConfig": {
+      "type": "object",
+      "required": ["title", "description", "priority", "changeFrequency"],
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/multilangString"
+        },
+        "description": {
+          "$ref": "#/definitions/multilangString"
+        },
+        "priority": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "changeFrequency": {
+          "type": "string",
+          "enum": ["always", "hourly", "daily", "weekly", "monthly", "yearly", "never"]
+        },
+        "headingStructure": {
+          "type": "object",
+          "required": ["h1"],
+          "properties": {
+            "h1": {
+              "type": "string",
+              "minLength": 1
+            },
+            "h2": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "h3": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "lengthValidation": {
+      "type": "object",
+      "required": ["minLength", "maxLength"],
+      "properties": {
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "countValidation": {
+      "type": "object",
+      "required": ["minCount", "maxCount"],
+      "properties": {
+        "minCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxCount": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

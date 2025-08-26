@@ -1,0 +1,282 @@
+{
+  "version": "1.0.0",
+  "site": {
+    "name": {
+      "zh-CN": "长截图分割工具",
+      "en": "Long Screenshot Splitter"
+    },
+    "url": "https://screenshot-splitter.com",
+    "defaultLanguage": "zh-CN",
+    "supportedLanguages": ["zh-CN", "en"]
+  },
+  "socialMedia": {
+    "twitter": "@screenshot_tool",
+    "facebook": "screenshot-splitter",
+    "linkedin": "screenshot-splitter",
+    "instagram": "screenshot_splitter",
+    "youtube": "screenshot-splitter-tool"
+  },
+  "analytics": {
+    "googleAnalyticsId": "G-XXXXXXXXXX",
+    "googleSearchConsoleId": "XXXXXXXXXX",
+    "baiduAnalyticsId": "",
+    "hotjarId": ""
+  },
+  "keywords": {
+    "primary": {
+      "zh-CN": [
+        "长截图分割",
+        "截图切割",
+        "图片分割工具",
+        "在线截图工具",
+        "免费图片处理"
+      ],
+      "en": [
+        "long screenshot splitter",
+        "screenshot cutter",
+        "image splitting tool",
+        "online screenshot tool",
+        "free image processing"
+      ]
+    },
+    "secondary": {
+      "zh-CN": [
+        "长图切割",
+        "截图处理",
+        "图片编辑",
+        "在线工具",
+        "图片分割器"
+      ],
+      "en": [
+        "long image cutter",
+        "screenshot processing",
+        "image editing",
+        "online tool",
+        "image splitter"
+      ]
+    },
+    "longTail": {
+      "zh-CN": [
+        "如何分割长截图",
+        "长截图怎么切割",
+        "免费在线图片分割工具",
+        "手机长截图分割方法",
+        "网页截图分割工具"
+      ],
+      "en": [
+        "how to split long screenshots",
+        "cut long screenshots online",
+        "free online image splitting tool",
+        "mobile screenshot splitting method",
+        "web screenshot splitting tool"
+      ]
+    }
+  },
+  "defaultImages": {
+    "ogImage": "/images/og-image-1200x630.jpg",
+    "twitterImage": "/images/twitter-card-1200x600.jpg",
+    "favicon": "/favicon.ico",
+    "appleTouchIcon": "/images/apple-touch-icon-180x180.png",
+    "logo": "/images/logo-512x512.png"
+  },
+  "pages": {
+    "home": {
+      "title": {
+        "zh-CN": "长截图分割工具 - 免费在线截图切割处理",
+        "en": "Long Screenshot Splitter - Free Online Image Cutting Tool"
+      },
+      "description": {
+        "zh-CN": "免费的在线长截图分割工具，支持将长图片自动切割成多个部分，无需注册，支持多种格式，快速处理长截图分享需求。",
+        "en": "Free online long screenshot splitter tool. Automatically cut long images into multiple parts, no registration required, supports multiple formats, quickly process long screenshot sharing needs."
+      },
+      "priority": 1.0,
+      "changeFrequency": "weekly",
+      "headingStructure": {
+        "h1": {
+          "zh-CN": "长截图分割工具",
+          "en": "Long Screenshot Splitter"
+        },
+        "h2": {
+          "zh-CN": [
+            "功能特点",
+            "使用方法",
+            "支持格式",
+            "常见问题"
+          ],
+          "en": [
+            "Features",
+            "How to Use",
+            "Supported Formats", 
+            "FAQ"
+          ]
+        },
+        "h3": {
+          "zh-CN": [
+            "自动识别分割点",
+            "多种导出格式",
+            "批量处理功能",
+            "隐私安全保护"
+          ],
+          "en": [
+            "Auto Split Point Detection",
+            "Multiple Export Formats",
+            "Batch Processing",
+            "Privacy Protection"
+          ]
+        }
+      }
+    },
+    "upload": {
+      "title": {
+        "zh-CN": "上传截图 - 长截图分割工具",
+        "en": "Upload Screenshot - Long Screenshot Splitter"
+      },
+      "description": {
+        "zh-CN": "上传您的长截图文件，支持拖拽上传、点击选择等多种上传方式，支持PNG、JPG、JPEG等常见图片格式。",
+        "en": "Upload your long screenshot files. Supports drag-and-drop upload, click to select and other upload methods. Supports PNG, JPG, JPEG and other common image formats."
+      },
+      "priority": 0.8,
+      "changeFrequency": "monthly",
+      "headingStructure": {
+        "h1": {
+          "zh-CN": "上传长截图",
+          "en": "Upload Long Screenshot"
+        },
+        "h2": {
+          "zh-CN": [
+            "上传方式",
+            "支持格式",
+            "文件要求"
+          ],
+          "en": [
+            "Upload Methods",
+            "Supported Formats",
+            "File Requirements"
+          ]
+        }
+      }
+    },
+    "split": {
+      "title": {
+        "zh-CN": "分割处理 - 长截图分割工具",
+        "en": "Split Processing - Long Screenshot Splitter"
+      },
+      "description": {
+        "zh-CN": "智能识别长截图的最佳分割点，可手动调整分割区域，实时预览分割效果，确保分割结果符合您的需求。",
+        "en": "Intelligently identify the best split points of long screenshots, manually adjust split areas, real-time preview split effects, ensure split results meet your needs."
+      },
+      "priority": 0.9,
+      "changeFrequency": "monthly",
+      "headingStructure": {
+        "h1": {
+          "zh-CN": "分割设置",
+          "en": "Split Settings"
+        },
+        "h2": {
+          "zh-CN": [
+            "自动分割",
+            "手动调整",
+            "预览效果"
+          ],
+          "en": [
+            "Auto Split",
+            "Manual Adjustment", 
+            "Preview Effects"
+          ]
+        }
+      }
+    },
+    "export": {
+      "title": {
+        "zh-CN": "导出下载 - 长截图分割工具",
+        "en": "Export Download - Long Screenshot Splitter"
+      },
+      "description": {
+        "zh-CN": "选择需要导出的分割片段，支持单个下载或打包下载，可自定义文件名称和导出格式。",
+        "en": "Select the split segments to export, supports single download or batch download, customizable file names and export formats."
+      },
+      "priority": 0.7,
+      "changeFrequency": "monthly",
+      "headingStructure": {
+        "h1": {
+          "zh-CN": "导出设置",
+          "en": "Export Settings"
+        },
+        "h2": {
+          "zh-CN": [
+            "选择片段",
+            "导出选项",
+            "下载文件"
+          ],
+          "en": [
+            "Select Segments",
+            "Export Options",
+            "Download Files"
+          ]
+        }
+      }
+    }
+  },
+  "structuredData": {
+    "organization": {
+      "name": "Long Screenshot Splitter",
+      "url": "https://screenshot-splitter.com",
+      "logo": "https://screenshot-splitter.com/images/logo-512x512.png",
+      "description": {
+        "zh-CN": "免费的在线长截图分割工具开发团队",
+        "en": "Free online long screenshot splitter tool development team"
+      }
+    },
+    "webApplication": {
+      "name": {
+        "zh-CN": "长截图分割工具",
+        "en": "Long Screenshot Splitter"
+      },
+      "description": {
+        "zh-CN": "免费的在线长截图分割工具，支持将长图片自动切割成多个部分",
+        "en": "Free online long screenshot splitter tool, supports automatically cutting long images into multiple parts"
+      },
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Web Browser",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "features": {
+        "zh-CN": [
+          "长截图自动分割",
+          "多格式支持",
+          "批量导出",
+          "在线处理",
+          "免费使用",
+          "隐私保护"
+        ],
+        "en": [
+          "Automatic long screenshot splitting",
+          "Multi-format support", 
+          "Batch export",
+          "Online processing",
+          "Free to use",
+          "Privacy protection"
+        ]
+      }
+    }
+  },
+  "validation": {
+    "title": {
+      "minLength": 10,
+      "maxLength": 60
+    },
+    "description": {
+      "minLength": 50,
+      "maxLength": 160
+    },
+    "keywords": {
+      "minCount": 3,
+      "maxCount": 10
+    }
+  },
+  "performance": {
+    "enableImageLazyLoading": true,
+    "enableResourcePreloading": true,
+    "enableCriticalCSS": true,
+    "optimizeForMobile": true
+  }
+}

@@ -40,32 +40,151 @@ export interface PageSEO {
   customMeta?: Record<string, string>;
 }
 
-// SEO配置接口
+// 语言类型
+export type Language = 'zh-CN' | 'en';
+
+// 多语言字符串接口
+export interface MultiLanguageString {
+  'zh-CN': string;
+  'en': string;
+}
+
+// 多语言字符串数组接口
+export interface MultiLanguageStringArray {
+  'zh-CN': string[];
+  'en': string[];
+}
+
+// 页面类型
+export type PageType = 'home' | 'upload' | 'split' | 'export';
+
+// 修改频率类型
+export type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+
+// 标题结构接口
+export interface HeadingStructure {
+  h1: string;
+  h2?: string[];
+  h3?: string[];
+  h4?: string[];
+  h5?: string[];
+  h6?: string[];
+}
+
+// 页面配置接口
+export interface PageConfig {
+  title: MultiLanguageString;
+  description: MultiLanguageString;
+  priority: number;
+  changeFrequency: ChangeFrequency;
+  headingStructure?: HeadingStructure;
+  customMeta?: Record<string, string>;
+}
+
+// 验证规则接口
+export interface ValidationRule {
+  minLength: number;
+  maxLength: number;
+}
+
+// 计数验证规则接口
+export interface CountValidationRule {
+  minCount: number;
+  maxCount: number;
+}
+
+// 验证配置接口
+export interface ValidationConfig {
+  title?: ValidationRule;
+  description?: ValidationRule;
+  keywords?: CountValidationRule;
+}
+
+// 性能配置接口
+export interface PerformanceConfig {
+  enableImageLazyLoading?: boolean;
+  enableResourcePreloading?: boolean;
+  enableCriticalCSS?: boolean;
+  optimizeForMobile?: boolean;
+}
+
+// 组织信息接口
+export interface OrganizationInfo {
+  name: string;
+  url: string;
+  logo?: string;
+  description: MultiLanguageString;
+}
+
+// Web应用信息接口
+export interface WebApplicationInfo {
+  name: MultiLanguageString;
+  description: MultiLanguageString;
+  applicationCategory: 'UtilitiesApplication' | 'MultimediaApplication' | 'ProductivityApplication';
+  operatingSystem: string;
+  browserRequirements?: string;
+  features?: MultiLanguageStringArray;
+}
+
+// 结构化数据配置接口
+export interface StructuredDataConfig {
+  organization: OrganizationInfo;
+  webApplication: WebApplicationInfo;
+}
+
+// 站点配置接口
+export interface SiteConfig {
+  name: MultiLanguageString;
+  url: string;
+  defaultLanguage: Language;
+  supportedLanguages: Language[];
+}
+
+// 社交媒体配置接口
+export interface SocialMediaConfig {
+  twitter?: string;
+  facebook?: string;
+  linkedin?: string;
+  instagram?: string;
+  youtube?: string;
+}
+
+// 分析工具配置接口
+export interface AnalyticsConfig {
+  googleAnalyticsId?: string;
+  googleSearchConsoleId?: string;
+  baiduAnalyticsId?: string;
+  hotjarId?: string;
+}
+
+// 关键词配置接口
+export interface KeywordsConfig {
+  primary: MultiLanguageStringArray;
+  secondary?: MultiLanguageStringArray;
+  longTail?: MultiLanguageStringArray;
+}
+
+// 默认图片配置接口
+export interface DefaultImagesConfig {
+  ogImage?: string;
+  twitterImage?: string;
+  favicon?: string;
+  appleTouchIcon?: string;
+  logo?: string;
+}
+
+// 主SEO配置接口
 export interface SEOConfig {
-  siteName: string;
-  siteUrl: string;
-  defaultLanguage: string;
-  supportedLanguages: string[];
-  socialMedia: {
-    twitter: string;
-    facebook: string;
-    linkedin: string;
-  };
-  analytics: {
-    googleAnalyticsId: string;
-    googleSearchConsoleId: string;
-  };
-  keywords: {
-    primary: string[];
-    secondary: string[];
-    longTail: string[];
-  };
-  defaultImages: {
-    ogImage: string;
-    twitterImage: string;
-    favicon: string;
-    appleTouchIcon: string;
-  };
+  version: string;
+  site: SiteConfig;
+  socialMedia?: SocialMediaConfig;
+  analytics?: AnalyticsConfig;
+  keywords: KeywordsConfig;
+  defaultImages?: DefaultImagesConfig;
+  pages: Record<PageType, PageConfig>;
+  structuredData: StructuredDataConfig;
+  validation?: ValidationConfig;
+  performance?: PerformanceConfig;
 }
 
 // 结构化数据相关接口
@@ -78,6 +197,8 @@ export interface WebApplicationSchema {
   applicationCategory: string;
   operatingSystem: string;
   browserRequirements: string;
+  inLanguage: string;
+  isAccessibleForFree: boolean;
   offers: {
     '@type': 'Offer';
     price: string;
@@ -89,6 +210,11 @@ export interface WebApplicationSchema {
     '@type': 'AggregateRating';
     ratingValue: string;
     ratingCount: string;
+  };
+  author?: {
+    '@type': 'Organization';
+    name: string;
+    url: string;
   };
 }
 
@@ -263,11 +389,7 @@ export interface SEOContext {
   [key: string]: any;
 }
 
-// 页面类型
-export type PageType = 'home' | 'upload' | 'split' | 'export';
-
-// 语言类型
-export type Language = 'zh-CN' | 'en';
+// Removed duplicate type definitions - already defined earlier
 
 // 结构化数据生成器接口
 export interface StructuredDataGenerator {
@@ -308,6 +430,113 @@ export interface SEOMonitor {
   validateSEO(): Promise<SEOIssue[]>;
 }
 
+// 配置加载选项接口
+export interface SEOConfigLoadOptions {
+  force?: boolean;
+  validateOnly?: boolean;
+  configPath?: string;
+}
+
+// 配置验证结果接口
+export interface SEOConfigValidationResult {
+  success: boolean;
+  config?: SEOConfig;
+  errors: string[];
+  warnings: string[];
+  loadTime: number;
+}
+
+// 配置加载器选项接口
+export interface ConfigLoaderOptions extends SEOConfigLoadOptions {
+  autoReload?: boolean;
+  reloadInterval?: number;
+  enableHotReload?: boolean;
+  validateOnLoad?: boolean;
+  retryOnFailure?: boolean;
+  maxRetries?: number;
+}
+
+// 配置加载器指标接口
+export interface ConfigLoaderMetrics {
+  loadCount: number;
+  successCount: number;
+  errorCount: number;
+  avgLoadTime: number;
+  lastLoadTime: number;
+  totalLoadTime: number;
+}
+
+// SEO配置缓存类型
+export type SEOConfigCache = Map<string, any>;
+
+// 标题层级类型
+export type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
+// 标题层级验证接口
+export interface HeadingHierarchyValidation {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  structure: {
+    level: HeadingLevel;
+    text: string;
+    position: number;
+  }[];
+}
+
+// H标签组件属性接口
+export interface HeadingProps {
+  level: HeadingLevel;
+  children: React.ReactNode;
+  id?: string;
+  className?: string;
+  validateHierarchy?: boolean;
+  context?: string;
+}
+
+// 标题提供者上下文接口
+export interface HeadingContextValue {
+  currentLevel: number;
+  headings: {
+    level: HeadingLevel;
+    text: string;
+    id: string;
+  }[];
+  registerHeading: (level: HeadingLevel, text: string, id: string) => void;
+  validateHierarchy: () => HeadingHierarchyValidation;
+}
+
+// SEO国际化hook接口
+export interface UseSEOI18nReturn {
+  t: (key: string, variables?: Record<string, any>) => string;
+  language: Language;
+  setLanguage: (language: Language) => void;
+  getSEOText: (page: PageType, field: 'title' | 'description', context?: Record<string, any>) => string;
+  getKeywords: (page: PageType, includeContext?: boolean) => string[];
+}
+
+// 设备类型
+export type DeviceType = 'mobile' | 'tablet' | 'desktop';
+
+// 响应式断点
+export interface ResponsiveBreakpoints {
+  mobile: number;
+  tablet: number;
+  desktop: number;
+  wide: number;
+}
+
+// 视窗检测结果接口
+export interface ViewportInfo {
+  width: number;
+  height: number;
+  deviceType: DeviceType;
+  isMobile: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
+  orientation: 'portrait' | 'landscape';
+}
+
 // 导出所有类型的联合类型
 export type StructuredDataType =
   | WebApplicationSchema
@@ -323,3 +552,157 @@ export type SEOAnalyticsEvent = {
   value?: number;
   metadata?: Record<string, any>;
 };
+
+// 增强的SEO配置管理器接口
+export interface SEOConfigManagerInterface {
+  loadConfig(options?: SEOConfigLoadOptions): Promise<SEOConfigValidationResult>;
+  validateConfig(configData: unknown): Promise<SEOConfigValidationResult>;
+  getConfig(): SEOConfig;
+  getPageConfig(page: PageType, language?: Language): {
+    title: string;
+    description: string;
+    keywords: string[];
+    headingStructure: Record<string, string | string[]>;
+  };
+  getKeywords(page: PageType, language?: Language, includeContext?: boolean): string[];
+  getStructuredData(page: PageType, language?: Language): Record<string, unknown>;
+  reloadConfig(): Promise<SEOConfigValidationResult>;
+  clearCache(): void;
+  getStats(): {
+    loaded: boolean;
+    cacheSize: number;
+    lastLoadTime: number;
+    cacheValid: boolean;
+  };
+}
+
+// JSON Schema validation interfaces
+export interface JSONSchemaProperty {
+  type: string;
+  format?: string;
+  pattern?: string;
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  enum?: string[];
+  items?: JSONSchemaProperty;
+  minItems?: number;
+  maxItems?: number;
+  properties?: Record<string, JSONSchemaProperty>;
+  required?: string[];
+  $ref?: string;
+}
+
+export interface JSONSchema {
+  type: string;
+  required?: string[];
+  properties?: Record<string, JSONSchemaProperty>;
+  definitions?: Record<string, JSONSchemaProperty>;
+}
+
+// Configuration validation error interfaces
+export interface ValidationError {
+  field: string;
+  message: string;
+  value?: any;
+  severity: 'error' | 'warning';
+}
+
+export interface SchemaValidationResult {
+  valid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationError[];
+}
+
+// Enhanced configuration loader interfaces
+export interface ConfigurationSource {
+  type: 'json' | 'typescript' | 'remote';
+  path: string;
+  encoding?: string;
+  timeout?: number;
+}
+
+export interface LoaderStrategy {
+  primary: ConfigurationSource;
+  fallback?: ConfigurationSource[];
+  cache?: boolean;
+  retryCount?: number;
+  retryDelay?: number;
+}
+
+// Configuration manager events
+export type ConfigManagerEventType = 
+  | 'config:loaded'
+  | 'config:validated' 
+  | 'config:error'
+  | 'config:cache:cleared'
+  | 'config:hot:reload';
+
+export interface ConfigManagerEvent {
+  type: ConfigManagerEventType;
+  timestamp: number;
+  data?: any;
+  error?: Error;
+}
+
+export interface ConfigManagerEventHandler {
+  (event: ConfigManagerEvent): void;
+}
+
+// Advanced configuration management interfaces
+export interface ConfigurationManager {
+  load(strategy?: LoaderStrategy): Promise<SEOConfigValidationResult>;
+  validate(config: unknown, schema?: JSONSchema): Promise<SchemaValidationResult>;
+  watch(handler: ConfigManagerEventHandler): () => void;
+  get<T = any>(path: string): T | undefined;
+  set(path: string, value: any): boolean;
+  merge(config: Partial<SEOConfig>): boolean;
+  export(format?: 'json' | 'typescript'): string;
+}
+
+// Hot reload configuration interfaces
+export interface HotReloadOptions {
+  enabled: boolean;
+  watchPaths: string[];
+  debounceMs: number;
+  validateOnChange: boolean;
+  notifyOnError: boolean;
+}
+
+export interface WatcherEvent {
+  type: 'add' | 'change' | 'unlink';
+  path: string;
+  stats?: any;
+}
+
+// Configuration migration interfaces
+export interface ConfigMigration {
+  version: string;
+  description: string;
+  up: (config: any) => any;
+  down: (config: any) => any;
+}
+
+export interface MigrationRunner {
+  migrate(config: any, fromVersion: string, toVersion: string): Promise<any>;
+  rollback(config: any, fromVersion: string, toVersion: string): Promise<any>;
+  getAvailableMigrations(): ConfigMigration[];
+}
+
+// Performance monitoring for config operations
+export interface ConfigPerformanceMetrics {
+  loadTime: number;
+  parseTime: number;
+  validationTime: number;
+  cacheHitRate: number;
+  memoryUsage: number;
+  operationCount: number;
+}
+
+export interface PerformanceMonitor {
+  startTimer(operation: string): () => number;
+  recordMetrics(operation: string, metrics: Partial<ConfigPerformanceMetrics>): void;
+  getMetrics(): ConfigPerformanceMetrics;
+  reset(): void;
+}

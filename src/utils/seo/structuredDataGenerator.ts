@@ -49,6 +49,8 @@ export class StructuredDataGenerator {
       applicationCategory: 'UtilitiesApplication',
       operatingSystem: 'Web Browser',
       browserRequirements: 'Requires JavaScript. Requires HTML5.',
+      inLanguage: language,
+      isAccessibleForFree: true,
       offers: {
         '@type': 'Offer',
         price: '0',
@@ -60,6 +62,11 @@ export class StructuredDataGenerator {
         '@type': 'AggregateRating',
         ratingValue: '4.8',
         ratingCount: '1250',
+      },
+      author: {
+        '@type': 'Organization',
+        name: 'Long Screenshot Splitter Team',
+        url: this.baseUrl,
       },
     };
   }
