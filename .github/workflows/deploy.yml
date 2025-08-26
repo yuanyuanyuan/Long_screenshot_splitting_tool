@@ -50,7 +50,6 @@ jobs:
       run: npm test || echo "测试完成"
       
     - name: 构建应用
-    - name: 构建应用
       run: npm run build
       env:
         NODE_ENV: production
