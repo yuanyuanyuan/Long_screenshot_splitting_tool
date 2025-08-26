@@ -4,7 +4,6 @@ node_modules/
 
 # Build outputs
 dist/
-dist-single/
 build/
 *.tsbuildinfo
 
@@ -85,9 +84,6 @@ jspm_packages/
 # Nuxt.js build / generate output
 .nuxt
 
-# Storybook build outputs
-.out
-.storybook-out
 
 # Temporary folders
 tmp/
@@ -113,19 +109,5 @@ coverage
 # TypeScript
 *.tsbuildinfo
 
-# Monorepo specific
-packages/*/dist/
-packages/*/dist-single/
-packages/**/dist/
-packages/**/dist-single/
-packages/*/build/
-apps/*/dist/
-apps/*/build/
-tools/*/dist/
-tools/*/build/
-
 .codebuddy
-packages/screenshot-splitter/dist-single/index.html
 
-*storybook.log
-storybook-static
