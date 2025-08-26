@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"],
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strict": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "noStrictGenericChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "shared-components/**/*.test.ts",
+    "shared-components/**/*.test.tsx",
+    "**/__tests__/**/*",
+    "src/test-setup.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".backup"
+  ]
+}

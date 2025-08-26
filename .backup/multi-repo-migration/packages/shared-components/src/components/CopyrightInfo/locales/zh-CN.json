@@ -1,8 +1,0 @@
-{
-  "copyright": "© {year} {author} 版权所有",
-  "contact": "联系方式：{email}",
-  "website": "网站：{url}",
-  "poweredBy": "技术支持：{toolName}",
-  "license": "许可协议：{license}",
-  "attribution": "署名要求：{attributionText}"
-}

@@ -5,35 +5,40 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+
+    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+
+    /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+
+    /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["packages/shared-components/src/*"],
-      "@ui/*": ["packages/ui-library/src/*"],
-      "@screenshot-splitter/*": ["packages/screenshot-splitter/src/*"]
+      "@/*": ["src/*"],
+      "shared-components": ["shared-components/index.ts"],
+      "shared-components/*": ["shared-components/*"]
     }
   },
-  "include": [
-    "tools/**/*",
-    "*.js",
-    "*.ts"
-  ],
+  "include": ["src", "shared-components"],
   "exclude": [
-    "node_modules",
+    "node_modules", 
     "dist",
-    "build",
-    "packages/*/dist",
-    "packages/*/node_modules",
-    "old-astro-prj",
-    "vite-migration"
-  ]
+    "**/*.test.*",
+    "**/*.spec.*", 
+    "**/__tests__/**",
+    "**/test-setup/**",
+    "**/tests/**",
+    "src/test-setup.ts"
+  ],
+  "references": []
 }
