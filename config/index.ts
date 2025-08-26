@@ -36,10 +36,10 @@ export {
 } from './constants/app.constants';
 
 // 导入用于创建统一配置对象
-import { defaultAppConfig } from './app/app.config';
-import { routeConfig, navigationConfig } from './app/routing.config';
-import { deploymentConfig } from './build/deployment.config';
-import { environmentConfig } from './env/environment.config';
+import { defaultAppConfig, getAppConfig } from './app/app.config';
+import { routeConfig, navigationConfig, getRouteConfig } from './app/routing.config';
+import { deploymentConfig, getDeploymentConfig, getAssetUrl, getRouteUrl } from './build/deployment.config';
+import { environmentConfig, getEnvironmentConfig, getCurrentEnvironment } from './env/environment.config';
 import { 
   APP_INFO,
   SUPPORTED_FILE_TYPES,
@@ -54,15 +54,6 @@ import {
   HTTP_STATUS,
   REGEX_PATTERNS
 } from './constants/app.constants';
-import { 
-  getAssetUrl, 
-  getRouteUrl,
-  getEnvironmentConfig,
-  getDeploymentConfig,
-  getCurrentEnvironment,
-  getAppConfig,
-  getRouteConfig
-} from './build/deployment.config';
 
 /**
  * 统一配置对象
