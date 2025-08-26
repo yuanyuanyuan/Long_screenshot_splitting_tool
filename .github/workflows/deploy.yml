@@ -60,7 +60,11 @@ jobs:
         VITE_USE_ABSOLUTE_URLS: true
         VITE_ASSETS_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
         VITE_DEPLOY_ENV: production
-        
+        VITE_COPYRIGHT_AUTHOR: StarkYuan
+        VITE_COPYRIGHT_EMAIL: StarkYuan
+        VITE_COPYRIGHT_WEBSITE: https://github.com/yuanyuanyuan/Long_screenshot_splitting_tool
+        VITE_COPYRIGHT_TOOL_NAME: StarkYuan
+        VITE_COPYRIGHT_YEAR: 2025
     - name: 准备部署目录
       run: |
         # 创建部署目录
