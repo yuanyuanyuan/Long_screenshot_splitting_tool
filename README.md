@@ -74,6 +74,10 @@ long-screenshot-splitter/
 │   └── constants/         # 常量定义
 ├── tests/                 # 测试文件
 ├── docs/                  # 项目文档
+│   ├── PROJECT-INDEX.md   # 📚 项目文档索引
+│   ├── API-REFERENCE.md   # 🔌 API 参考文档
+│   ├── ARCHITECTURE.md    # 🏗️ 系统架构文档
+│   └── DEVELOPMENT-GUIDE.md # 🛠️ 开发指南
 └── dist/                  # 构建输出
 ```
 
@@ -213,11 +217,20 @@ npm run test:monitor
 
 MIT License - 详见 [LICENSE](LICENSE) 文件
 
+## 📚 文档导航
+
+- **[📖 项目文档索引](docs/PROJECT-INDEX.md)** - 完整的项目文档导航和结构说明
+- **[🔌 API 参考文档](docs/API-REFERENCE.md)** - 详细的组件、Hook 和工具函数 API
+- **[🏗️ 系统架构文档](docs/ARCHITECTURE.md)** - 架构设计决策和技术选型说明
+- **[🛠️ 开发指南](docs/DEVELOPMENT-GUIDE.md)** - 开发环境设置和工作流程
+- **[⚙️ 配置管理](docs/configuration.md)** - 环境配置和部署指南
+- **[📋 前端技术规范](docs/frontend-spec-new.md)** - 编码规范和最佳实践
+
 ## 🆘 获取帮助
 
-- 查看 [项目文档](docs/)
+- 查看 [项目文档索引](docs/PROJECT-INDEX.md) 获取完整文档导航
 - 提交 [Issue](https://github.com/your-username/long-screenshot-splitter/issues)
-- 查看 [架构迁移总结](docs/migration-summary.md)
+- 参考 [开发指南](docs/DEVELOPMENT-GUIDE.md) 解决开发问题
 
 ---
 

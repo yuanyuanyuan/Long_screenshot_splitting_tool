@@ -7,20 +7,31 @@ import { getDeploymentConfig } from './config/build/deployment.config'
 export default defineConfig(({ mode }) => {
   // 加载环境变量
   const env = loadEnv(mode, process.cwd(), '')
-  
-  // 设置环境变量到process.env，以便部署配置能够读取
+  // 注入到 process.env，供自定义部署配置读取
   Object.assign(process.env, env)
-  
-  // 获取部署配置
-  const config = getDeploymentConfig()
-  
+
+  // 调试日志：检查 vite 加载的 env
+  console.log('[vite env] COPYRIGHT DEBUG', {
+    VITE_COPYRIGHT_AUTHOR: env.VITE_COPYRIGHT_AUTHOR,
+    VITE_COPYRIGHT_EMAIL: env.VITE_COPYRIGHT_EMAIL,
+    VITE_COPYRIGHT_WEBSITE: env.VITE_COPYRIGHT_WEBSITE,
+    VITE_COPYRIGHT_TOOL_NAME: env.VITE_COPYRIGHT_TOOL_NAME,
+    VITE_COPYRIGHT_YEAR: env.VITE_COPYRIGHT_YEAR,
+    mode,
+    envFiles: ['.env.development.local', '.env.development', '.env.local', '.env']
+  });
+
+  const deploy = getDeploymentConfig()
+
   return {
+    // 仅使用 base 控制公共路径：绝对URL 或 子路径
+    base: deploy.useAbsoluteUrls ? deploy.assetsBaseUrl : deploy.basePath,
     plugins: [react()],
-    base: config.useAbsoluteUrls ? config.assetsBaseUrl : config.basePath,
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
-        'shared-components': path.resolve(__dirname, './shared-components')
+        '@shared': path.resolve(__dirname, './shared-components'),
+        'shared-components': path.resolve(__dirname, './shared-components'),
       }
     },
     build: {
@@ -29,39 +40,18 @@ export default defineConfig(({ mode }) => {
       assetsDir: 'assets',
       rollupOptions: {
         output: {
-          // 资源文件命名
           assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
           manualChunks: {
-            vendor: ['react', 'react-dom'],
-            utils: ['html2canvas', 'dompurify']
+            vendor: ['react', 'react-dom']
           }
         }
       }
     },
     server: {
-      port: 3000,
-      host: true
-    },
-    // 实验性功能：支持运行时基础路径
-    // 实验性功能：支持运行时基础路径
-    experimental: {
-      renderBuiltUrl(filename, { hostType }) {
-        // 移除filename中的assets/前缀，避免重复
-        const cleanFilename = filename.startsWith('assets/') ? filename.slice(7) : filename
-        
-        if (hostType === 'js') {
-          // 对于JS中的动态导入，使用配置的URL
-          return config.useAbsoluteUrls 
-            ? `${config.assetsBaseUrl}/assets/${cleanFilename}`
-            : `./assets/${cleanFilename}`
-        }
-        // 对于HTML中的资源引用
-        return config.useAbsoluteUrls
-          ? `${config.assetsBaseUrl}/assets/${cleanFilename}`
-          : `./assets/${cleanFilename}`
-      }
+      host: true,
+      port: 3000
     }
   }
 })

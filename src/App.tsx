@@ -452,21 +452,7 @@ function AppContent() {
         <header className="text-center py-8 mb-8 relative">
           {/* 右上角版权信息 */}
           <div className="absolute top-4 right-4 z-10">
-            <CopyrightInfo
-              author="Tencent"
-              email="contact@example.com"
-              website="https://example.com"
-              toolName="Screenshot Splitter Tool"
-              license="MIT License"
-              attributionText="Please include attribution when sharing"
-              showCopyrightSymbol={true}
-              showContactInfo={true}
-              showWebsiteLink={true}
-              showPoweredBy={true}
-              showLicense={false}
-              showAttribution={false}
-              language="en"
-            />
+            <CopyrightInfo />
           </div>
           
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">{t('header.title')}</h1>

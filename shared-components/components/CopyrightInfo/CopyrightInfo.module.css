@@ -1,4 +1,4 @@
-/* 版权信息组件样式 */
+/* 版权信息组件样式 (CSS Modules) */
 .copyright-info {
   font-size: 12px;
   line-height: 1.4;
@@ -43,7 +43,6 @@
   .copyright-info {
     color: #aaa;
   }
-  
   .copyright-info:hover {
     color: #fff;
   }
@@ -82,8 +81,4 @@
 /* 可点击版本 */
 .copyright-info-clickable {
   cursor: pointer;
-}
-
-.copyright-info-clickable:hover {
-  background-color: #f0f0f0;
 }

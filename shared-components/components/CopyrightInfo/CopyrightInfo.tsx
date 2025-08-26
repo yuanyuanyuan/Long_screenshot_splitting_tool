@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styles from './CopyrightInfo.module.css';
 import { CopyrightInfoProps, CopyrightTranslations } from './types';
 import { defaultCopyrightConfig } from './config/defaultConfig';
 
@@ -55,8 +56,14 @@ function interpolate(template: string, params: Record<string, any>): string {
  * 检测浏览器语言
  */
 function detectLanguage(): 'zh-CN' | 'en' {
-  const browserLang = navigator.language;
+  const browserLang = typeof navigator !== 'undefined' ? navigator.language : 'en';
   return browserLang.startsWith('zh') ? 'zh-CN' : 'en';
+}
+
+function normalizeUrl(url?: string) {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  return `https://${url.replace(/^\/+/, '')}`;
 }
 
 export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
@@ -93,56 +100,69 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
   }, [language]);
 
   if (isLoading || !translations) {
+    const loadingClasses = [styles['copyright-info-loading'], className]
+      .filter(Boolean)
+      .join(' ');
     return (
-      <div className={`copyright-info-loading ${className}`}>
+      <div className={loadingClasses}>
         <span>Loading copyright information...</span>
       </div>
     );
   }
 
-  // 构建显示的内容
-  const contentParts: string[] = [];
+  // 内容改为 ReactNode，便于插入链接
+  const contentNodes: React.ReactNode[] = [];
 
   if (showCopyrightSymbol) {
-    contentParts.push(interpolate(translations.copyright, { year, author }));
+    contentNodes.push(interpolate(translations.copyright, { year, author }));
   }
 
   if (showContactInfo && email) {
-    contentParts.push(interpolate(translations.contact, { email }));
+    contentNodes.push(interpolate(translations.contact, { email }));
   }
 
   if (showWebsiteLink && website) {
-    contentParts.push(interpolate(translations.website, { url: website }));
+    const websiteUrl = normalizeUrl(website);
+    // 取出 label（去掉占位符），再渲染链接
+    const label = translations.website.replace(/\{url\}/, '').trim();
+    contentNodes.push(
+      <>
+        {label ? `${label} ` : ''}
+        <a href={websiteUrl} target="_blank" rel="noopener noreferrer" aria-label="website">
+          Long_screenshot_splitting_tool官网
+        </a>
+      </>
+    );
   }
 
   if (showPoweredBy && toolName) {
-    contentParts.push(interpolate(translations.poweredBy, { toolName }));
+    contentNodes.push(interpolate(translations.poweredBy, { toolName }));
   }
 
   if (showLicense && license) {
-    contentParts.push(interpolate(translations.license, { license }));
+    contentNodes.push(interpolate(translations.license, { license }));
   }
 
   if (showAttribution && attributionText) {
-    contentParts.push(interpolate(translations.attribution, { attributionText }));
+    contentNodes.push(interpolate(translations.attribution, { attributionText }));
   }
+
+  const containerClasses = [
+    styles['copyright-info'],
+    onClick ? styles['copyright-info-clickable'] : '',
+    className
+  ].filter(Boolean).join(' ');
+
+  // 调试日志：检查生效值
+  console.log('[CopyrightInfo effective]', { author, email, website, toolName, year });
 
   return (
     <div 
-      className={`copyright-info ${className}`}
+      className={containerClasses}
       onClick={onClick}
-      style={{ 
-        cursor: onClick ? 'pointer' : 'default',
-        fontSize: '12px',
-        lineHeight: '1.4',
-        color: '#666',
-        textAlign: 'right',
-        padding: '8px',
-        userSelect: 'text'
-      }}
     >
-      {contentParts.map((part, index) => (
-        <div key={index}>{part}</div>
+      {contentNodes.map((node, index) => (
+        <div key={index}>{node}</div>
       ))}
     </div>
   );

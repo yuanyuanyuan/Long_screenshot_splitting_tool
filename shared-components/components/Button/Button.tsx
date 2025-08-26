@@ -1,17 +1,30 @@
 import React from 'react';
-import './Button.css';
+import styles from './Button.module.css';
 import { ButtonProps } from './types';
 
 /**
- * 基础按钮组件
- * 
- * @example
- * ```tsx
- * <Button variant="primary" size="medium" onClick={handleClick}>
- *   点击我
- * </Button>
- * ```
+ * 基础按钮组件（CSS Modules）
+ *
+ * 兼容尺寸别名：small->sm, medium->md, large->lg
  */
+function normalizeSize(size?: string): 'sm' | 'md' | 'lg' | 'xl' {
+  switch (size) {
+    case 'small':
+      return 'sm';
+    case 'medium':
+      return 'md';
+    case 'large':
+      return 'lg';
+    case 'sm':
+    case 'md':
+    case 'lg':
+    case 'xl':
+      return size as any;
+    default:
+      return 'md';
+  }
+}
+
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
@@ -23,18 +36,14 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseClass = 'btn';
-  const variantClass = `btn--${variant}`;
-  const sizeClass = `btn--${size}`;
-  const stateClass = disabled ? 'btn--disabled' : '';
-  const loadingClass = loading ? 'btn--loading' : '';
-
-  const combinedClassName = [
-    baseClass,
-    variantClass,
-    sizeClass,
-    stateClass,
-    loadingClass,
+  const sizeKey = `btn--${normalizeSize(size)}`;
+  const variantKey = `btn--${variant}`;
+  const classes = [
+    styles['btn'],
+    styles[sizeKey],
+    styles[variantKey],
+    disabled ? styles['btn--disabled'] : '',
+    loading ? styles['btn--loading'] : '',
     className
   ].filter(Boolean).join(' ');
 
@@ -47,13 +56,13 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       type={type}
-      className={combinedClassName}
+      className={classes}
       disabled={disabled || loading}
       onClick={handleClick}
       {...props}
     >
-      {loading && <span className="btn__spinner" />}
-      <span className="btn__content">{children}</span>
+      {loading && <span className={styles['btn__spinner']} />}
+      <span className={styles['btn__content']}>{children}</span>
     </button>
   );
 };

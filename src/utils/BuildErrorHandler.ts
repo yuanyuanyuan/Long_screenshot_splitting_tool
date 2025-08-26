@@ -193,7 +193,6 @@ ${buildError.originalError ? `\n原始错误:\n${buildError.originalError.stack 
         'package.json',
         'vite.config.ts',
         'tsconfig.json',
-        'config/build/vite.config.ts'
       ];
 
       for (const configFile of configFiles) {

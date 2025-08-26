@@ -25,6 +25,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
+      "@shared": ["shared-components/index.ts"],
+      "@shared/*": ["shared-components/*"],
       "shared-components": ["shared-components/index.ts"],
       "shared-components/*": ["shared-components/*"]
     }

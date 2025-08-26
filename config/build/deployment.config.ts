@@ -50,7 +50,7 @@ function getEnvConfig() {
     
     // 资源服务器配置
     assetsServerDomain: process.env.VITE_ASSETS_DOMAIN || '',
-    assetsPathPrefix: process.env.VITE_ASSETS_PATH_PREFIX || '/assets',
+    assetsPathPrefix: process.env.VITE_ASSETS_PATH_PREFIX || '',
     useHttps: process.env.VITE_ASSETS_HTTPS !== 'false',
     
     // CDN配置
@@ -81,16 +81,18 @@ function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { asset
 
   // 如果强制使用绝对URL且提供了自定义URL
   if (forceAbsoluteUrls && customAssetsBaseUrl) {
+    const base = customAssetsBaseUrl.endsWith('/') ? customAssetsBaseUrl : `${customAssetsBaseUrl}/`;
     return {
-      assetsBaseUrl: customAssetsBaseUrl.endsWith('/') ? customAssetsBaseUrl.slice(0, -1) : customAssetsBaseUrl,
+      assetsBaseUrl: base,
       useAbsoluteUrls: true
     };
   }
 
   // 如果配置了CDN
   if (cdnBaseUrl) {
+    const base = cdnBaseUrl.endsWith('/') ? cdnBaseUrl : `${cdnBaseUrl}/`;
     return {
-      assetsBaseUrl: cdnBaseUrl.endsWith('/') ? cdnBaseUrl.slice(0, -1) : cdnBaseUrl,
+      assetsBaseUrl: base,
       useAbsoluteUrls: true
     };
   }
@@ -98,8 +100,10 @@ function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { asset
   // 如果配置了自定义资源服务器
   if (assetsServerDomain) {
     const protocol = useHttps ? 'https' : 'http';
+    const prefix = assetsPathPrefix ? (assetsPathPrefix.startsWith('/') ? assetsPathPrefix : `/${assetsPathPrefix}`) : '';
+    const joined = `${protocol}://${assetsServerDomain}${prefix}`;
     return {
-      assetsBaseUrl: `${protocol}://${assetsServerDomain}${assetsPathPrefix}`,
+      assetsBaseUrl: joined.endsWith('/') ? joined : `${joined}/`,
       useAbsoluteUrls: true
     };
   }
@@ -110,7 +114,7 @@ function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { asset
     const finalUser = user || githubUser;
     const finalRepo = repo || 'long-screenshot-splitter';
     return {
-      assetsBaseUrl: `https://${finalUser}.github.io/${finalRepo}`,
+      assetsBaseUrl: `https://${finalUser}.github.io/${finalRepo}/`,
       useAbsoluteUrls: true
     };
   }
@@ -134,6 +138,9 @@ export function getDeploymentConfig(): DeploymentConfig {
   if (envConfig.isGitHubPages && envConfig.githubRepository) {
     const repoName = envConfig.githubRepository.split('/')[1] || 'long-screenshot-splitter';
     basePath = `/${repoName}/`;
+  }
+  if (!basePath.endsWith('/')) {
+    basePath = `${basePath}/`;
   }
 
   return {
@@ -165,17 +172,14 @@ export function getDeploymentConfig(): DeploymentConfig {
  */
 export function getAssetUrl(assetPath: string): string {
   const config = getDeploymentConfig();
-  
-  // 移除开头的斜杠，确保路径格式正确
-  const cleanPath = assetPath.startsWith('/') ? assetPath.slice(1) : assetPath;
-  
+
+  const clean = assetPath.startsWith('/') ? assetPath.slice(1) : assetPath;
+  const p = clean.startsWith('assets/') ? clean : `assets/${clean}`;
+
   if (config.useAbsoluteUrls) {
-    // 使用完整URL（CDN、自定义域名或GitHub Pages）
-    return `${config.assetsBaseUrl}/${cleanPath}`;
+    return `${config.assetsBaseUrl}${p}`;
   }
-  
-  // 使用相对路径（开发环境或本地部署）
-  return `./assets/${cleanPath}`;
+  return `./${p}`;
 }
 
 /**
@@ -199,18 +203,12 @@ export function getAssetsBaseUrl(): string {
  */
 export function createDynamicImportUrl(modulePath: string): string {
   const config = getDeploymentConfig();
-  
-  // 移除开头的斜杠和assets前缀
-  let cleanPath = modulePath.startsWith('/') ? modulePath.slice(1) : modulePath;
-  if (cleanPath.startsWith('assets/')) {
-    cleanPath = cleanPath.slice(7); // 移除 'assets/' 前缀
-  }
-  
+  const clean = modulePath.startsWith('/') ? modulePath.slice(1) : modulePath;
+  const p = clean.startsWith('assets/') ? clean : `assets/${clean}`;
   if (config.useAbsoluteUrls) {
-    return `${config.assetsBaseUrl}/${cleanPath}`;
+    return `${config.assetsBaseUrl}${p}`;
   }
-  
-  return `./assets/${cleanPath}`;
+  return `./${p}`;
 }
 
 // 导出默认配置

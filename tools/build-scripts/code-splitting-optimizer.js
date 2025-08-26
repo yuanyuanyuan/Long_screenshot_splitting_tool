@@ -552,7 +552,7 @@ const routes = [
         step: 2,
         title: '配置代码分割',
         description: '更新Vite配置，启用手动代码分割',
-        files: ['vite.config.js', 'vite.config.base.js'],
+        files: ['vite.config.ts'],
         estimatedTime: '30分钟'
       },
       {
