@@ -5,17 +5,18 @@
  * Supports isolated feature testing and parallel execution
  */
 
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import path from 'path';
 
 const testConfigs = {
   seo: {
     name: 'SEO Tests',
     patterns: [
-      'src/utils/seo/**/*.test.ts',
-      'src/components/**/SEO*.test.tsx',
-      'src/hooks/**/useSEO*.test.ts',
-      'src/config/**/seo*.test.ts'
+      'src/utils/seo/__tests__/*.test.ts',
+      'src/components/__tests__/SEO*.test.tsx',
+      'src/hooks/__tests__/*SEO*.test.ts',
+      'src/config/__tests__/seo*.test.ts',
+      'src/types/__tests__/seo*.test.ts'
     ],
     env: {
       VITE_ENABLE_SEO_DEV: 'true',
@@ -27,8 +28,10 @@ const testConfigs = {
     name: 'Mobile Responsive Tests',
     patterns: [
       'src/components/responsive/**/*.test.tsx',
-      'src/hooks/**/useViewport*.test.ts',
-      'src/utils/**/*responsive*.test.ts'
+      'src/hooks/__tests__/*Viewport*.test.ts',
+      'src/hooks/__tests__/*viewport*.test.ts',
+      'src/utils/__tests__/*responsive*.test.ts',
+      'src/components/__tests__/*Responsive*.test.tsx'
     ],
     env: {
       VITE_ENABLE_SEO_DEV: 'false',
@@ -39,8 +42,12 @@ const testConfigs = {
   integration: {
     name: 'Integration Tests',
     patterns: [
-      'src/**/*.integration.test.{ts,tsx}',
-      'tests/integration/**/*.test.{ts,tsx}'
+      'src/**/*.integration.test.ts',
+      'src/**/*.integration.test.tsx',
+      'tests/integration/**/*.test.ts',
+      'tests/integration/**/*.test.tsx',
+      'src/components/__tests__/*.test.tsx',
+      'shared-components/**/*.test.ts'
     ],
     env: {
       VITE_ENABLE_SEO_DEV: 'true',
@@ -58,15 +65,28 @@ function runTests(feature, options = {}) {
   }
 
   console.log(`\n🧪 Running ${config.name}...`);
-  console.log(`📁 Patterns: ${config.patterns.join(', ')}\n`);
-
+  
   const args = [
     'run',
     options.coverage ? 'test:coverage' : 'test',
     '--',
     '--reporter=verbose',
-    ...config.patterns.map(pattern => `--run "${pattern}"`)
+    '--run'
   ];
+  
+  // Add test name pattern filter for the feature
+  if (feature === 'seo') {
+    args.push('--testNamePattern', '(seo|SEO)');
+    console.log('🔍 Filter: SEO-related tests\n');
+  } else if (feature === 'mobile') {
+    args.push('--testNamePattern', '(responsive|Responsive|viewport|Viewport)');
+    console.log('📱 Filter: Mobile/Responsive tests\n');
+  } else if (feature === 'integration') {
+    args.push('--testNamePattern', '(integration|components)');
+    console.log('🔗 Filter: Integration and component tests\n');
+  } else {
+    console.log('📁 Running all tests\n');
+  }
 
   if (options.watch) {
     args.push('--watch');
