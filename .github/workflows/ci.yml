@@ -1,12 +1,47 @@
-Name: CI
+name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, seo-optimization, mobile-responsive ]
   pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
 
 jobs:
-  lint-and-test:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      seo-changed: ${{ steps.changes.outputs.seo }}
+      mobile-changed: ${{ steps.changes.outputs.mobile }}
+      core-changed: ${{ steps.changes.outputs.core }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            seo:
+              - 'src/utils/seo/**'
+              - 'src/components/**/SEO*'
+              - 'src/hooks/**/useSEO*'
+              - 'src/config/**/seo*'
+            mobile:
+              - 'src/components/responsive/**'
+              - 'src/hooks/**/useViewport*'
+              - 'src/utils/**/*responsive*'
+              - 'src/styles/**'
+            core:
+              - 'src/**'
+              - 'shared-components/**'
+              - 'package.json'
+              - 'vite.config.ts'
+              - 'vitest.config.ts'
+
+  lint-and-format:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,8 +59,165 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm run test -- --run
+      - name: Format check
+        run: npm run format:check
 
-      - name: Build
-        run: npm run build
+      - name: Type check
+        run: npm run type-check
+
+  test-seo:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.seo-changed == 'true' || needs.detect-changes.outputs.core-changed == 'true'
+    env:
+      VITE_DEV_MODE: parallel
+      VITE_ENABLE_SEO_DEV: true
+      VITE_ENABLE_MOBILE_DEV: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm install --legacy-peer-deps
+
+      - name: Run SEO Tests
+        run: npm run test:seo
+
+      - name: Upload SEO Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: seo-test-results
+          path: test-results/
+
+  test-mobile:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.mobile-changed == 'true' || needs.detect-changes.outputs.core-changed == 'true'
+    env:
+      VITE_DEV_MODE: parallel
+      VITE_ENABLE_SEO_DEV: false
+      VITE_ENABLE_MOBILE_DEV: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm install --legacy-peer-deps
+
+      - name: Run Mobile Tests
+        run: npm run test:mobile
+
+      - name: Upload Mobile Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: mobile-test-results
+          path: test-results/
+
+  test-integration:
+    runs-on: ubuntu-latest
+    needs: [test-seo, test-mobile]
+    if: always() && (needs.test-seo.result == 'success' || needs.test-seo.result == 'skipped') && (needs.test-mobile.result == 'success' || needs.test-mobile.result == 'skipped')
+    env:
+      VITE_DEV_MODE: parallel
+      VITE_ENABLE_SEO_DEV: true
+      VITE_ENABLE_MOBILE_DEV: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm install --legacy-peer-deps
+
+      - name: Run Integration Tests
+        run: npm run test:integration
+
+      - name: Upload Integration Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: integration-test-results
+          path: test-results/
+
+  build-and-validate:
+    runs-on: ubuntu-latest
+    needs: [lint-and-format, test-integration]
+    if: always() && needs.lint-and-format.result == 'success' && (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped')
+    strategy:
+      matrix:
+        build-mode: [development, production]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm install --legacy-peer-deps
+
+      - name: Build (${{ matrix.build-mode }})
+        run: |
+          if [ "${{ matrix.build-mode }}" = "production" ]; then
+            npm run build
+          else
+            NODE_ENV=development npm run build
+          fi
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.build-mode }}
+          path: dist/
+
+  feature-branch-validation:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/seo-optimization' || github.ref == 'refs/heads/mobile-responsive'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm install --legacy-peer-deps
+
+      - name: Branch-specific validation
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/seo-optimization" ]; then
+            echo "🔍 Running SEO-specific validations..."
+            npm run test:seo -- --coverage
+          elif [ "${{ github.ref }}" = "refs/heads/mobile-responsive" ]; then
+            echo "📱 Running Mobile-specific validations..."
+            npm run test:mobile -- --coverage
+          fi
+
+      - name: Feature validation report
+        run: |
+          echo "✅ Feature branch validation completed for ${{ github.ref }}"
