@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { BuildConfig, createBuildConfig } from '../build/vite.config';
+import { BuildConfig, createBuildConfig } from '../../../vite.config';
 
 describe('BuildConfig', () => {
   beforeEach(() => {

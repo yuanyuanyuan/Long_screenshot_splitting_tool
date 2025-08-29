@@ -1,0 +1,206 @@
+/* 触摸导航基础样式 */
+.touchNav {
+  display: flex;
+  align-items: center;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.touchNav::-webkit-scrollbar {
+  display: none;
+}
+
+.touchNav {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 导航项目样式 */
+.navItem {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 触摸反馈动画 */
+@keyframes touchFeedback {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.navItem:active {
+  animation: touchFeedback 0.2s ease;
+}
+
+/* 图标样式 */
+.navIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+}
+
+/* 标签样式 */
+.navLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+/* 活动指示器 */
+.activeIndicator {
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+  background: var(--primary-color, #007AFF);
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 标签栏容器 */
+.tabBar {
+  display: flex;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 徽章样式 */
+.badge {
+  position: absolute;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  animation: badgePop 0.3s ease;
+}
+
+@keyframes badgePop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 640px) {
+  .navItem {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+  
+  .navIcon {
+    width: 22px;
+    height: 22px;
+    font-size: 18px;
+  }
+  
+  .navLabel {
+    max-width: 80px;
+    font-size: 11px;
+  }
+  
+  .touchNav {
+    gap: 4px;
+    padding: 6px;
+  }
+}
+
+/* 横屏模式优化 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .navItem {
+    min-height: 36px;
+    padding: 8px 12px;
+  }
+  
+  .navIcon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .touchNav {
+    background: rgba(30, 30, 30, 0.95);
+  }
+  
+  .navItem {
+    color: #e0e0e0;
+  }
+  
+  .navItem:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .tabBar {
+    background: rgba(20, 20, 20, 0.98);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .navItem {
+    border: 2px solid transparent;
+  }
+  
+  .navItem:focus {
+    border-color: currentColor;
+  }
+  
+  .activeIndicator {
+    height: 4px;
+  }
+}
+
+/* 动画减少模式 */
+@media (prefers-reduced-motion: reduce) {
+  .navItem,
+  .activeIndicator,
+  .badge {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* 焦点可见性（键盘导航） */
+.navItem:focus-visible {
+  outline: 2px solid var(--primary-color, #007AFF);
+  outline-offset: 2px;
+}
+
+/* 禁用状态 */
+.navItem:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  pointer-events: none;
+}

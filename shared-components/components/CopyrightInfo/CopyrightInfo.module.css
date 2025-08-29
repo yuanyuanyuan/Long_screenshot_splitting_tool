@@ -25,16 +25,24 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
   .copyright-info {
-    font-size: 11px;
-    padding: 6px;
+    font-size: 10px;
+    padding: 4px 6px;
     text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    max-width: 200px;
+    line-height: 1.2;
   }
 }
 
 @media (max-width: 480px) {
   .copyright-info {
-    font-size: 10px;
-    padding: 4px;
+    font-size: 9px;
+    padding: 2px 4px;
+    max-width: 150px;
+    opacity: 0.7;
   }
 }
 
@@ -81,4 +89,53 @@
 /* 可点击版本 */
 .copyright-info-clickable {
   cursor: pointer;
+}
+
+/* 移动端专用链接样式 */
+.mobile-powered-link {
+  color: #007acc !important;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 122, 204, 0.2);
+  transition: all 0.3s ease;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-powered-link:hover, .mobile-powered-link:active {
+  background: #007acc;
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 122, 204, 0.3);
+}
+
+/* 移动端专用优化 */
+@media (max-width: 768px) {
+  .copyright-info {
+    /* 确保移动端版权信息醒目显示 */
+    pointer-events: auto;
+    z-index: 10;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  
+  .copyright-info a {
+    pointer-events: auto;
+  }
+}
+
+/* 小屏幕设备上进一步降低干扰性 */
+@media (max-width: 480px) {
+  .copyright-info {
+    transition: opacity 0.3s ease;
+  }
+  
+  /* 在小屏幕上默认几乎透明，只在需要时显示 */
+  .copyright-info:not(:hover):not(:focus-within) {
+    opacity: 0.4;
+  }
 }

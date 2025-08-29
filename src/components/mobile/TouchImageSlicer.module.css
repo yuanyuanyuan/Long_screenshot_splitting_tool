@@ -1,0 +1,333 @@
+/* 触摸图片切片器容器 */
+.touchImageSlicer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  background: #f5f5f5;
+}
+
+/* 图片容器 */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: crosshair;
+}
+
+/* 图片样式 */
+.slicerImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* 切片覆盖层 */
+.sliceOverlay {
+  position: absolute;
+  border: 2px solid #007AFF;
+  background: rgba(0, 122, 255, 0.1);
+  pointer-events: none;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.sliceOverlay.active {
+  border-color: #34C759;
+  background: rgba(52, 199, 89, 0.15);
+  animation: pulseGreen 1s ease-in-out infinite;
+}
+
+.sliceOverlay.selected {
+  border-color: #FF3B30;
+  background: rgba(255, 59, 48, 0.1);
+  border-width: 3px;
+  box-shadow: 0 0 20px rgba(255, 59, 48, 0.3);
+}
+
+/* 切片控制按钮 */
+.sliceControls {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  z-index: 20;
+}
+
+.deleteButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #FF3B30;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+  transition: all 0.2s ease;
+  pointer-events: all;
+  touch-action: manipulation;
+}
+
+.deleteButton:active {
+  transform: scale(0.9);
+  background: #D70015;
+}
+
+/* 切片信息显示 */
+.sliceInfo {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 触摸反馈指示器 */
+.touchFeedback {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 122, 255, 0.6);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: touchRipple 0.2s ease-out;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* 工具栏 */
+.toolbar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 12px 16px;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+
+.toolButton {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toolButton:active {
+  transform: scale(0.95);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.toolButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sliceCounter {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  padding: 0 8px;
+}
+
+/* 使用提示 */
+.helpText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  line-height: 1.6;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.helpText p {
+  margin: 8px 0;
+}
+
+/* 动画效果 */
+@keyframes pulseGreen {
+  0%, 100% {
+    border-color: #34C759;
+    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4);
+  }
+  50% {
+    border-color: #30D158;
+    box-shadow: 0 0 0 8px rgba(52, 199, 89, 0);
+  }
+}
+
+@keyframes touchRipple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 640px) {
+  .toolbar {
+    bottom: 12px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .toolButton {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 16px;
+  }
+  
+  .sliceCounter {
+    font-size: 12px;
+    padding: 0 4px;
+  }
+  
+  .deleteButton {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  
+  .sliceInfo {
+    font-size: 11px;
+    padding: 2px 6px;
+    bottom: -22px;
+  }
+  
+  .helpText {
+    font-size: 12px;
+    padding: 0 20px;
+  }
+  
+  .sliceOverlay {
+    border-width: 2px;
+  }
+  
+  .sliceOverlay.selected {
+    border-width: 3px;
+  }
+}
+
+/* 平板优化 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .toolbar {
+    bottom: 24px;
+    padding: 14px 18px;
+  }
+  
+  .toolButton {
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 20px;
+  }
+}
+
+/* 横屏模式 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .toolbar {
+    bottom: 8px;
+    padding: 6px 10px;
+  }
+  
+  .toolButton {
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 14px;
+  }
+  
+  .helpText {
+    font-size: 11px;
+  }
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+  .touchImageSlicer {
+    background: #1c1c1e;
+  }
+  
+  .toolbar {
+    background: rgba(44, 44, 46, 0.95);
+    color: white;
+  }
+  
+  .sliceCounter {
+    color: #8e8e93;
+  }
+  
+  .helpText {
+    color: #8e8e93;
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .sliceOverlay {
+    border-width: 3px;
+  }
+  
+  .sliceOverlay.selected {
+    border-width: 4px;
+  }
+  
+  .deleteButton {
+    border: 2px solid white;
+  }
+}
+
+/* 动画减少模式 */
+@media (prefers-reduced-motion: reduce) {
+  .sliceOverlay,
+  .imageContainer,
+  .toolButton,
+  .deleteButton {
+    transition: none;
+    animation: none;
+  }
+  
+  .touchFeedback {
+    display: none;
+  }
+}

@@ -19,6 +19,8 @@ import {
   type NavigationError,
 } from './utils/navigationErrorHandler';
 import { CopyrightInfo } from 'shared-components';
+import { initializeTouchOptimization } from './utils/touchOptimization';
+import { mobileCache } from './utils/mobileCaching';
 import './styles/responsive.css';
 
 function AppContent() {
@@ -32,6 +34,7 @@ function AppContent() {
   });
   const { t, isLoading: i18nLoading } = useI18nContext();
   const { currentPath, push } = useRouter();
+  const viewport = useViewport();
   const [isExporting, setIsExporting] = useState(false);
   const [forceRender, setForceRender] = useState(0);
   const [isStateValidated, setIsStateValidated] = useState(false);
@@ -49,6 +52,30 @@ function AppContent() {
       console.log(...args);
     }
   };
+
+  // 初始化移动端优化（触摸优化 + 缓存策略）
+  useEffect(() => {
+    const initializeMobileOptimizations = async () => {
+      // 1. 初始化触摸优化
+      const touchOptimizer = initializeTouchOptimization({
+        fastClick: true,
+        preventGhostClick: true,
+        touchFeedback: true,
+        scrollOptimization: true
+      });
+
+      // 2. 初始化缓存管理器
+      await mobileCache.initialize();
+
+      debugLog('[App] 移动端优化已初始化 (触摸优化 + 缓存策略)');
+    };
+
+    initializeMobileOptimizations();
+
+    return () => {
+      // 应用卸载时清理（通常不会发生）
+    };
+  }, []);
 
   // 调试：在控制台输出状态（仅在允许调试时）
   useEffect(() => {
@@ -474,7 +501,6 @@ function AppContent() {
     }
   };
 
-  const viewport = useViewport();
   const appContainerClasses = createResponsiveClasses('app-container', viewport);
 
   return (
@@ -486,7 +512,7 @@ function AppContent() {
           {/* Responsive copyright positioning */}
           <div className={`absolute z-10 ${
             viewport.isMobile 
-              ? 'top-2 right-2' 
+              ? 'bottom-2 right-2 opacity-60' 
               : 'top-4 right-4'
           }`}>
             <CopyrightInfo />

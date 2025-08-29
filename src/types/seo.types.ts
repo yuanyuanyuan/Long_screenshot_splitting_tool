@@ -379,6 +379,10 @@ export interface SEOManagerProps {
   enableOpenGraph?: boolean;
   enableTwitterCard?: boolean;
   enableCanonical?: boolean;
+  enablePerformanceTracking?: boolean;
+  structuredDataTypes?: StructuredDataType[];
+  onMetadataGenerated?: (metadata: SEOMetadata) => void;
+  onPerformanceUpdate?: (metrics: PerformanceMetrics) => void;
 }
 
 // SEO上下文接口

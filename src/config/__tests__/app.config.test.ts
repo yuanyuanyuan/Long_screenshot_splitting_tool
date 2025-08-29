@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AppConfig, createAppConfig } from '../app/app.config';
+import { AppConfig, createAppConfig } from '../../../config/app/app.config';
 
 // Mock环境变量
 const mockEnv = {

@@ -86,6 +86,19 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
 }) => {
   const [translations, setTranslations] = useState<CopyrightTranslations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 检测移动端设备
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // 加载国际化资源
   useEffect(() => {
@@ -110,41 +123,61 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
     );
   }
 
-  // 内容改为 ReactNode，便于插入链接
+  // 移动端显示简化版本，桌面端显示完整版本
   const contentNodes: React.ReactNode[] = [];
 
-  if (showCopyrightSymbol) {
-    contentNodes.push(interpolate(translations.copyright, { year, author }));
-  }
-
-  if (showContactInfo && email) {
-    contentNodes.push(interpolate(translations.contact, { email }));
-  }
-
-  if (showWebsiteLink && website) {
-    const websiteUrl = normalizeUrl(website);
-    // 取出 label（去掉占位符），再渲染链接
-    const label = translations.website.replace(/\{url\}/, '').trim();
-    contentNodes.push(
-      <>
-        {label ? `${label} ` : ''}
-        <a href={websiteUrl} target="_blank" rel="noopener noreferrer" aria-label="website">
-          Long_screenshot_splitting_tool官网
+  if (isMobile) {
+    // 移动端只显示 "Powered by StarkYuan" 并支持点击跳转
+    if (showPoweredBy && toolName && website) {
+      const websiteUrl = normalizeUrl(website);
+      contentNodes.push(
+        <a 
+          href={websiteUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          aria-label="Visit StarkYuan's website"
+          className={styles['mobile-powered-link']}
+        >
+          Powered by {author || 'StarkYuan'}
         </a>
-      </>
-    );
-  }
+      );
+    } else if (showPoweredBy && toolName) {
+      contentNodes.push(`Powered by ${author || 'StarkYuan'}`);
+    }
+  } else {
+    // 桌面端显示完整版本
+    if (showCopyrightSymbol) {
+      contentNodes.push(interpolate(translations.copyright, { year, author }));
+    }
 
-  if (showPoweredBy && toolName) {
-    contentNodes.push(interpolate(translations.poweredBy, { toolName }));
-  }
+    if (showContactInfo && email) {
+      contentNodes.push(interpolate(translations.contact, { email }));
+    }
 
-  if (showLicense && license) {
-    contentNodes.push(interpolate(translations.license, { license }));
-  }
+    if (showWebsiteLink && website) {
+      const websiteUrl = normalizeUrl(website);
+      const label = translations.website.replace(/\{url\}/, '').trim();
+      contentNodes.push(
+        <>
+          {label ? `${label} ` : ''}
+          <a href={websiteUrl} target="_blank" rel="noopener noreferrer" aria-label="website">
+            Long_screenshot_splitting_tool官网
+          </a>
+        </>
+      );
+    }
 
-  if (showAttribution && attributionText) {
-    contentNodes.push(interpolate(translations.attribution, { attributionText }));
+    if (showPoweredBy && toolName) {
+      contentNodes.push(interpolate(translations.poweredBy, { toolName }));
+    }
+
+    if (showLicense && license) {
+      contentNodes.push(interpolate(translations.license, { license }));
+    }
+
+    if (showAttribution && attributionText) {
+      contentNodes.push(interpolate(translations.attribution, { attributionText }));
+    }
   }
 
   const containerClasses = [

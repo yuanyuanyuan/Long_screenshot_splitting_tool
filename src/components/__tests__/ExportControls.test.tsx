@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { ExportControls } from '../ExportControls';
 import { I18nProvider } from '../../hooks/useI18nContext';
 
@@ -12,7 +13,7 @@ const mockSlices = [
 ];
 
 describe('ExportControls 组件国际化测试', () => {
-  const mockExportFn = jest.fn();
+  const mockExportFn = vi.fn();
   
   test('在中文环境下正确显示文本', () => {
     render(

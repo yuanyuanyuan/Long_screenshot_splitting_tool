@@ -6,6 +6,9 @@
 **Strategy**: Agile with intelligent delegation and parallel execution  
 **Duration**: 3-4 weeks (20 working days)  
 **Team Structure**: Multi-persona coordination with specialized MCP routing  
+**状态**: 📊 实时进度跟踪请查看 [TASK-PROGRESS.md](./TASK-PROGRESS.md)
+
+> 🔄 **注意**: 此文档为初始时间线规划。实际执行进度和调整请查看 [TASK-PROGRESS.md](./TASK-PROGRESS.md)  
 
 ---
 

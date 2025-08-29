@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import { ImagePreview } from '../ImagePreview';
 import { I18nProvider } from '../../hooks/useI18nContext';
 
@@ -32,7 +33,7 @@ const mockProps = {
   originalImage: null,
   slices: mockSlices,
   selectedSlices: [0, 2],
-  onSelectionChange: jest.fn(),
+  onSelectionChange: vi.fn(),
   className: 'test-class',
 };
 
@@ -155,7 +156,7 @@ describe('ImagePreview 国际化测试', () => {
           return translation;
         },
         currentLanguage: 'en',
-        changeLanguage: jest.fn(),
+        changeLanguage: vi.fn(),
         isLoading: false,
         supportedLanguages: ['zh-CN', 'en'],
       };
@@ -231,7 +232,7 @@ describe('ImagePreview 国际化测试', () => {
 
   describe('交互功能测试', () => {
     it('应该在点击全选按钮时更新文本', () => {
-      const mockOnSelectionChange = jest.fn();
+      const mockOnSelectionChange = vi.fn();
       const propsWithCallback = { ...mockProps, onSelectionChange: mockOnSelectionChange };
       
       render(
@@ -249,7 +250,7 @@ describe('ImagePreview 国际化测试', () => {
     });
 
     it('应该在点击切片时触发选择变更', () => {
-      const mockOnSelectionChange = jest.fn();
+      const mockOnSelectionChange = vi.fn();
       const propsWithCallback = { ...mockProps, onSelectionChange: mockOnSelectionChange };
       
       render(

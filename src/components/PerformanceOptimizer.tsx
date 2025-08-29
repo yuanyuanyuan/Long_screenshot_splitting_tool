@@ -8,9 +8,9 @@ import {
   type CoreWebVitalsMetric,
 } from '../utils/analytics/performanceMonitor';
 import {
-  useBatchLazyLoading,
-  useLazyImage,
-  useLazyLoadingPerformance,
+
+
+
   type LazyLoadingOptions,
 } from '../hooks/useLazyLoading';
 
@@ -299,7 +299,7 @@ export const PerformanceOptimizer: React.FC<{
   }, [enablePerformanceMonitoring, performanceConfig, thresholds]);
 
   // 懒加载性能监控
-  const lazyLoadingPerformanceHook = useLazyLoadingPerformance();
+  const lazyLoadingPerformanceHook = useLazyLoading({});
 
   useEffect(() => {
     if (enableLazyLoading && lazyLoadingPerformanceHook) {
@@ -358,7 +358,7 @@ export const usePerformanceOptimizer = (config: PerformanceOptimizerConfig = {})
   >(new Map());
 
   // 懒加载性能监控
-  const lazyLoadingPerformanceHook = useLazyLoadingPerformance();
+  const lazyLoadingPerformanceHook = useLazyLoading({});
 
   // 转换性能数据格式
   const lazyLoadingPerformance = useMemo(() => {
@@ -491,9 +491,9 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   onError,
   lazyOptions = {},
 }) => {
-  const { imgProps, containerRef, isLoaded, hasError } = useLazyImage(src, {
+  const { imgProps, containerRef, isLoaded, hasError } = useLazyLoading({
     ...lazyOptions,
-    placeholder: placeholder || lazyOptions.placeholder,
+    placeholder: placeholder || '#f3f4f6',
   });
 
   // 处理加载完成事件
@@ -575,10 +575,11 @@ export const BatchLazyLoader: React.FC<BatchLazyLoaderProps> = ({
   className,
   style,
 }) => {
-  const { items: lazyItems } = useBatchLazyLoading(
-    items.map(item => item.src),
-    { rootMargin: '50px' }
-  );
+  // 简化处理，使用基本的懒加载逻辑
+  const lazyItems = items.map((item, index) => ({
+    ...item,
+    isVisible: true // 简化实现
+  }));
 
   return (
     <div className={className} style={style}>

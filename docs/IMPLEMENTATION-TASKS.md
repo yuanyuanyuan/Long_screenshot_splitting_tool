@@ -6,9 +6,12 @@
 **Duration**: 3-4 weeks (4 sprints)  
 **Strategy**: Agile with parallel development streams  
 **Delegation**: Multi-persona coordination with specialized MCP routing  
+**状态**: 📊 实时进度跟踪请查看 [TASK-PROGRESS.md](./TASK-PROGRESS.md)
 
 ### Epic Scope
 Implement comprehensive SEO optimization and mobile responsiveness improvements for the Long Screenshot Splitter application, following the specifications in AGILE-WORKFLOW-SEO-MOBILE.md.
+
+> 🔄 **注意**: 此文档为初始规划参考。实际执行进度和状态请查看 [TASK-PROGRESS.md](./TASK-PROGRESS.md)
 
 ---
 
