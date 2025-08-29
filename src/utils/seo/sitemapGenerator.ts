@@ -322,7 +322,7 @@ class SitemapGenerator {
       if (parseError) {
         errors.push('Invalid XML format');
       }
-    } catch (error) {
+    } catch {
       errors.push('Failed to parse XML');
     }
 

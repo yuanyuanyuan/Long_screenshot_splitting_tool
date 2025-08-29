@@ -4,7 +4,7 @@
  */
 
 import { seoConfigManager } from './SEOConfigManager';
-import type { Language } from '../../types/seo.types';
+// import type { Language as _Language } from '../../types/seo.types';
 
 interface RobotsTxtConfig {
   userAgent: string;

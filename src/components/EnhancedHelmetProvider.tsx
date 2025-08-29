@@ -40,7 +40,7 @@ interface EnhancedHelmetProviderProps {
 export const EnhancedHelmetProvider: React.FC<EnhancedHelmetProviderProps> = ({
   children,
   enableRealTimeUpdates = true,
-  enablePerformanceOptimizations = true,
+  enablePerformanceOptimizations: _enablePerformanceOptimizations = true,
 }) => {
   const initializationRef = useRef(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
@@ -130,8 +130,8 @@ export const EnhancedHelmet: React.FC<{
 }> = ({ 
   children, 
   defer = false,
-  encodeSpecialCharacters = true,
-  prioritizeSEOTags = true,
+  encodeSpecialCharacters: _encodeSpecialCharacters = true,
+  prioritizeSEOTags: _prioritizeSEOTags = true,
 }) => {
   const { isInitialized } = useEnhancedHelmet();
 

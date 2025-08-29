@@ -260,7 +260,7 @@ class KeywordDensityManager {
   /**
    * 生成包含关键词的自然短语
    */
-  private generateKeywordPhrase(keyword: string, language: Language, context: Record<string, any>): string {
+  private generateKeywordPhrase(keyword: string, language: Language, _context: Record<string, any>): string {
     const phraseTemplates = {
       'zh-CN': [
         `提供专业的${keyword}服务`,
@@ -298,7 +298,7 @@ class KeywordDensityManager {
     let replacementCount = 0;
     const targetReplacements = Math.floor(matches.length / 3); // 替换约1/3的关键词
 
-    return text.replace(regex, (match, offset) => {
+    return text.replace(regex, (match, _offset) => {
       if (replacementCount < targetReplacements && Math.random() > 0.5) {
         replacementCount++;
         return synonyms[Math.floor(Math.random() * synonyms.length)] || match;
@@ -346,7 +346,7 @@ class KeywordDensityManager {
   /**
    * 计算SEO评分
    */
-  private calculateSEOScore(analysis: KeywordAnalysis[], page: PageType, language: Language): number {
+  private calculateSEOScore(analysis: KeywordAnalysis[], _page: PageType, _language: Language): number {
     let score = 0;
     let maxScore = 0;
 

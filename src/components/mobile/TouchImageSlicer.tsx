@@ -59,8 +59,8 @@ export const TouchImageSlicer: React.FC<TouchImageSlicerProps> = ({
   imageHeight,
   minSliceHeight = 50,
   maxSliceHeight = 2000,
-  snapToContent = true,
-  autoDetectSlices = false,
+  snapToContent: _snapToContent = true,
+  autoDetectSlices: _autoDetectSlices = false,
   onSlicesChange,
   onSliceSelect,
   className = ''

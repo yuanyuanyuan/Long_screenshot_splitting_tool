@@ -34,7 +34,6 @@ const useKeywordOptimization = (page: PageType, language: Language, context: Rec
     try {
       // 尝试从配置管理器获取关键词
       if (seoConfigManager.getStats().loaded) {
-        const pageConfig = seoConfigManager.getPageConfig(page, language);
         const seoConfig = seoConfigManager.getCurrentConfig();
         
         if (seoConfig && seoConfig.keywords) {

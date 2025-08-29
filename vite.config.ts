@@ -25,7 +25,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     // 仅使用 base 控制公共路径：绝对URL 或 子路径
-    base: deploy.useAbsoluteUrls ? deploy.assetsBaseUrl : deploy.basePath,
+    // 在preview模式下使用简单路径避免404
+    base: mode === 'production' && deploy.useAbsoluteUrls ? deploy.assetsBaseUrl : deploy.basePath,
     plugins: [react()],
     resolve: {
       alias: {

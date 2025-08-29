@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({
   const viewport = useViewport();
   const [isVisible, setIsVisible] = useState(true);
   const [isAtBottom, setIsAtBottom] = useState(false);
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
+  const [, setScrollDirection] = useState<'up' | 'down'>('up');
   const lastScrollY = useRef(0);
   const footerRef = useRef<HTMLDivElement>(null);
   

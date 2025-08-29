@@ -220,7 +220,7 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
 
     // Note: This would require implementing an event system in SEOConfigManager
     // For now, we'll use a simple polling mechanism in development
-    let isSubscribed = true;
+    // const _isSubscribed = true;
     let hotReloadInterval: NodeJS.Timeout | undefined;
     
     if (process.env.NODE_ENV === 'development') {
