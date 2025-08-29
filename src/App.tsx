@@ -21,6 +21,8 @@ import {
 import { CopyrightInfo } from 'shared-components';
 import { initializeTouchOptimization } from './utils/touchOptimization';
 import { mobileCache } from './utils/mobileCaching';
+import { SEOManager } from './components/SEOManager';
+import { HelmetProvider } from 'react-helmet-async';
 import './styles/responsive.css';
 
 function AppContent() {
@@ -252,6 +254,16 @@ function AppContent() {
   if (i18nLoading) {
     return <div>{t('app.i18nLoading')}</div>;
   }
+
+  // 获取当前页面类型用于SEO
+  const getCurrentPageType = (): 'home' | 'upload' | 'split' | 'export' => {
+    switch (currentPath) {
+      case '/upload': return 'upload';
+      case '/split': return 'split';
+      case '/export': return 'export';
+      default: return 'home';
+    }
+  };
 
   // 根据路由渲染不同内容
   const renderContent = () => {
@@ -504,7 +516,24 @@ function AppContent() {
   const appContainerClasses = createResponsiveClasses('app-container', viewport);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* SEO Meta Tags */}
+      <SEOManager 
+        page={getCurrentPageType()}
+        language="zh-CN"
+        context={{
+          sliceCount: state.imageSlices.length,
+          selectedCount: state.selectedSlices.size,
+          isProcessing: isProcessing,
+          hasImage: !!state.originalImage
+        }}
+        enableStructuredData={true}
+        enableOpenGraph={true}
+        enableTwitterCard={true}
+        enableCanonical={true}
+        enablePerformanceTracking={true}
+      />
+      <div className="min-h-screen bg-gray-50">
       <div className={`${appContainerClasses} mobile-stack`}>
         <header className={`text-center py-8 mb-8 relative ${
           viewport.isMobile ? 'py-4 mb-4' : 'py-8 mb-8'
@@ -663,15 +692,18 @@ function AppContent() {
         {isDevelopment && <I18nTestPanel show={true} />}
       </div>
     </div>
+    </>
   );
 }
 
 // 包装App组件以提供I18n上下文
 function App() {
   return (
-    <I18nProvider>
-      <AppContent />
-    </I18nProvider>
+    <HelmetProvider>
+      <I18nProvider>
+        <AppContent />
+      </I18nProvider>
+    </HelmetProvider>
   );
 }
 

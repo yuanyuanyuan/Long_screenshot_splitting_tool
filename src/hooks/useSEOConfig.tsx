@@ -237,7 +237,7 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
     }
 
     return () => {
-      isSubscribed = false;
+      // isSubscribed = false;
       if (hotReloadInterval) {
         clearInterval(hotReloadInterval);
       }

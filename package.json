@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/generate-seo-files.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix --ignore-pattern '**/*.test.*' --ignore-pattern '**/__tests__/**'",
     "format": "prettier --write .",
