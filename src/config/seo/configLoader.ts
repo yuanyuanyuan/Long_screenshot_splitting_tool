@@ -57,7 +57,7 @@ export class ConfigLoader {
       autoReload = false,
       reloadInterval = 5 * 60 * 1000, // 5 minutes
       enableHotReload = process.env.NODE_ENV === 'development',
-      validateOnLoad = true,
+      // _validateOnLoad = true,
       retryOnFailure = true,
       maxRetries = 3
     } = options;

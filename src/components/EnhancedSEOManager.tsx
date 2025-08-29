@@ -1,14 +1,14 @@
-import React, { useEffect, useMemo, useCallback, useRef, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { generatePageMetadata } from '../utils/seo/metadataGenerator';
-import { SEO_CONFIG, getCurrentSEOConfig } from '../config/seo.config';
-import { seoConfigManager } from '../utils/seo/SEOConfigManager';
-import { useSEOConfig } from '../hooks/useSEOConfig';
+import '../config/seo.config';
+import '../utils/seo/SEOConfigManager';
+// import { useSEOConfig } from '../hooks/useSEOConfig';
 import { useViewport } from '../hooks/useViewport';
 import type { 
   SEOManagerProps, 
   SEOMetadata, 
-  SEOConfig, 
+ 
   Language, 
   PageType,
   ViewportInfo,
@@ -17,9 +17,9 @@ import type {
 } from '../types/seo.types';
 
 // Lazy load structured data generator for performance
-const StructuredDataGenerator = lazy(() => 
-  import('../utils/seo/structuredDataGenerator').then(module => ({
-    default: module.StructuredDataGenerator as any
+const StructuredDataProvider = lazy(() => 
+  import('./seo/StructuredDataProvider').then(module => ({
+    default: module.StructuredDataProvider
   }))
 );
 
@@ -150,8 +150,8 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
   onMetadataGenerated,
   onPerformanceUpdate
 }) => {
-  // Use enhanced hooks
-  const { config, loading: configLoading } = useSEOConfig();
+  // Use enhanced hooks (暂时注释避免未使用错误)
+  // const { isLoading } = useSEOConfig();
   const viewport = useViewport();
   const { metrics, isLoading: metricsLoading } = useEnhancedSEOPerformance(enablePerformanceTracking);
   
@@ -170,7 +170,7 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
         isHydrated
       };
       
-      const generated = generatePageMetadata(page as PageType, language, context);
+      const generated = generatePageMetadata(page as PageType, context, language);
       const merged = customMetadata ? { ...generated, ...customMetadata } : generated;
       
       // Notify parent component
@@ -179,12 +179,19 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
       return merged;
     } catch (error) {
       console.error('[EnhancedSEOManager] Metadata generation failed:', error);
-      return generatePageMetadata('home', language);
+      return generatePageMetadata('home', {}, language);
     }
   }, [page, language, customMetadata, viewport, metrics, isHydrated, onMetadataGenerated]);
 
+  // Convert ViewportState to ViewportInfo
+  const viewportInfo = viewport ? {
+    ...viewport,
+    deviceType: viewport.isMobile ? 'mobile' as const : viewport.isTablet ? 'tablet' as const : 'desktop' as const,
+    orientation: viewport.isPortrait ? 'portrait' as const : 'landscape' as const
+  } : null;
+
   // Generate dynamic tags
-  const dynamicTags = useDynamicMetaTags(metadata, language, viewport);
+  const dynamicTags = useDynamicMetaTags(metadata, language, viewportInfo);
 
   // Handle performance updates
   useEffect(() => {
@@ -238,7 +245,7 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
   const preconnectHints = useMemo(() => [
     { rel: 'dns-prefetch', href: 'https://fonts.googleapis.com' },
     { rel: 'dns-prefetch', href: 'https://www.googletagmanager.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' }
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: "anonymous" as const }
   ], []);
 
   return (
@@ -296,10 +303,10 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
         ))}
       </Helmet>
       
-      {/* Lazy Load Structured Data Generator */}
+      {/* Structured Data Provider */}
       {enableStructuredData && (
         <Suspense fallback={null}>
-          <StructuredDataGenerator
+          <StructuredDataProvider
             page={page as PageType}
             language={language}
             types={structuredDataTypes as StructuredDataType[]}

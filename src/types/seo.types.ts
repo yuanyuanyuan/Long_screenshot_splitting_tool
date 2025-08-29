@@ -12,16 +12,22 @@ export interface SEOMetadata {
   ogImage: string;
   ogType: 'website' | 'article' | 'product';
   ogUrl: string;
+  ogSiteName?: string;
+  ogLocale?: string;
   twitterCard: 'summary' | 'summary_large_image' | 'app' | 'player';
   twitterTitle?: string;
   twitterDescription?: string;
   twitterImage?: string;
+  twitterCreator?: string;
+  twitterSite?: string;
+  ogImageAlt?: string;
   canonicalUrl: string;
   hreflang: Record<string, string>;
   robots?: string;
   author?: string;
   publishedTime?: string;
   modifiedTime?: string;
+  language?: Language;
 }
 
 // 页面SEO配置接口
@@ -124,6 +130,7 @@ export interface WebApplicationInfo {
   operatingSystem: string;
   browserRequirements?: string;
   features?: MultiLanguageStringArray;
+  datePublished?: string;
 }
 
 // 结构化数据配置接口
@@ -185,6 +192,75 @@ export interface SEOConfig {
   structuredData: StructuredDataConfig;
   validation?: ValidationConfig;
   performance?: PerformanceConfig;
+  robotsTxt?: RobotsTxtConfig;
+  sitemap?: SitemapConfig;
+  keywordOptimization?: KeywordOptimizationConfig;
+  contentSEO?: ContentSEOConfig;
+}
+
+// Robots.txt 配置接口
+export interface RobotsTxtConfig {
+  userAgent: string;
+  allow: string[];
+  disallow: string[];
+  crawlDelay?: number;
+  sitemapUrl: string;
+  customRules?: string[];
+}
+
+// Sitemap 配置接口
+export interface SitemapConfig {
+  baseUrl: string;
+  generateStaticSitemap: boolean;
+  includeDynamicPages: boolean;
+  lastModified: string;
+  staticPages: Array<{
+    url: string;
+    lastmod: string;
+    changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+    priority: number;
+    languages?: Language[];
+  }>;
+}
+
+// 关键词优化配置接口
+export interface KeywordOptimizationConfig {
+  targetDensity: {
+    primary: number;
+    secondary: number;
+    longTail: number;
+  };
+  contentStructure: {
+    titleKeywordPosition: 'beginning' | 'middle' | 'end' | 'natural';
+    keywordVariations: boolean;
+    semanticKeywords: boolean;
+    keywordProximity: number;
+  };
+  densityRules: {
+    minDensity: number;
+    maxDensity: number;
+    optimalRange: [number, number];
+    avoidOverOptimization: boolean;
+  };
+}
+
+// 内容SEO配置接口
+export interface ContentSEOConfig {
+  minContentLength: Record<PageType, number>;
+  headingDistribution: {
+    h1Count: number;
+    h2MinCount: number;
+    h2MaxCount: number;
+    h3MinCount: number;
+    h3MaxCount: number;
+  };
+  keywordPlacement: {
+    h1: string;
+    h2: string;
+    h3: string;
+    firstParagraph: string;
+    lastParagraph: string;
+  };
 }
 
 // 结构化数据相关接口

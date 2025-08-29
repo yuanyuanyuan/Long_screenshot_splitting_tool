@@ -57,7 +57,7 @@ function AppContent() {
   useEffect(() => {
     const initializeMobileOptimizations = async () => {
       // 1. 初始化触摸优化
-      const touchOptimizer = initializeTouchOptimization({
+      initializeTouchOptimization({
         fastClick: true,
         preventGhostClick: true,
         touchFeedback: true,

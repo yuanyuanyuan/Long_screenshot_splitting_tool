@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import type { ReactNode, HTMLAttributes } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode, type HTMLAttributes } from 'react';
 
 /**
  * Heading hierarchy levels
@@ -326,13 +325,9 @@ export const Heading: React.FC<HeadingProps> = ({
     }
   }, [headingId, level, children, skipValidation, context]);
   
-  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
+  const HeadingTag = `h${level}` as any;
   
-  return (
-    <HeadingTag id={headingId} {...props}>
-      {children}
-    </HeadingTag>
-  );
+  return React.createElement(HeadingTag, { id: headingId, ...props }, children);
 };
 
 /**

@@ -6,8 +6,8 @@
 import type { 
   SEOMetadata, 
   StructuredDataType,
-  PageType,
-  Language,
+  // PageType,
+  // Language,
   ViewportInfo
 } from '../../types/seo.types';
 

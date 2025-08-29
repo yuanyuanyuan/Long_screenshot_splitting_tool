@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+// import { Helmet } from 'react-helmet-async';
 import { SEOManager } from '../SEOManager';
 import { EnhancedHelmetProvider, useEnhancedHelmet } from '../EnhancedHelmetProvider';
 import { SEOProvider, useSEO } from '../../context/SEOContext';
@@ -22,7 +22,7 @@ const ExamplePage: React.FC<{
   const [selectedCount, setSelectedCount] = useState(0);
 
   // 使用SEO上下文
-  const { state, actions, utils } = useSEO();
+  const { actions, utils } = useSEO();
   const { updateMetadata, updatePage } = actions;
   const { getPageTitle, getPageDescription, isPerformanceOptimal } = utils;
 

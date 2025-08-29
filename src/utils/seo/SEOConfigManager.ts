@@ -20,6 +20,8 @@ import type {
  * Basic validation schema for SEO configuration
  * Simplified for core functionality without external dependencies
  */
+// SEO配置验证模式（临时注释以避免未使用警告）
+/* 
 const SEO_CONFIG_SCHEMA = {
   type: 'object',
   required: ['version', 'site', 'keywords', 'pages', 'structuredData'],
@@ -131,6 +133,7 @@ const SEO_CONFIG_SCHEMA = {
     }
   }
 } as const;
+*/
 
 /**
  * SEO Configuration Manager Class
@@ -425,6 +428,17 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
   }
 
   /**
+   * Get current configuration (alias for getConfig)
+   * This method provides backward compatibility
+   */
+  getCurrentConfig(): SEOConfig | null {
+    if (!this.config) {
+      return null;
+    }
+    return this.config;
+  }
+
+  /**
    * Get page-specific configuration with language support
    */
   getPageConfig(page: PageType, language: Language = 'zh-CN'): {
@@ -470,7 +484,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
    */
   getStructuredData(page: PageType, language: Language = 'zh-CN'): Record<string, unknown> {
     const config = this.getConfig();
-    const pageConfig = config.pages[page];
+    // const pageConfig = config.pages[page]; // 临时注释避免未使用警告
     
     const baseStructuredData = {
       '@context': 'https://schema.org',

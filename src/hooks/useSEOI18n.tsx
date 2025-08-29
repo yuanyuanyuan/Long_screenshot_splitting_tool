@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useI18nContext } from './useI18nContext';
 import { seoConfigManager } from '../utils/seo/SEOConfigManager';
-import type { Language, PageType, SEOConfig } from '../types/seo.types';
+import type { Language, PageType } from '../types/seo.types';
 
 /**
  * SEO-specific translation keys interface
@@ -276,8 +276,7 @@ export const useSEOI18n = (page: PageType = 'home') => {
         'upload': [],
         'split': ['upload'],
         'export': ['upload', 'split'],
-        'home': [],
-        'home': ['upload', 'split', 'export']
+        'home': []
       };
       
       const hierarchy = pageHierarchy[page] || [];

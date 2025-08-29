@@ -58,7 +58,7 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
                 break;
                 
               case 'SoftwareApplication':
-                data = structuredDataGenerator.generateSoftwareApplication(page, language);
+                data = structuredDataGenerator.generateSoftwareApplication(language, context);
                 break;
                 
               case 'BreadcrumbList':

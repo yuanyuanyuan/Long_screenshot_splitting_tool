@@ -164,7 +164,7 @@ const useDynamicMetadata = (
       if (seoConfigManager.getStats().loaded) {
         // 使用新配置系统
         const pageConfig = seoConfigManager.getPageConfig(page, language);
-        const structuredData = seoConfigManager.getStructuredData(page, language);
+        seoConfigManager.getStructuredData(page, language);
         
         // 生成基础元数据
         const baseTitle = pageConfig.title;

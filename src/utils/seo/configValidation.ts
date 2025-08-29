@@ -7,9 +7,9 @@ import type {
   SEOConfig,
   ValidationError,
   SchemaValidationResult,
-  PageType,
+  // PageType,
   Language,
-  JSONSchema,
+  // JSONSchema,
   HeadingHierarchyValidation,
   HeadingLevel,
 } from '../../types/seo.types';
@@ -311,7 +311,7 @@ export class SEOConfigValidator {
       if (Array.isArray(structure.h1)) {
         errors.push('Page should have only one H1 heading');
       } else if (typeof structure.h1 === 'object') {
-        Object.entries(structure.h1).forEach(([lang, text]) => {
+        Object.entries(structure.h1).forEach(([_lang, text]) => {
           headings.push({ level: 'h1', text: text as string, position: 1 });
         });
       }

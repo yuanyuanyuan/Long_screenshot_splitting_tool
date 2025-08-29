@@ -1,10 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { useViewport } from '../../hooks/useViewport';
+// import { useViewport } from '../../hooks/useViewport';
 import styles from './TouchImageSlicer.module.css';
 
 /**
  * 触摸手势类型
  */
+// 触摸手势接口（暂时注释）
+/*
 interface TouchGesture {
   type: 'tap' | 'drag' | 'pinch' | 'swipe';
   startX: number;
@@ -16,6 +18,7 @@ interface TouchGesture {
   scale?: number;
   velocity?: number;
 }
+*/
 
 /**
  * 图片切片区域
@@ -62,16 +65,13 @@ export const TouchImageSlicer: React.FC<TouchImageSlicerProps> = ({
   onSliceSelect,
   className = ''
 }) => {
-  const viewport = useViewport();
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // 状态管理
   const [slices, setSlices] = useState<SliceArea[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
-  const [currentGesture, setCurrentGesture] = useState<TouchGesture | null>(null);
   const [imageScale, setImageScale] = useState(1);
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [activeSliceId, setActiveSliceId] = useState<string | null>(null);

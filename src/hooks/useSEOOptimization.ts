@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { 
   PerformanceMetrics, 
   SEOPerformanceReport,
-  ViewportInfo,
+  // ViewportInfo,
   DeviceType 
 } from '../types/seo.types';
 
@@ -16,7 +16,7 @@ import type {
  */
 export const useCoreWebVitals = () => {
   const [vitals, setVitals] = useState<PerformanceMetrics | null>(null);
-  const observerRef = useRef<PerformanceObserver | null>(null);
+  // const observerRef = useRef<PerformanceObserver | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {

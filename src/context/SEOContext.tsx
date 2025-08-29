@@ -209,7 +209,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     
     try {
       const pageConfig = seoConfigManager.getPageConfig(page, language);
-      const structuredData = seoConfigManager.getStructuredData(page, language);
+      // const structuredData = seoConfigManager.getStructuredData(page, language);
       
       // 生成增强的元数据
       const metadata: SEOMetadata = {
@@ -278,8 +278,8 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     try {
       if (state.config || state.isConfigLoaded) {
         // 预生成页面元数据以提高性能
-        const pageConfig = seoConfigManager.getPageConfig(page, language);
-        const structuredData = seoConfigManager.getStructuredData(page, language);
+        seoConfigManager.getPageConfig(page, language);
+        seoConfigManager.getStructuredData(page, language);
         
         // 可以在这里添加缓存逻辑
         console.log(`Prefetched metadata for ${page} (${language})`);
@@ -300,7 +300,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     try {
       const pageConfig = seoConfigManager.getPageConfig(page, language);
       return addContextToTitle(pageConfig.title, context, language);
-    } catch (error) {
+    } catch {
       return '';
     }
   }, [state.config]);
@@ -315,7 +315,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     try {
       const pageConfig = seoConfigManager.getPageConfig(page, language);
       return addContextToDescription(pageConfig.description, context, language);
-    } catch (error) {
+    } catch {
       return '';
     }
   }, [state.config]);
@@ -328,7 +328,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     
     try {
       return seoConfigManager.getKeywords(page, language, true);
-    } catch (error) {
+    } catch {
       return [];
     }
   }, [state.config]);

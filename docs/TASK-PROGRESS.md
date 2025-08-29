@@ -235,10 +235,10 @@
 **计划开始**: 2025-08-30  
 **状态**: 0% 等待中
 
-#### Task 4.1: Cross-Platform Testing ⏳
+#### Task 4.1: Cross-Platform Testing ⏳ (不做了)
 **计划内容**: 多平台兼容性测试
 
-#### Task 4.2: Performance Benchmarking ⏳  
+#### Task 4.2: Performance Benchmarking ⏳  (不做了)
 **计划内容**: 性能基准测试
 
 #### Task 4.3: SEO Audit ⏳

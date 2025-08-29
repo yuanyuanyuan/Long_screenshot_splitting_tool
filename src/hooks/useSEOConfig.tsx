@@ -7,11 +7,11 @@ import React, { useState, useEffect, useCallback, useMemo, createContext, useCon
 import { seoConfigManager } from '../utils/seo/SEOConfigManager';
 import type {
   SEOConfig,
-  SEOConfigValidationResult,
+  // SEOConfigValidationResult,
   Language,
   PageType,
-  ConfigManagerEvent,
-  ConfigManagerEventHandler,
+  // ConfigManagerEvent,
+  // ConfigManagerEventHandler,
 } from '../types/seo.types';
 
 export interface UseSEOConfigOptions {
@@ -188,38 +188,39 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
   useEffect(() => {
     if (!enableHotReload) return;
 
-    let isSubscribed = true;
-    const eventHandler: ConfigManagerEventHandler = (event: ConfigManagerEvent) => {
-      if (!isSubscribed) return;
-
-      switch (event.type) {
-        case 'config:loaded':
-          if (event.data?.config) {
-            setConfig(event.data.config);
-            setIsLoaded(true);
-            setErrors([]);
-          }
-          break;
-          
-        case 'config:error':
-          if (event.error) {
-            setErrors([event.error.message]);
-            setIsLoaded(false);
-          }
-          break;
-          
-        case 'config:hot:reload':
-          // Trigger reload on hot reload event
-          reloadConfig();
-          break;
-          
-        default:
-          break;
-      }
-    };
+    // let isSubscribed = true;
+//     // const eventHandler: ConfigManagerEventHandler = (event: ConfigManagerEvent) => {
+//       if (!isSubscribed) return;
+// 
+//       switch (event.type) {
+//         case 'config:loaded':
+//           if (event.data?.config) {
+//             setConfig(event.data.config);
+//             setIsLoaded(true);
+//             setErrors([]);
+//           }
+//           break;
+//           
+//         case 'config:error':
+//           if (event.error) {
+//             setErrors([event.error.message]);
+//             setIsLoaded(false);
+//           }
+//           break;
+//           
+//         case 'config:hot:reload':
+//           // Trigger reload on hot reload event
+//           reloadConfig();
+//           break;
+//           
+//         default:
+//           break;
+//       }
+//     };
 
     // Note: This would require implementing an event system in SEOConfigManager
     // For now, we'll use a simple polling mechanism in development
+    let isSubscribed = true;
     let hotReloadInterval: NodeJS.Timeout | undefined;
     
     if (process.env.NODE_ENV === 'development') {

@@ -160,7 +160,7 @@ class LocalStorageAdapter implements StorageAdapter {
   async setItem(key: string, value: string): Promise<void> {
     try {
       localStorage.setItem(key, value);
-    } catch (e) {
+    } catch {
       // 存储空间不足，清理旧缓存
       console.warn('LocalStorage full, clearing old cache');
       this.clearOldCache();
@@ -297,7 +297,7 @@ export class MobileCacheManager {
             const entry: CacheEntry = JSON.parse(data);
             this.cache.set(entry.key, entry);
             this.totalSize += entry.size;
-          } catch (e) {
+          } catch {
             // 损坏的缓存条目，删除
             await this.storage.removeItem(key);
           }
@@ -390,7 +390,7 @@ export class MobileCacheManager {
     }
   }
 
-  async get(key: string, type: CacheType = CacheType.DATA): Promise<any> {
+  async get(key: string, _type: CacheType = CacheType.DATA): Promise<any> {
     if (!this.isInitialized) await this.initialize();
 
     const entry = this.cache.get(key);
@@ -465,7 +465,7 @@ export class MobileCacheManager {
 
     // 获取可清理的条目（按优先级和最后访问时间排序）
     const entries = Array.from(this.cache.entries())
-      .map(([cacheKey, entry]) => ({ key: cacheKey, ...entry }))
+.map(([cacheKey, entry]) => ({ cacheKey, ...entry }))
       .filter(entry => entry.type !== type || this.configs.get(entry.type)!.priority < config.priority)
       .sort((a, b) => {
         // 优先清理低优先级和长时间未访问的条目
@@ -479,7 +479,7 @@ export class MobileCacheManager {
     for (const entry of entries) {
       if (freedSpace >= requiredSize) break;
       
-      await this.delete(entry.key);
+      await this.delete(entry.cacheKey);
       freedSpace += entry.size;
     }
 
@@ -514,8 +514,8 @@ export class MobileCacheManager {
         
         return btoa(String.fromCharCode(...compressed));
       }
-    } catch (e) {
-      console.warn('压缩失败，使用原始数据:', e);
+    } catch (error) {
+      console.warn('压缩失败，使用原始数据:', error);
     }
     
     return data;
@@ -549,8 +549,8 @@ export class MobileCacheManager {
         
         return new TextDecoder().decode(decompressed);
       }
-    } catch (e) {
-      console.warn('解压缩失败，使用原始数据:', e);
+    } catch (error) {
+      console.warn('解压缩失败，使用原始数据:', error);
     }
     
     return data;
@@ -618,9 +618,8 @@ export const mobileCache = MobileCacheManager.getInstance();
 export function useMobileCache() {
   const cache = MobileCacheManager.getInstance();
   
-  React.useEffect(() => {
-    cache.initialize();
-  }, []);
+  // Initialize cache on import
+  cache.initialize();
 
   return {
     get: cache.get.bind(cache),
@@ -633,7 +632,7 @@ export function useMobileCache() {
 }
 
 // 缓存装饰器
-export function withMobileCache(type: CacheType = CacheType.DATA, maxAge?: number) {
+export function withMobileCache(type: CacheType = CacheType.DATA, _maxAge?: number) {
   return function <T extends (...args: any[]) => Promise<any>>(
     target: any,
     propertyName: string,
@@ -641,7 +640,7 @@ export function withMobileCache(type: CacheType = CacheType.DATA, maxAge?: numbe
   ) {
     const method = descriptor.value!;
     
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (this: any, ...args: any[]) {
       const cache = MobileCacheManager.getInstance();
       const cacheKey = `${propertyName}-${JSON.stringify(args)}`;
       
@@ -652,7 +651,7 @@ export function withMobileCache(type: CacheType = CacheType.DATA, maxAge?: numbe
       }
       
       // 执行原方法
-      const result = await method.apply(this as any, args);
+      const result = await method.apply(this, args);
       
       // 缓存结果
       if (result !== undefined && result !== null) {
@@ -664,9 +663,4 @@ export function withMobileCache(type: CacheType = CacheType.DATA, maxAge?: numbe
   };
 }
 
-// 导入React类型（如果需要）
-declare global {
-  namespace React {
-    // Hook类型声明
-  }
-}
+// TypeScript全局声明（删除不必要的namespace）

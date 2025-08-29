@@ -197,7 +197,7 @@ export function useBatchImageLazyLoading({
   loadDelay = 100,
   onBatchLoad,
   onAllLoaded,
-  ...options
+  ..._options
 }: BatchImageLazyLoadingOptions) {
   const [imageStates, setImageStates] = useState<BatchImageState>({});
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0);

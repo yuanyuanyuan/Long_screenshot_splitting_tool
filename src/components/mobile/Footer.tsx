@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CopyrightInfo } from '../../../shared-components/components/CopyrightInfo/CopyrightInfo';
 import { useViewport } from '../../hooks/useViewport';
 import styles from './Footer.module.css';

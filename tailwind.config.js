@@ -75,7 +75,7 @@ export default {
   },
   // Mobile-first utilities
   plugins: [
-    function({ addUtilities, theme }) {
+    function({ addUtilities, _theme }) {
       const newUtilities = {
         // Touch-friendly utilities
         '.touch-manipulation': {

@@ -374,15 +374,13 @@ export function hapticFeedback(type: HapticFeedbackType = 'light'): void {
 /**
  * React Hook: 使用触摸优化
  */
+import React from 'react';
+
 export function useTouchOptimization(options?: TouchOptimizationOptions) {
   const manager = TouchOptimizationManager.getInstance(options);
   
-  React.useEffect(() => {
-    manager.initialize();
-    return () => {
-      // 组件卸载时不销毁全局优化器
-    };
-  }, [manager]);
+  // Initialize manager
+  manager.initialize();
 
   return {
     hapticFeedback: (type?: HapticFeedbackType) => manager.triggerHapticFeedback(type),
@@ -417,10 +415,9 @@ export function withTouchOptimization<P extends object>(
 }
 
 // 导入React类型（如果需要）
+// TypeScript全局类型扩展
 declare global {
-  namespace React {
-    interface HTMLAttributes<T> {
-      'data-scrollable'?: boolean;
-    }
+  interface HTMLElement {
+    readonly 'data-scrollable'?: boolean;
   }
 }

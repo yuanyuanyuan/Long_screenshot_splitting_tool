@@ -278,5 +278,113 @@
     "enableResourcePreloading": true,
     "enableCriticalCSS": true,
     "optimizeForMobile": true
+  },
+  "robotsTxt": {
+    "userAgent": "*",
+    "allow": ["/"],
+    "disallow": [
+      "/api/",
+      "/admin/",
+      "/temp/",
+      "/*.json",
+      "/node_modules/"
+    ],
+    "crawlDelay": 1,
+    "sitemapUrl": "https://screenshot-splitter.com/sitemap.xml",
+    "customRules": [
+      "# 允许搜索引擎抓取主要页面",
+      "User-agent: *",
+      "Allow: /",
+      "Allow: /en/",
+      "",
+      "# 禁止抓取API和管理页面",
+      "Disallow: /api/",
+      "Disallow: /admin/",
+      "Disallow: /temp/",
+      "",
+      "# 特定搜索引擎优化",
+      "User-agent: Googlebot",
+      "Crawl-delay: 0.5",
+      "",
+      "User-agent: Baiduspider",
+      "Crawl-delay: 2"
+    ]
+  },
+  "sitemap": {
+    "baseUrl": "https://screenshot-splitter.com",
+    "generateStaticSitemap": true,
+    "includeDynamicPages": false,
+    "lastModified": "2024-01-01",
+    "staticPages": [
+      {
+        "url": "/",
+        "lastmod": "2024-01-01",
+        "changefreq": "weekly",
+        "priority": 1.0,
+        "languages": ["zh-CN", "en"]
+      },
+      {
+        "url": "/upload",
+        "lastmod": "2024-01-01", 
+        "changefreq": "monthly",
+        "priority": 0.8,
+        "languages": ["zh-CN", "en"]
+      },
+      {
+        "url": "/split",
+        "lastmod": "2024-01-01",
+        "changefreq": "monthly", 
+        "priority": 0.9,
+        "languages": ["zh-CN", "en"]
+      },
+      {
+        "url": "/export",
+        "lastmod": "2024-01-01",
+        "changefreq": "monthly",
+        "priority": 0.7,
+        "languages": ["zh-CN", "en"]
+      }
+    ]
+  },
+  "keywordOptimization": {
+    "targetDensity": {
+      "primary": 2.5,
+      "secondary": 1.8,
+      "longTail": 1.2
+    },
+    "contentStructure": {
+      "titleKeywordPosition": "beginning",
+      "keywordVariations": true,
+      "semanticKeywords": true,
+      "keywordProximity": 50
+    },
+    "densityRules": {
+      "minDensity": 0.5,
+      "maxDensity": 5.0,
+      "optimalRange": [1.5, 3.0],
+      "avoidOverOptimization": true
+    }
+  },
+  "contentSEO": {
+    "minContentLength": {
+      "home": 800,
+      "upload": 400,
+      "split": 500,
+      "export": 300
+    },
+    "headingDistribution": {
+      "h1Count": 1,
+      "h2MinCount": 2,
+      "h2MaxCount": 6,
+      "h3MinCount": 4,
+      "h3MaxCount": 12
+    },
+    "keywordPlacement": {
+      "h1": "primary",
+      "h2": "primary+secondary",
+      "h3": "secondary+longTail",
+      "firstParagraph": "primary",
+      "lastParagraph": "secondary"
+    }
   }
 }
