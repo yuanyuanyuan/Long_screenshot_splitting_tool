@@ -46,9 +46,12 @@ function appStateReducer(state: AppState, action: AppAction): AppState {
 
     case 'ADD_IMAGE_SLICE': {
       console.log('[AppState] 添加图片切片 action 被调用:', action.payload);
+      // 按 index 写入（而非按异步到达顺序 push），修复 img.onload 回调导致的切片乱序（spec §5）
+      const newImageSlices = [...state.imageSlices];
+      newImageSlices[action.payload.index] = action.payload;
       const newState = {
         ...state,
-        imageSlices: [...state.imageSlices, action.payload],
+        imageSlices: newImageSlices,
         objectUrls: [...state.objectUrls, action.payload.url],
       };
       console.log('[AppState] 新状态中的 imageSlices 数量:', newState.imageSlices.length);

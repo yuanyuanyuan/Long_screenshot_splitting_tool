@@ -1,10 +1,15 @@
 // Message Contract (v1.1):
 // From Main to Worker: { file: File, splitHeight: number }
 // From Worker to Main:
-// - Progress: { type: 'progress', progress: number } // 0-100 percentage
+// - Progress: { type: 'progress', progress: number } // 0-100；分段：0-25 解码 / 25-30 内容感知分析 / 30-95 切片 / 100 完成
 // - Chunk:    { type: 'chunk', blob: Blob, index: number }
 // - Done:     { type: 'done' } // Simplified completion signal
 // - Error:    { type: 'error', message: string }
+//
+// 内容感知切割（spec §4）：解码后插入「分析」阶段，调用纯函数 splitAnalyzer
+// 得到切割点；有切割点则按点切，无则回退固定高度等分（绝不切得比现状差）。
+
+import { analyzeSplitPoints } from '../utils/splitAnalyzer';
 
 // Web Worker for handling image splitting operations
 // This worker runs in a separate thread to avoid blocking the UI
@@ -64,7 +69,8 @@ self.onmessage = function (event) {
 };
 
 /**
- * 图片处理主函数 - task-1.3: 实现图片解码与 OffscreenCanvas 绘制
+ * 图片处理主函数
+ * 流程：解码 → 全图绘制 → 内容感知分析（得切割点）→ 按切割点切片（无切割点则等分回退）
  */
 async function processImage(file, splitHeight) {
   try {
@@ -93,19 +99,6 @@ async function processImage(file, splitHeight) {
     // 将图片位图绘制到 OffscreenCanvas 上
     ctx.drawImage(imageBitmap, 0, 0);
 
-    console.log('Image bitmap drawn to OffscreenCanvas successfully');
-
-    // 验证 OffscreenCanvas 尺寸与原图一致
-    console.log(
-      `Verification - OffscreenCanvas: ${canvas.width} x ${canvas.height}, Original: ${imageBitmap.width} x ${imageBitmap.height}`
-    );
-
-    if (canvas.width === imageBitmap.width && canvas.height === imageBitmap.height) {
-      console.log('✅ OffscreenCanvas dimensions match original image');
-    } else {
-      console.error('❌ OffscreenCanvas dimensions do not match original image');
-    }
-
     // 更新进度到 25% (图片解码和绘制完成)
     self.postMessage({
       type: 'progress',
@@ -115,17 +108,43 @@ async function processImage(file, splitHeight) {
     // 释放 imageBitmap 资源
     imageBitmap.close();
 
-    // task-1.4: 开始图片切割、Blob 生成与进度上报
+    // 内容感知分析：读取全图像素，计算切割点
+    // 注：当前为全图 getImageData（KISS）；大图（>4000px）分块读取为未来优化项（spec §4.6）
+    console.log('Analyzing content for split points...');
+    let splitPoints = [];
+    try {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      splitPoints = analyzeSplitPoints(imageData.data, canvas.width, canvas.height, {
+        targetHeight: splitHeight,
+      });
+      console.log(
+        `Content analysis done. splitPoints: ${JSON.stringify(splitPoints)} (mode: ${
+          splitPoints.length > 0 ? 'content-aware' : 'equal-split-fallback'
+        })`
+      );
+    } catch (analyzeError) {
+      // 分析任何异常 → 安全回退等分（绝不因分析失败而中断或劣化，spec §4.5）
+      console.warn('Content analysis failed, falling back to equal split:', analyzeError);
+      splitPoints = [];
+    }
+
+    // 更新进度到 30% (分析完成)
+    self.postMessage({
+      type: 'progress',
+      progress: 30,
+    });
+
+    // task-1.4: 按切割点切片（无切割点则等分回退）
     console.log('Starting image splitting...');
 
-    // 计算切片总数
-    const totalChunks = Math.ceil(canvas.height / splitHeight);
+    const sliceBounds = computeSliceBounds(splitPoints, canvas.height, splitHeight);
+    const totalChunks = sliceBounds.length;
     console.log(`Total chunks to create: ${totalChunks}`);
 
     // 循环处理每个切片
     for (let i = 0; i < totalChunks; i++) {
-      const startY = i * splitHeight;
-      const chunkHeight = Math.min(splitHeight, canvas.height - startY);
+      const [startY, endY] = sliceBounds[i];
+      const chunkHeight = endY - startY;
 
       console.log(
         `Processing chunk ${i + 1}/${totalChunks}, startY: ${startY}, height: ${chunkHeight}`
@@ -148,8 +167,8 @@ async function processImage(file, splitHeight) {
         chunkHeight // 目标尺寸
       );
 
-      // 转换为 Blob (JPEG 格式，质量 0.9)
-      const blob = await convertToBlob(chunkCanvas, 'image/jpeg', 0.9);
+      // 转换为 Blob (JPEG 格式，质量 0.92——减轻截图文字边缘振铃伪影)
+      const blob = await convertToBlob(chunkCanvas, 'image/jpeg', 0.92);
 
       console.log(`Chunk ${i + 1} blob created, size: ${blob.size} bytes`);
 
@@ -160,8 +179,8 @@ async function processImage(file, splitHeight) {
         index: i,
       });
 
-      // 计算并发送进度 (25% 到 95%)
-      const progress = Math.round(25 + ((i + 1) / totalChunks) * 70);
+      // 计算并发送进度 (30% 到 95%)
+      const progress = Math.round(30 + ((i + 1) / totalChunks) * 65);
       self.postMessage({
         type: 'progress',
         progress: progress,
@@ -197,13 +216,47 @@ async function processImage(file, splitHeight) {
 }
 
 /**
+ * 根据切割点计算切片边界 [[startY, endY], ...]（spec §4.5）
+ * - 有切割点：按切割点分段，保证每段落在内容空白带之间
+ * - 无切割点：回退固定高度等分（与原逻辑一致，绝不切得比现状差）
+ *
+ * @param {number[]} splitPoints 切割点 y 坐标数组（来自 splitAnalyzer）
+ * @param {number} imageHeight   图像总高度
+ * @param {number} splitHeight   等分回退时的固定页高
+ * @returns {Array<[number, number]>} 切片边界数组
+ */
+function computeSliceBounds(splitPoints, imageHeight, splitHeight) {
+  // 内容感知：按切割点分段
+  if (splitPoints.length > 0) {
+    const bounds = [];
+    let prev = 0;
+    for (const point of splitPoints) {
+      bounds.push([prev, point]);
+      prev = point;
+    }
+    bounds.push([prev, imageHeight]);
+    return bounds;
+  }
+
+  // 等分回退：固定高度等分（与原 split.worker.js 行为完全一致）
+  const bounds = [];
+  const totalChunks = Math.ceil(imageHeight / splitHeight);
+  for (let i = 0; i < totalChunks; i++) {
+    const startY = i * splitHeight;
+    const endY = Math.min(startY + splitHeight, imageHeight);
+    bounds.push([startY, endY]);
+  }
+  return bounds;
+}
+
+/**
  * 将 OffscreenCanvas 转换为 Blob
  * @param {OffscreenCanvas} canvas - 要转换的 canvas
  * @param {string} type - 图片类型 (如 'image/jpeg')
- * @param {number} quality - 图片质量 (0-1)
+ * @param {number} quality - 图片质量 (0-1)，默认 0.92（减轻文字振铃伪影）
  * @returns {Promise<Blob>} - 转换后的 Blob 对象
  */
-async function convertToBlob(canvas, type = 'image/jpeg', quality = 0.9) {
+async function convertToBlob(canvas, type = 'image/jpeg', quality = 0.92) {
   return await canvas.convertToBlob({
     type: type,
     quality: quality,
