@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAppState } from './hooks/useAppState';
 import { useImageProcessor } from './hooks/useImageProcessor';
 import { useI18nContext, I18nProvider } from './hooks/useI18nContext';
@@ -118,6 +118,22 @@ function AppContent() {
     debugLog('[App] 选中切片变化:', Array.from(state.selectedSlices));
   }, [state.selectedSlices, shouldShowDebugInfo]);
 
+  // 上传完成自动跳转：监听切片「首次到达」(0→>0) 再跳 /split。
+  // 不能在 handleFileSelect 里上传后立即跳——此时 worker 尚未产出切片，
+  // /split 的状态守卫会因 imageSlices 为空判定 MISSING_SLICES 并踢回 /upload。
+  const prevSliceCountRef = useRef(state.imageSlices.length);
+  useEffect(() => {
+    const prevCount = prevSliceCountRef.current;
+    prevSliceCountRef.current = state.imageSlices.length;
+    if (
+      prevCount === 0 &&
+      state.imageSlices.length > 0 &&
+      (currentPath === '/upload' || currentPath === '/')
+    ) {
+      push('/split');
+    }
+  }, [state.imageSlices, currentPath, push]);
+
   // 页面刷新状态恢复逻辑（集成错误处理）
   useEffect(() => {
     const validateAndRecoverState = () => {
@@ -181,11 +197,7 @@ function AppContent() {
     try {
       await processImage(file);
       
-      // 如果当前在上传页面，处理完成后自动跳转到分割页面
-      if (currentPath === '/upload') {
-        console.log(t('console.imageProcessed'));
-        push('/split');
-      }
+      // 跳转由 imageSlices 监听 useEffect 驱动（切片到达后再跳，避免过早跳转被守卫踢回）
     } catch (error) {
       // 使用导航错误处理器处理处理错误
       console.error(t('console.processingFailed'), error);
