@@ -1,0 +1,22 @@
+# === graphify 排除规则（减少噪声社区）===
+
+# AI 工具元数据 — AI agent 工作产物，非项目核心，是重复架构描述噪声源
+.serena/
+.vibedev/
+.roo/
+.claude/todos/
+
+# seo.config.json — JSON Schema 被 AST 拆成大量碎片微社区
+src/config/seo.config.json
+src/config/seo/seo.config.json
+
+# 测试文件与目录
+tests/
+test-setup/
+test-results/
+*.test.ts
+*.test.tsx
+*.test.js
+
+# CI/CD 工作流配置
+.github/workflows/
