@@ -47,17 +47,20 @@ function getEnvConfig() {
     customAssetsBaseUrl: process.env.VITE_ASSETS_BASE_URL || '',
     deployEnv: process.env.VITE_DEPLOY_ENV || 'development',
     basePath: process.env.VITE_BASE_PATH || '/',
-    
+
     // 资源服务器配置
     assetsServerDomain: process.env.VITE_ASSETS_DOMAIN || '',
     assetsPathPrefix: process.env.VITE_ASSETS_PATH_PREFIX || '',
     useHttps: process.env.VITE_ASSETS_HTTPS !== 'false',
-    
+
     // CDN配置
     cdnBaseUrl: process.env.VITE_CDN_BASE_URL || '',
-    
+
     // GitHub Pages配置
-    isGitHubPages: process.env.VITE_GITHUB_PAGES === 'true' || process.env.GITHUB_PAGES === 'true' || process.env.CI === 'true',
+    isGitHubPages:
+      process.env.VITE_GITHUB_PAGES === 'true' ||
+      process.env.GITHUB_PAGES === 'true' ||
+      process.env.CI === 'true',
     githubRepository: process.env.VITE_GITHUB_REPOSITORY || process.env.GITHUB_REPOSITORY || '',
     githubUser: process.env.VITE_GITHUB_USER || '',
   };
@@ -66,7 +69,10 @@ function getEnvConfig() {
 /**
  * 构建资源基础URL的逻辑
  */
-function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { assetsBaseUrl: string; useAbsoluteUrls: boolean } {
+function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): {
+  assetsBaseUrl: string;
+  useAbsoluteUrls: boolean;
+} {
   const {
     useAbsoluteUrls: forceAbsoluteUrls,
     customAssetsBaseUrl,
@@ -76,15 +82,17 @@ function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { asset
     useHttps,
     isGitHubPages,
     githubRepository,
-    githubUser
+    githubUser,
   } = envConfig;
 
   // 如果强制使用绝对URL且提供了自定义URL
   if (forceAbsoluteUrls && customAssetsBaseUrl) {
-    const base = customAssetsBaseUrl.endsWith('/') ? customAssetsBaseUrl : `${customAssetsBaseUrl}/`;
+    const base = customAssetsBaseUrl.endsWith('/')
+      ? customAssetsBaseUrl
+      : `${customAssetsBaseUrl}/`;
     return {
       assetsBaseUrl: base,
-      useAbsoluteUrls: true
+      useAbsoluteUrls: true,
     };
   }
 
@@ -93,18 +101,22 @@ function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { asset
     const base = cdnBaseUrl.endsWith('/') ? cdnBaseUrl : `${cdnBaseUrl}/`;
     return {
       assetsBaseUrl: base,
-      useAbsoluteUrls: true
+      useAbsoluteUrls: true,
     };
   }
 
   // 如果配置了自定义资源服务器
   if (assetsServerDomain) {
     const protocol = useHttps ? 'https' : 'http';
-    const prefix = assetsPathPrefix ? (assetsPathPrefix.startsWith('/') ? assetsPathPrefix : `/${assetsPathPrefix}`) : '';
+    const prefix = assetsPathPrefix
+      ? assetsPathPrefix.startsWith('/')
+        ? assetsPathPrefix
+        : `/${assetsPathPrefix}`
+      : '';
     const joined = `${protocol}://${assetsServerDomain}${prefix}`;
     return {
       assetsBaseUrl: joined.endsWith('/') ? joined : `${joined}/`,
-      useAbsoluteUrls: true
+      useAbsoluteUrls: true,
     };
   }
 
@@ -115,14 +127,14 @@ function buildAssetsBaseUrl(envConfig: ReturnType<typeof getEnvConfig>): { asset
     const finalRepo = repo || 'long-screenshot-splitter';
     return {
       assetsBaseUrl: `https://${finalUser}.github.io/${finalRepo}/`,
-      useAbsoluteUrls: true
+      useAbsoluteUrls: true,
     };
   }
 
   // 默认使用相对路径
   return {
     assetsBaseUrl: '.',
-    useAbsoluteUrls: false
+    useAbsoluteUrls: false,
   };
 }
 
@@ -147,19 +159,19 @@ export function getDeploymentConfig(): DeploymentConfig {
     basePath,
     assetsBaseUrl,
     useAbsoluteUrls,
-    
+
     assetsServer: {
       domain: envConfig.assetsServerDomain,
       pathPrefix: envConfig.assetsPathPrefix,
       https: envConfig.useHttps,
     },
-    
+
     githubPages: {
       repository: envConfig.githubRepository,
       enabled: envConfig.isGitHubPages,
       domain: envConfig.githubUser ? `${envConfig.githubUser}.github.io` : '',
     },
-    
+
     cdn: {
       baseUrl: envConfig.cdnBaseUrl,
       enabled: !!envConfig.cdnBaseUrl,

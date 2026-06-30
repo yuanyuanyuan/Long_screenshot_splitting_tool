@@ -74,32 +74,27 @@ export class DependencyResolver {
   /**
    * 尝试解析单个路径
    */
-  private async tryResolvePath(
-    basePath: string,
-    dependencyName: string
-  ): Promise<string | null> {
+  private async tryResolvePath(basePath: string, dependencyName: string): Promise<string | null> {
     try {
       // 检查是否为相对路径依赖
       if (basePath.startsWith('../') || basePath.startsWith('./')) {
         const fs = await import('fs/promises');
         const path = await import('path');
-        
+
         const fullPath = path.resolve(process.cwd(), basePath);
         const packageJsonPath = path.join(fullPath, 'package.json');
-        
+
         // 检查package.json是否存在
         await fs.access(packageJsonPath);
-        
-        const packageJson = JSON.parse(
-          await fs.readFile(packageJsonPath, 'utf-8')
-        );
-        
+
+        const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
+
         // 验证包名是否匹配
         if (packageJson.name === dependencyName || basePath.includes(dependencyName)) {
           return fullPath;
         }
       }
-      
+
       // 对于npm包，尝试动态导入解析
       try {
         await import(dependencyName);
@@ -117,7 +112,7 @@ export class DependencyResolver {
    */
   private generateErrorMessage(dependencyName: string, attemptedPaths: string[]): string {
     const suggestions = this.generateSuggestions(dependencyName);
-    
+
     return `
 无法解析依赖: ${dependencyName}
 
@@ -181,12 +176,10 @@ ${suggestions.map(suggestion => `  • ${suggestion}`).join('\n')}
     try {
       const fs = await import('fs/promises');
       const path = await import('path');
-      
+
       // 检查package.json
       const packageJsonPath = path.join(process.cwd(), 'package.json');
-      const packageJson = JSON.parse(
-        await fs.readFile(packageJsonPath, 'utf-8')
-      );
+      const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
 
       // 检查workspace配置（应该已移除）
       if (packageJson.workspaces) {
@@ -215,7 +208,6 @@ ${suggestions.map(suggestion => `  • ${suggestion}`).join('\n')}
         issues.push('无法访问 shared-components 目录');
         suggestions.push('确保 shared-components 在正确的相对路径位置');
       }
-
     } catch (error) {
       issues.push(`验证过程中发生错误: ${error}`);
     }

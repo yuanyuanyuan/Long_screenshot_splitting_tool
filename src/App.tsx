@@ -27,12 +27,12 @@ import './styles/responsive.css';
 
 function AppContent() {
   const { state, actions, getStateSnapshot } = useAppState();
-  const { processImage, progress, isProcessing } = useImageProcessor({ 
-    state, 
+  const { processImage, progress, isProcessing } = useImageProcessor({
+    state,
     actions: {
       ...actions,
-      setOriginalImage: actions.setOriginalImage
-    }
+      setOriginalImage: actions.setOriginalImage,
+    },
   });
   const { t, isLoading: i18nLoading } = useI18nContext();
   const { currentPath, push } = useRouter();
@@ -63,7 +63,7 @@ function AppContent() {
         fastClick: true,
         preventGhostClick: true,
         touchFeedback: true,
-        scrollOptimization: true
+        scrollOptimization: true,
       });
 
       // 2. 初始化缓存管理器
@@ -196,7 +196,7 @@ function AppContent() {
   const handleFileSelect = async (file: File) => {
     try {
       await processImage(file);
-      
+
       // 跳转由 imageSlices 监听 useEffect 驱动（切片到达后再跳，避免过早跳转被守卫踢回）
     } catch (error) {
       // 使用导航错误处理器处理处理错误
@@ -229,9 +229,9 @@ function AppContent() {
 
     try {
       setIsExporting(true);
-      
+
       const filename = options?.filename || 'exported-images';
-      
+
       if (format === 'pdf') {
         const pdfFilename = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
         await exportToPDF(
@@ -270,10 +270,14 @@ function AppContent() {
   // 获取当前页面类型用于SEO
   const getCurrentPageType = (): 'home' | 'upload' | 'split' | 'export' => {
     switch (currentPath) {
-      case '/upload': return 'upload';
-      case '/split': return 'split';
-      case '/export': return 'export';
-      default: return 'home';
+      case '/upload':
+        return 'upload';
+      case '/split':
+        return 'split';
+      case '/export':
+        return 'export';
+      default:
+        return 'home';
     }
   };
 
@@ -282,12 +286,12 @@ function AppContent() {
     switch (currentPath) {
       case '/upload':
         return (
-          <section className={`mb-8 ${
-            viewport.isMobile ? 'mb-4' : 'mb-8'
-          }`}>
-            <h2 className={`font-bold text-gray-800 text-center ${
-              viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
-            }`}>
+          <section className={`mb-8 ${viewport.isMobile ? 'mb-4' : 'mb-8'}`}>
+            <h2
+              className={`font-bold text-gray-800 text-center ${
+                viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
+              }`}
+            >
               {t('upload.title')}
             </h2>
             <FileUploader
@@ -302,21 +306,23 @@ function AppContent() {
         // 增强状态验证：检查是否有原始图片和切片
         if (!state.originalImage || state.imageSlices.length === 0) {
           return (
-            <div className={`text-center bg-white rounded-lg shadow-sm mobile-center ${
-              viewport.isMobile ? 'py-8 mx-2' : 'py-12 mx-4'
-            }`}>
+            <div
+              className={`text-center bg-white rounded-lg shadow-sm mobile-center ${
+                viewport.isMobile ? 'py-8 mx-2' : 'py-12 mx-4'
+              }`}
+            >
               <div className={viewport.isMobile ? 'max-w-sm mx-auto px-4' : 'max-w-md mx-auto'}>
-                <div className={`mb-4 ${
-                  viewport.isMobile ? 'text-4xl' : 'text-6xl'
-                }`}>📤</div>
-                <h3 className={`font-semibold text-gray-800 mb-2 ${
-                  viewport.isMobile ? 'text-lg' : 'text-xl'
-                }`}>
+                <div className={`mb-4 ${viewport.isMobile ? 'text-4xl' : 'text-6xl'}`}>📤</div>
+                <h3
+                  className={`font-semibold text-gray-800 mb-2 ${
+                    viewport.isMobile ? 'text-lg' : 'text-xl'
+                  }`}
+                >
                   {t('split.validation.title')}
                 </h3>
-                <p className={`text-gray-600 mb-6 mobile-text ${
-                  viewport.isMobile ? 'text-sm' : ''
-                }`}>
+                <p
+                  className={`text-gray-600 mb-6 mobile-text ${viewport.isMobile ? 'text-sm' : ''}`}
+                >
                   {t('split.validation.message')}
                 </p>
                 <div className="space-y-3">
@@ -342,12 +348,12 @@ function AppContent() {
           );
         }
         return (
-          <section className={`mb-8 ${
-            viewport.isMobile ? 'mb-4' : 'mb-8'
-          }`}>
-            <h2 className={`font-bold text-gray-800 text-center ${
-              viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
-            }`}>
+          <section className={`mb-8 ${viewport.isMobile ? 'mb-4' : 'mb-8'}`}>
+            <h2
+              className={`font-bold text-gray-800 text-center ${
+                viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
+              }`}
+            >
               {t('split.title')}
             </h2>
             <ImagePreview
@@ -433,12 +439,12 @@ function AppContent() {
         }
 
         return (
-          <section className={`mb-8 ${
-            viewport.isMobile ? 'mb-4' : 'mb-8'
-          }`}>
-            <h2 className={`font-bold text-gray-800 text-center ${
-              viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
-            }`}>
+          <section className={`mb-8 ${viewport.isMobile ? 'mb-4' : 'mb-8'}`}>
+            <h2
+              className={`font-bold text-gray-800 text-center ${
+                viewport.isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'
+              }`}
+            >
               {t('export.title')}
             </h2>
             <ExportControls
@@ -530,14 +536,14 @@ function AppContent() {
   return (
     <>
       {/* SEO Meta Tags */}
-      <SEOManager 
+      <SEOManager
         page={getCurrentPageType()}
         language="zh-CN"
         context={{
           sliceCount: state.imageSlices.length,
           selectedCount: state.selectedSlices.size,
           isProcessing: isProcessing,
-          hasImage: !!state.originalImage
+          hasImage: !!state.originalImage,
         }}
         enableStructuredData={true}
         enableOpenGraph={true}
@@ -546,164 +552,181 @@ function AppContent() {
         enablePerformanceTracking={true}
       />
       <div className="min-h-screen bg-gray-50">
-      <div className={`${appContainerClasses} mobile-stack`}>
-        <header className={`text-center py-8 mb-8 relative ${
-          viewport.isMobile ? 'py-4 mb-4' : 'py-8 mb-8'
-        }`}>
-          {/* Responsive copyright positioning */}
-          <div className={`absolute z-10 ${
-            viewport.isMobile 
-              ? 'bottom-2 right-2 opacity-60' 
-              : 'top-4 right-4'
-          }`}>
-            <CopyrightInfo />
-          </div>
-          
-          <h1 className={`font-bold text-gray-800 mb-4 ${
-            viewport.isMobile 
-              ? 'text-2xl' 
-              : viewport.isTablet 
-              ? 'text-3xl' 
-              : 'text-4xl'
-          }`}>
-            {t('header.title')}
-          </h1>
-          <p className={`text-gray-600 mb-6 ${
-            viewport.isMobile 
-              ? 'text-base px-4' 
-              : 'text-lg'
-          }`}>
-            {t('header.subtitle')}
-          </p>
-        </header>
+        <div className={`${appContainerClasses} mobile-stack`}>
+          <header
+            className={`text-center py-8 mb-8 relative ${
+              viewport.isMobile ? 'py-4 mb-4' : 'py-8 mb-8'
+            }`}
+          >
+            {/* Responsive copyright positioning */}
+            <div
+              className={`absolute z-10 ${
+                viewport.isMobile ? 'bottom-2 right-2 opacity-60' : 'top-4 right-4'
+              }`}
+            >
+              <CopyrightInfo />
+            </div>
 
-        {/* 导航组件 */}
-        <Navigation
-          appState={state}
-          currentPath={currentPath}
-          onNavigate={(path: string) => {
-            push(path);
-          }}
-        />
+            <h1
+              className={`font-bold text-gray-800 mb-4 ${
+                viewport.isMobile ? 'text-2xl' : viewport.isTablet ? 'text-3xl' : 'text-4xl'
+              }`}
+            >
+              {t('header.title')}
+            </h1>
+            <p className={`text-gray-600 mb-6 ${viewport.isMobile ? 'text-base px-4' : 'text-lg'}`}>
+              {t('header.subtitle')}
+            </p>
+          </header>
 
-        <main className={`flex-1 ${viewport.isMobile ? 'px-2' : ''}`}>
-          {/* Responsive error message */}
-          {showErrorMessage && navigationError && (
-            <div className={`fixed z-50 ${
-              viewport.isMobile 
-                ? 'top-2 left-2 right-2' 
-                : 'top-4 right-4 max-w-md'
-            }`}>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <span className="text-red-400 text-xl">⚠️</span>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      {t('navigation.error.title')}
-                    </h3>
-                    <div className="mt-2 text-sm text-red-700">
-                      <p>{t(navigationError.message) || navigationError.message}</p>
+          {/* 导航组件 */}
+          <Navigation
+            appState={state}
+            currentPath={currentPath}
+            onNavigate={(path: string) => {
+              push(path);
+            }}
+          />
+
+          <main className={`flex-1 ${viewport.isMobile ? 'px-2' : ''}`}>
+            {/* Responsive error message */}
+            {showErrorMessage && navigationError && (
+              <div
+                className={`fixed z-50 ${
+                  viewport.isMobile ? 'top-2 left-2 right-2' : 'top-4 right-4 max-w-md'
+                }`}
+              >
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <span className="text-red-400 text-xl">⚠️</span>
                     </div>
-                    <div className="mt-3">
-                      <button
-                        type="button"
-                        className={`text-sm bg-red-100 text-red-800 rounded px-2 py-1 hover:bg-red-200 transition-colors btn-touch ${
-                          viewport.isTouch ? 'min-h-12 px-4' : ''
-                        }`}
-                        onClick={() => setShowErrorMessage(false)}
-                      >
-                        {t('navigation.error.dismiss')}
-                      </button>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">
+                        {t('navigation.error.title')}
+                      </h3>
+                      <div className="mt-2 text-sm text-red-700">
+                        <p>{t(navigationError.message) || navigationError.message}</p>
+                      </div>
+                      <div className="mt-3">
+                        <button
+                          type="button"
+                          className={`text-sm bg-red-100 text-red-800 rounded px-2 py-1 hover:bg-red-200 transition-colors btn-touch ${
+                            viewport.isTouch ? 'min-h-12 px-4' : ''
+                          }`}
+                          onClick={() => setShowErrorMessage(false)}
+                        >
+                          {t('navigation.error.dismiss')}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {renderContent()}
+            {renderContent()}
 
-          {/* 调试信息面板 - 仅在开发环境或用户明确启用时显示 */}
-          {isDevelopment && shouldShowDebugInfo && (
-            <section className="bg-white rounded-lg shadow-sm p-6">
-              <details open>
-                <summary className="text-lg font-semibold text-gray-800 cursor-pointer mb-4">
-                  {t('debug.info.title')}
-                </summary>
-                <div className="flex gap-3 mb-4">
-                  <button
-                    onClick={() => {
-                      console.log('=== 手动调试检查 ===');
-                      console.log('当前状态:', getStateSnapshot());
-                      console.log('imageSlices数量:', state.imageSlices.length);
-                      console.log('是否正在处理:', isProcessing);
-                      console.log('处理进度:', progress);
-                      console.log('选中切片:', Array.from(state.selectedSlices));
-                      alert(
-                        t('alert.debugOutput', { 
-                          count: state.imageSlices.length, 
-                          shouldShow: state.imageSlices.length > 0 ? t('debug.info.yes') : t('debug.info.no')
-                        })
-                      );
-                    }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    {t('debug.info.manualCheck')}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setForceRender((prev: number) => prev + 1);
-                      debugLog('[App] 强制重新渲染:', forceRender + 1);
-                    }}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    {t('debug.info.forceRefresh')} ({forceRender})
-                  </button>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg mb-4 text-sm">
-                  <div className="font-semibold text-gray-800 mb-2">{t('debug.info.realTimeStatus')}</div>
-                  <div className="space-y-1 text-gray-700">
-                    <div>{t('debug.info.sliceCount')}: {state.imageSlices.length}</div>
-                    <div>{t('debug.info.processing')}: {isProcessing ? t('debug.info.yes') : t('debug.info.no')}</div>
-                    <div>{t('debug.info.progress')}: {progress}%</div>
-                    <div>{t('debug.info.selectedCount')}: {state.selectedSlices.size}</div>
-                    <div>{t('debug.info.shouldShowPreview')}: {state.imageSlices.length > 0 ? t('debug.info.yes') : t('debug.info.no')}</div>
-                    <div className="font-semibold text-red-600 mt-2">{t('debug.info.directStateCheck')}</div>
-                    <div>
-                      {t('debug.info.stateObject')}:{' '}
-                      {JSON.stringify({
-                        imageSlicesLength: state.imageSlices.length,
-                        hasImageSlices: state.imageSlices.length > 0,
-                      })}
-                    </div>
-                    <div>{t('debug.info.snapshotObject')}: {JSON.stringify(getStateSnapshot())}</div>
+            {/* 调试信息面板 - 仅在开发环境或用户明确启用时显示 */}
+            {isDevelopment && shouldShowDebugInfo && (
+              <section className="bg-white rounded-lg shadow-sm p-6">
+                <details open>
+                  <summary className="text-lg font-semibold text-gray-800 cursor-pointer mb-4">
+                    {t('debug.info.title')}
+                  </summary>
+                  <div className="flex gap-3 mb-4">
+                    <button
+                      onClick={() => {
+                        console.log('=== 手动调试检查 ===');
+                        console.log('当前状态:', getStateSnapshot());
+                        console.log('imageSlices数量:', state.imageSlices.length);
+                        console.log('是否正在处理:', isProcessing);
+                        console.log('处理进度:', progress);
+                        console.log('选中切片:', Array.from(state.selectedSlices));
+                        alert(
+                          t('alert.debugOutput', {
+                            count: state.imageSlices.length,
+                            shouldShow:
+                              state.imageSlices.length > 0
+                                ? t('debug.info.yes')
+                                : t('debug.info.no'),
+                          })
+                        );
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      {t('debug.info.manualCheck')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setForceRender((prev: number) => prev + 1);
+                        debugLog('[App] 强制重新渲染:', forceRender + 1);
+                      }}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    >
+                      {t('debug.info.forceRefresh')} ({forceRender})
+                    </button>
                   </div>
-                </div>
-                <pre className="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-auto max-h-64">
-                  {JSON.stringify(getStateSnapshot(), null, 2)}
-                </pre>
-              </details>
-            </section>
+                  <div className="bg-gray-50 p-4 rounded-lg mb-4 text-sm">
+                    <div className="font-semibold text-gray-800 mb-2">
+                      {t('debug.info.realTimeStatus')}
+                    </div>
+                    <div className="space-y-1 text-gray-700">
+                      <div>
+                        {t('debug.info.sliceCount')}: {state.imageSlices.length}
+                      </div>
+                      <div>
+                        {t('debug.info.processing')}:{' '}
+                        {isProcessing ? t('debug.info.yes') : t('debug.info.no')}
+                      </div>
+                      <div>
+                        {t('debug.info.progress')}: {progress}%
+                      </div>
+                      <div>
+                        {t('debug.info.selectedCount')}: {state.selectedSlices.size}
+                      </div>
+                      <div>
+                        {t('debug.info.shouldShowPreview')}:{' '}
+                        {state.imageSlices.length > 0 ? t('debug.info.yes') : t('debug.info.no')}
+                      </div>
+                      <div className="font-semibold text-red-600 mt-2">
+                        {t('debug.info.directStateCheck')}
+                      </div>
+                      <div>
+                        {t('debug.info.stateObject')}:{' '}
+                        {JSON.stringify({
+                          imageSlicesLength: state.imageSlices.length,
+                          hasImageSlices: state.imageSlices.length > 0,
+                        })}
+                      </div>
+                      <div>
+                        {t('debug.info.snapshotObject')}: {JSON.stringify(getStateSnapshot())}
+                      </div>
+                    </div>
+                  </div>
+                  <pre className="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-auto max-h-64">
+                    {JSON.stringify(getStateSnapshot(), null, 2)}
+                  </pre>
+                </details>
+              </section>
+            )}
+          </main>
+
+          {/* 调试控制面板 - 仅在开发环境中显示，生产环境完全隐藏 */}
+          {/* 调试控制面板 - 仅在开发环境中显示，生产环境完全隐藏 */}
+          {isDevelopment && (
+            <DebugInfoControl
+              visible={debugControlVisible}
+              onVisibilityChange={setDebugControlVisible}
+              position="bottom-right"
+              compact={false}
+            />
           )}
-        </main>
 
-        {/* 调试控制面板 - 仅在开发环境中显示，生产环境完全隐藏 */}
-        {/* 调试控制面板 - 仅在开发环境中显示，生产环境完全隐藏 */}
-        {isDevelopment && (
-          <DebugInfoControl
-            visible={debugControlVisible}
-            onVisibilityChange={setDebugControlVisible}
-            position="bottom-right"
-            compact={false}
-          />
-        )}
-
-        {/* I18n测试面板 - 仅在开发环境中显示 */}
-        {isDevelopment && <I18nTestPanel show={true} />}
+          {/* I18n测试面板 - 仅在开发环境中显示 */}
+          {isDevelopment && <I18nTestPanel show={true} />}
+        </div>
       </div>
-    </div>
     </>
   );
 }

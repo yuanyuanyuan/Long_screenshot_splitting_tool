@@ -45,31 +45,40 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: '10px',
-      right: '10px',
-      width: '400px',
-      maxHeight: '80vh',
-      backgroundColor: '#f8f9fa',
-      border: '1px solid #dee2e6',
-      borderRadius: '8px',
-      padding: '16px',
-      fontSize: '12px',
-      zIndex: 9999,
-      overflow: 'auto',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        width: '400px',
+        maxHeight: '80vh',
+        backgroundColor: '#f8f9fa',
+        border: '1px solid #dee2e6',
+        borderRadius: '8px',
+        padding: '16px',
+        fontSize: '12px',
+        zIndex: 9999,
+        overflow: 'auto',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '12px',
+        }}
+      >
         <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>🌐 I18n Coverage Test</h3>
-        <button 
+        <button
           onClick={() => setIsVisible(false)}
-          style={{ 
-            background: 'none', 
-            border: 'none', 
-            fontSize: '16px', 
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '16px',
             cursor: 'pointer',
-            padding: '0 4px'
+            padding: '0 4px',
           }}
         >
           ×
@@ -79,31 +88,31 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
       <div style={{ marginBottom: '12px' }}>
         <strong>Current Language: {currentLanguage}</strong>
         <div style={{ marginTop: '4px' }}>
-          <button 
+          <button
             onClick={() => handleLanguageSwitch('zh-CN')}
-            style={{ 
-              marginRight: '8px', 
-              padding: '4px 8px', 
+            style={{
+              marginRight: '8px',
+              padding: '4px 8px',
               fontSize: '11px',
               backgroundColor: currentLanguage === 'zh-CN' ? '#007bff' : '#6c757d',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             中文
           </button>
-          <button 
+          <button
             onClick={() => handleLanguageSwitch('en')}
-            style={{ 
-              padding: '4px 8px', 
+            style={{
+              padding: '4px 8px',
               fontSize: '11px',
               backgroundColor: currentLanguage === 'en' ? '#007bff' : '#6c757d',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             English
@@ -111,7 +120,7 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
         </div>
       </div>
 
-      <button 
+      <button
         onClick={runTest}
         style={{
           width: '100%',
@@ -122,7 +131,7 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
           border: 'none',
           borderRadius: '4px',
           cursor: 'pointer',
-          fontSize: '12px'
+          fontSize: '12px',
         }}
       >
         🔄 Run Coverage Test
@@ -130,40 +139,50 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
 
       {testResults && (
         <div>
-          <div style={{ 
-            padding: '8px', 
-            backgroundColor: testResults.summary.status === 'COMPLETE' ? '#d4edda' : '#f8d7da',
-            borderRadius: '4px',
-            marginBottom: '12px'
-          }}>
+          <div
+            style={{
+              padding: '8px',
+              backgroundColor: testResults.summary.status === 'COMPLETE' ? '#d4edda' : '#f8d7da',
+              borderRadius: '4px',
+              marginBottom: '12px',
+            }}
+          >
             <strong>
-              {testResults.summary.status === 'COMPLETE' ? '✅' : '⚠️'} 
+              {testResults.summary.status === 'COMPLETE' ? '✅' : '⚠️'}
               Coverage: {testResults.summary.coveragePercentage}%
             </strong>
             <div>
-              Found: {testResults.summary.totalKeys - testResults.summary.missingKeys}/{testResults.summary.totalKeys} keys
+              Found: {testResults.summary.totalKeys - testResults.summary.missingKeys}/
+              {testResults.summary.totalKeys} keys
             </div>
           </div>
 
           {testResults.overall.missing.length > 0 && (
             <div style={{ marginBottom: '12px' }}>
-              <strong style={{ color: '#dc3545' }}>❌ Missing Keys ({testResults.overall.missing.length}):</strong>
-              <div style={{ 
-                maxHeight: '200px', 
-                overflow: 'auto', 
-                backgroundColor: '#fff', 
-                padding: '8px', 
-                borderRadius: '4px',
-                marginTop: '4px',
-                border: '1px solid #dee2e6'
-              }}>
+              <strong style={{ color: '#dc3545' }}>
+                ❌ Missing Keys ({testResults.overall.missing.length}):
+              </strong>
+              <div
+                style={{
+                  maxHeight: '200px',
+                  overflow: 'auto',
+                  backgroundColor: '#fff',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  marginTop: '4px',
+                  border: '1px solid #dee2e6',
+                }}
+              >
                 {testResults.overall.missing.map((key: string, index: number) => (
-                  <div key={index} style={{ 
-                    padding: '2px 0', 
-                    fontFamily: 'monospace',
-                    fontSize: '11px',
-                    color: '#dc3545'
-                  }}>
+                  <div
+                    key={index}
+                    style={{
+                      padding: '2px 0',
+                      fontFamily: 'monospace',
+                      fontSize: '11px',
+                      color: '#dc3545',
+                    }}
+                  >
                     {key}
                   </div>
                 ))}
@@ -175,17 +194,21 @@ const I18nTestPanel: React.FC<I18nTestPanelProps> = ({ show = false }) => {
             <strong>📋 Category Breakdown:</strong>
             <div style={{ marginTop: '4px' }}>
               {testResults.categories.map((category: any, index: number) => (
-                <div key={index} style={{ 
-                  padding: '4px 0', 
-                  borderBottom: '1px solid #eee',
-                  display: 'flex',
-                  justifyContent: 'space-between'
-                }}>
+                <div
+                  key={index}
+                  style={{
+                    padding: '4px 0',
+                    borderBottom: '1px solid #eee',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <span>
                     {category.coverage === 100 ? '✅' : '⚠️'} {category.category}
                   </span>
                   <span>
-                    {category.coverage}% ({category.total - category.missing.length}/{category.total})
+                    {category.coverage}% ({category.total - category.missing.length}/
+                    {category.total})
                   </span>
                 </div>
               ))}
@@ -211,7 +234,7 @@ if (process.env.NODE_ENV === 'development') {
     const event = new CustomEvent('toggleI18nTest', { detail: { show: true } });
     window.dispatchEvent(event);
   };
-  
+
   window.hideI18nTest = () => {
     const event = new CustomEvent('toggleI18nTest', { detail: { show: false } });
     window.dispatchEvent(event);

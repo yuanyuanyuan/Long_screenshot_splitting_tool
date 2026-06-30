@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
   const getLanguageDisplayName = (lang: string): string => {
     const displayNames: Record<string, string> = {
       'zh-CN': '简体中文',
-      'en': 'English'
+      en: 'English',
     };
     return displayNames[lang] || lang;
   };
@@ -42,24 +42,25 @@ export function LanguageSwitcher() {
 
   return (
     <div className={`language-switcher ${mobileOptimizedClass}`}>
-      <label 
-        htmlFor="language-select" 
+      <label
+        htmlFor="language-select"
         className={`${
           viewport.isMobile ? 'text-base font-medium text-gray-800 mb-2 block' : 'sr-only'
         }`}
       >
         {t('lang.current')}
       </label>
-      
+
       <select
         id="language-select"
         value={currentLanguage}
-        onChange={(e) => handleLanguageChange(e.target.value)}
+        onChange={e => handleLanguageChange(e.target.value)}
         disabled={isLoading}
         className={`
-          ${viewport.isMobile 
-            ? 'px-4 py-3 text-base min-h-[44px] w-full rounded-lg' 
-            : 'px-3 py-1 text-sm rounded-md'
+          ${
+            viewport.isMobile
+              ? 'px-4 py-3 text-base min-h-[44px] w-full rounded-lg'
+              : 'px-3 py-1 text-sm rounded-md'
           }
           border border-gray-300 
           bg-white 
@@ -78,30 +79,36 @@ export function LanguageSwitcher() {
           touchAction: 'manipulation',
           WebkitTapHighlightColor: 'transparent',
           userSelect: 'none',
-          WebkitUserSelect: 'none'
+          WebkitUserSelect: 'none',
         }}
         title={t('lang.current')}
       >
-        {supportedLanguages.map((lang) => (
+        {supportedLanguages.map(lang => (
           <option key={lang} value={lang}>
             {getLanguageDisplayName(lang)}
           </option>
         ))}
       </select>
-      
+
       {/* 移动端下拉箭头 */}
       {viewport.isMobile && !isLoading && (
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
           <svg width="12" height="8" viewBox="0 0 12 8" fill="none" className="text-gray-500">
-            <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
       )}
-      
+
       {isLoading && (
-        <span className={`${
-          viewport.isMobile ? 'block mt-2 text-base' : 'ml-2 text-xs'
-        } text-gray-500`}>
+        <span
+          className={`${viewport.isMobile ? 'block mt-2 text-base' : 'ml-2 text-xs'} text-gray-500`}
+        >
           {viewport.isMobile ? (
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
@@ -167,9 +174,10 @@ export function CompactLanguageSwitcher() {
       onClick={toggleLanguage}
       disabled={isLoading}
       className={`
-        ${viewport.isMobile 
-          ? 'px-4 py-3 text-base font-semibold min-h-[44px] min-w-[60px] rounded-lg' 
-          : 'px-2 py-1 text-sm font-medium min-w-[40px] rounded'
+        ${
+          viewport.isMobile
+            ? 'px-4 py-3 text-base font-semibold min-h-[44px] min-w-[60px] rounded-lg'
+            : 'px-2 py-1 text-sm font-medium min-w-[40px] rounded'
         }
         border border-gray-300 
         bg-white 
@@ -187,15 +195,17 @@ export function CompactLanguageSwitcher() {
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
-        WebkitUserSelect: 'none'
+        WebkitUserSelect: 'none',
       }}
       title={getNextLanguageTitle()}
     >
       {isLoading ? (
         <div className={`flex items-center justify-center ${viewport.isMobile ? 'space-x-1' : ''}`}>
-          <div className={`animate-spin rounded-full border-b-2 border-blue-500 ${
-            viewport.isMobile ? 'h-4 w-4' : 'h-3 w-3'
-          }`}></div>
+          <div
+            className={`animate-spin rounded-full border-b-2 border-blue-500 ${
+              viewport.isMobile ? 'h-4 w-4' : 'h-3 w-3'
+            }`}
+          ></div>
           {viewport.isMobile && <span className="text-xs">...</span>}
         </div>
       ) : (

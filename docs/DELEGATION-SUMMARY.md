@@ -6,7 +6,7 @@
 
 **Duration**: 20 working days (4 sprints)  
 **Strategy**: Parallel development with intelligent coordination  
-**Team Structure**: Multi-persona specialization with automated tool routing  
+**Team Structure**: Multi-persona specialization with automated tool routing
 
 ---
 
@@ -14,25 +14,27 @@
 
 ### Primary Responsibility Assignment
 
-| **Task Category** | **Primary Persona** | **Secondary Persona** | **Accountability** |
-|-------------------|-------------------|---------------------|-------------------|
-| **SEO Architecture** | Backend Architect | SEO Specialist | System design, configuration schema |
-| **Mobile Foundation** | Frontend Architect | UX Designer | Responsive layout, breakpoints |
-| **Component Development** | Frontend Developer | SEO Specialist | UI components, SEO integration |
-| **Performance Optimization** | Performance Engineer | DevOps | Mobile speed, Core Web Vitals |
-| **Quality Assurance** | QA Lead | Performance Engineer | Testing, validation, compliance |
-| **Documentation** | Tech Writer | Architect | Technical docs, user guides |
-| **Infrastructure** | DevOps | Backend Architect | CI/CD, environment management |
-| **Integration** | Architect | DevOps | System coordination, conflict resolution |
+| **Task Category**            | **Primary Persona**  | **Secondary Persona** | **Accountability**                       |
+| ---------------------------- | -------------------- | --------------------- | ---------------------------------------- |
+| **SEO Architecture**         | Backend Architect    | SEO Specialist        | System design, configuration schema      |
+| **Mobile Foundation**        | Frontend Architect   | UX Designer           | Responsive layout, breakpoints           |
+| **Component Development**    | Frontend Developer   | SEO Specialist        | UI components, SEO integration           |
+| **Performance Optimization** | Performance Engineer | DevOps                | Mobile speed, Core Web Vitals            |
+| **Quality Assurance**        | QA Lead              | Performance Engineer  | Testing, validation, compliance          |
+| **Documentation**            | Tech Writer          | Architect             | Technical docs, user guides              |
+| **Infrastructure**           | DevOps               | Backend Architect     | CI/CD, environment management            |
+| **Integration**              | Architect            | DevOps                | System coordination, conflict resolution |
 
 ### Cross-Persona Collaboration Rules
 
 #### **Daily Coordination**
+
 - **Morning Standup**: All personas report progress, blockers, dependencies
 - **Midday Sync**: Cross-stream personas coordinate integration points
 - **Evening Review**: Primary personas validate day's outputs
 
 #### **Sprint Collaboration Patterns**
+
 - **Sprint 1**: Architect (lead) + DevOps (support) + Frontend (implementation)
 - **Sprint 2**: Frontend Developer (lead) + SEO Specialist (guidance) + I18n Specialist (localization)
 - **Sprint 3**: Frontend Architect (lead) + Performance Engineer (optimization) + UX Designer (experience)
@@ -44,17 +46,18 @@
 
 ### Intelligent Tool Selection Matrix
 
-| **Operation Type** | **Primary MCP** | **Secondary MCP** | **Native Fallback** | **Success Rate** |
-|-------------------|----------------|------------------|-------------------|-----------------|
-| **SEO Documentation** | Context7 | Sequential | WebSearch | 95% |
-| **Component Generation** | Magic | Context7 | Manual coding | 92% |
-| **Complex Analysis** | Sequential | Context7 | Native reasoning | 88% |
-| **Browser Testing** | Playwright | Sequential | Unit tests | 90% |
-| **Pattern Edits** | Morphllm | Serena | MultiEdit | 85% |
+| **Operation Type**       | **Primary MCP** | **Secondary MCP** | **Native Fallback** | **Success Rate** |
+| ------------------------ | --------------- | ----------------- | ------------------- | ---------------- |
+| **SEO Documentation**    | Context7        | Sequential        | WebSearch           | 95%              |
+| **Component Generation** | Magic           | Context7          | Manual coding       | 92%              |
+| **Complex Analysis**     | Sequential      | Context7          | Native reasoning    | 88%              |
+| **Browser Testing**      | Playwright      | Sequential        | Unit tests          | 90%              |
+| **Pattern Edits**        | Morphllm        | Serena            | MultiEdit           | 85%              |
 
 ### Daily MCP Usage Strategy
 
 #### **Monday: Planning & Architecture**
+
 ```yaml
 personas: [Architect, DevOps]
 primary_mcp: Sequential
@@ -64,6 +67,7 @@ estimated_calls: 15-20
 ```
 
 #### **Tuesday-Wednesday: Implementation**
+
 ```yaml
 personas: [Frontend Developer, Backend Architect]
 primary_mcp: Magic, Context7
@@ -73,6 +77,7 @@ estimated_calls: 25-30
 ```
 
 #### **Thursday: Integration & Performance**
+
 ```yaml
 personas: [Performance Engineer, QA]
 primary_mcp: Sequential, Playwright
@@ -82,6 +87,7 @@ estimated_calls: 20-25
 ```
 
 #### **Friday: Validation & Review**
+
 ```yaml
 personas: [QA Lead, Product Owner]
 primary_mcp: Playwright, Sequential
@@ -93,18 +99,21 @@ estimated_calls: 10-15
 ### MCP Failure Handling Protocol
 
 #### **Context7 Unavailable**
+
 1. **Immediate**: Switch to WebSearch for documentation
 2. **Fallback**: Use cached knowledge with disclaimer
 3. **Recovery**: Manual pattern implementation
 4. **Escalation**: Architect persona for alternative approaches
 
 #### **Sequential Timeout**
-1. **Immediate**: Reduce complexity, use native analysis  
+
+1. **Immediate**: Reduce complexity, use native analysis
 2. **Fallback**: Break down into smaller chunks
 3. **Recovery**: Manual step-by-step reasoning
 4. **Escalation**: Task delegation to sub-agents
 
 #### **Magic/Playwright Failure**
+
 1. **Immediate**: Revert to manual component/testing
 2. **Fallback**: Use alternative tools (MultiEdit, manual testing)
 3. **Recovery**: Simplified implementation approach
@@ -117,6 +126,7 @@ estimated_calls: 10-15
 ### Sprint 1: Foundation & Architecture (Days 1-5)
 
 #### **Day 1: Architecture Foundation**
+
 ```
 Morning (9-12):
 ├─ Backend Architect (lead)
@@ -125,7 +135,7 @@ Morning (9-12):
 │  └─ Deliverable: seo.config.json schema draft
 ├─ Frontend Architect (parallel)
 │  ├─ MCP: Magic → Responsive layout patterns
-│  ├─ MCP: Context7 → CSS framework best practices  
+│  ├─ MCP: Context7 → CSS framework best practices
 │  └─ Deliverable: Breakpoint strategy document
 └─ DevOps (support)
    ├─ MCP: Sequential → CI/CD pipeline analysis
@@ -138,6 +148,7 @@ Afternoon (1-5):
 ```
 
 #### **Day 2: Core Implementation**
+
 ```
 Morning:
 ├─ Backend Architect: SEOConfigManager implementation
@@ -155,13 +166,14 @@ Afternoon:
 ### Sprint 2: SEO Implementation (Days 6-10)
 
 #### **Day 6: SEO Component Development**
+
 ```
 SEO Stream (Primary):
 ├─ Frontend Developer (lead)
-│  ├─ MCP: Magic → SEOManager component enhancement  
+│  ├─ MCP: Magic → SEOManager component enhancement
 │  ├─ MCP: Context7 → React Helmet Async patterns
 │  └─ Deliverable: Enhanced SEOManager component
-├─ SEO Specialist (guidance)  
+├─ SEO Specialist (guidance)
 │  ├─ MCP: Context7 → SEO best practices validation
 │  └─ Deliverable: Content strategy document
 └─ I18n Specialist (localization)
@@ -176,6 +188,7 @@ Mobile Stream (Parallel):
 ### Sprint 3: Mobile Optimization (Days 11-15)
 
 #### **Day 11: Mobile Component Focus**
+
 ```
 Mobile Stream (Primary):
 ├─ Frontend Developer (lead)
@@ -198,6 +211,7 @@ SEO Stream (Support):
 ### Sprint 4: Integration & Validation (Days 16-20)
 
 #### **Day 16: System Integration**
+
 ```
 Integration Phase:
 ├─ Architect (lead)
@@ -219,41 +233,45 @@ Integration Phase:
 ### Synchronization Schedule
 
 #### **Daily Sync Points**
+
 - **9:00 AM**: Morning standup with all personas
 - **1:00 PM**: Midday cross-stream coordination
 - **4:30 PM**: End-of-day progress review
 
 #### **Weekly Integration Points**
+
 - **Monday**: Sprint planning and architecture alignment
-- **Wednesday**: Mid-sprint integration checkpoint  
+- **Wednesday**: Mid-sprint integration checkpoint
 - **Friday**: Sprint review and retrospective
 
 ### Handoff Procedures
 
 #### **SEO → Mobile Stream Handoffs**
+
 1. **Configuration Sharing**: SEO config impacts mobile layout
 2. **Component Dependencies**: SEO components need mobile optimization
 3. **Performance Impact**: SEO features affect mobile performance
 4. **Testing Coordination**: Combined testing scenarios
 
 #### **Technical Handoff Protocol**
+
 ```yaml
 handoff_steps:
   1_preparation:
     - Complete current task to testable state
     - Document any dependencies or blockers
     - Prepare handoff documentation
-  
+
   2_coordination:
     - Schedule handoff meeting with receiving persona
     - Demo current state and requirements
     - Transfer context and next steps
-  
+
   3_validation:
     - Receiving persona confirms understanding
     - Test integration points together
     - Document any gaps or issues
-  
+
   4_tracking:
     - Update project tracking with handoff completion
     - Schedule follow-up check-in
@@ -263,16 +281,19 @@ handoff_steps:
 ### Conflict Resolution Escalation
 
 #### **Level 1: Persona-Level Resolution**
+
 - **Technical Conflicts**: Senior personas discuss and decide
 - **Resource Conflicts**: Project Manager reassigns priorities
 - **Timeline Conflicts**: Scrum Master facilitates compromise
 
 #### **Level 2: MCP Tool Conflicts**
+
 - **Tool Failures**: Automatic fallback to secondary tools
 - **Performance Issues**: Switch to manual processes
 - **Integration Problems**: Escalate to Architect persona
 
 #### **Level 3: Project-Level Escalation**
+
 - **Scope Conflicts**: Product Owner makes final decisions
 - **Quality Concerns**: QA Lead has veto power
 - **Timeline Risks**: Project Manager adjusts sprint scope
@@ -284,6 +305,7 @@ handoff_steps:
 ### Daily Quality Validation
 
 #### **Morning Quality Check (9:30 AM)**
+
 ```yaml
 responsible_persona: QA Lead
 duration: 15 minutes
@@ -299,6 +321,7 @@ actions:
 ```
 
 #### **Integration Checkpoint (3:00 PM)**
+
 ```yaml
 responsible_persona: Architect
 duration: 30 minutes
@@ -312,11 +335,13 @@ focus:
 ### Sprint Quality Gates
 
 #### **Sprint 1 Gate: Foundation Validation**
+
 **Responsible**: Backend Architect + DevOps  
 **Duration**: 2 hours  
 **MCP Tools**: Sequential (analysis), Context7 (validation patterns)
 
 **Validation Checklist**:
+
 - [ ] **Configuration System**: seo.config.json loads without errors
 - [ ] **Type Safety**: All TypeScript definitions compile
 - [ ] **Responsive Foundation**: Basic layout works on mobile/desktop
@@ -327,11 +352,13 @@ focus:
 **Fail Actions**: Extend sprint, address blockers, reassess scope
 
 #### **Sprint 2 Gate: SEO Implementation Validation**
+
 **Responsible**: SEO Specialist + Frontend Developer  
 **Duration**: 3 hours  
 **MCP Tools**: Context7 (SEO patterns), Playwright (testing)
 
 **Validation Checklist**:
+
 - [ ] **Meta Tags**: Render correctly in English and Chinese
 - [ ] **H-tag Hierarchy**: Follows proper SEO structure
 - [ ] **I18n Integration**: Language switching maintains SEO context
@@ -339,11 +366,13 @@ focus:
 - [ ] **Performance**: SEO additions don't degrade performance >10%
 
 #### **Sprint 3 Gate: Mobile Optimization Validation**
+
 **Responsible**: Performance Engineer + UX Designer  
 **Duration**: 4 hours  
 **MCP Tools**: Playwright (device testing), Sequential (performance analysis)
 
 **Validation Checklist**:
+
 - [ ] **Touch Targets**: All interactive elements ≥44px
 - [ ] **Content Accessibility**: No obstruction on any device size
 - [ ] **Performance**: <3s load time on 3G networks
@@ -351,11 +380,13 @@ focus:
 - [ ] **Accessibility**: WCAG 2.1 AA compliance maintained
 
 #### **Sprint 4 Gate: Production Readiness**
+
 **Responsible**: QA Lead + DevOps  
 **Duration**: Full day  
 **MCP Tools**: Playwright (comprehensive testing), Sequential (system analysis)
 
 **Validation Checklist**:
+
 - [ ] **Integration**: SEO + Mobile systems work seamlessly
 - [ ] **Cross-browser**: Works on Chrome, Firefox, Safari, Edge
 - [ ] **Performance**: Lighthouse scores (SEO ≥90, Performance ≥85)
@@ -364,51 +395,52 @@ focus:
 
 ### Validation Responsibility Matrix
 
-| **Quality Gate** | **Primary Validator** | **Secondary Validator** | **Escalation Path** |
-|------------------|----------------------|------------------------|-------------------|
-| Daily Morning Check | QA Lead | Performance Engineer | Project Manager |
-| Integration Checkpoint | Architect | DevOps | Product Owner |
-| Sprint Gate 1 | Backend Architect | DevOps | Tech Lead |
-| Sprint Gate 2 | SEO Specialist | Frontend Developer | Product Owner |
-| Sprint Gate 3 | Performance Engineer | UX Designer | Architect |
-| Sprint Gate 4 | QA Lead | DevOps | Executive Sponsor |
+| **Quality Gate**       | **Primary Validator** | **Secondary Validator** | **Escalation Path** |
+| ---------------------- | --------------------- | ----------------------- | ------------------- |
+| Daily Morning Check    | QA Lead               | Performance Engineer    | Project Manager     |
+| Integration Checkpoint | Architect             | DevOps                  | Product Owner       |
+| Sprint Gate 1          | Backend Architect     | DevOps                  | Tech Lead           |
+| Sprint Gate 2          | SEO Specialist        | Frontend Developer      | Product Owner       |
+| Sprint Gate 3          | Performance Engineer  | UX Designer             | Architect           |
+| Sprint Gate 4          | QA Lead               | DevOps                  | Executive Sponsor   |
 
 ### Quality Metrics Dashboard
 
 #### **Real-time Monitoring**
+
 ```yaml
 seo_metrics:
   lighthouse_seo_score:
-    target: "≥90"
-    current: "monitoring"
-    responsible: "SEO Specialist"
-  
+    target: '≥90'
+    current: 'monitoring'
+    responsible: 'SEO Specialist'
+
   meta_tag_coverage:
-    target: "100%"
-    current: "monitoring" 
-    responsible: "Frontend Developer"
+    target: '100%'
+    current: 'monitoring'
+    responsible: 'Frontend Developer'
 
 mobile_metrics:
   core_web_vitals:
-    target: "All Green"
-    current: "monitoring"
-    responsible: "Performance Engineer"
-  
+    target: 'All Green'
+    current: 'monitoring'
+    responsible: 'Performance Engineer'
+
   touch_target_compliance:
-    target: "100% ≥44px"
-    current: "monitoring"
-    responsible: "UX Designer"
+    target: '100% ≥44px'
+    current: 'monitoring'
+    responsible: 'UX Designer'
 
 integration_metrics:
   test_coverage:
-    target: "≥90%"
-    current: "monitoring"
-    responsible: "QA Lead"
-  
+    target: '≥90%'
+    current: 'monitoring'
+    responsible: 'QA Lead'
+
   performance_budget:
-    target: "<3s load time"
-    current: "monitoring"
-    responsible: "Performance Engineer"
+    target: '<3s load time'
+    current: 'monitoring'
+    responsible: 'Performance Engineer'
 ```
 
 ---
@@ -418,24 +450,28 @@ integration_metrics:
 ### Risk Classification & Response
 
 #### **High-Risk Scenarios** (Immediate Escalation)
+
 - **SEO Ranking Impact**: Changes affect search visibility
 - **Performance Degradation**: >20% performance loss
 - **Mobile UX Regression**: Touch targets <44px, content obstruction
 - **Integration Failures**: Systems don't work together
 
 #### **Medium-Risk Scenarios** (Daily Monitoring)
+
 - **Browser Compatibility**: Works on <90% target browsers
 - **I18n Issues**: Language switching problems
 - **Documentation Gaps**: Missing or outdated docs
 
 #### **Low-Risk Scenarios** (Sprint Review)
+
 - **Minor Performance**: 5-10% performance impact
 - **Edge Case Bugs**: Rare scenario failures
 - **Cosmetic Issues**: Minor UI inconsistencies
 
 ### Emergency Response Protocol
 
-#### **Code Red: Production Impact** 
+#### **Code Red: Production Impact**
+
 **Trigger**: Critical functionality broken, SEO disaster, major performance regression
 
 ```yaml
@@ -444,22 +480,23 @@ immediate_actions:
   - Activate incident response team
   - Assess impact and root cause
   - Implement immediate mitigation
-  
+
 response_team:
-  incident_commander: "DevOps"
-  technical_lead: "Architect" 
-  communications: "Project Manager"
-  validation: "QA Lead"
+  incident_commander: 'DevOps'
+  technical_lead: 'Architect'
+  communications: 'Project Manager'
+  validation: 'QA Lead'
 
 recovery_steps:
-  1: "Immediate rollback to last known good state"
-  2: "Root cause analysis with Sequential MCP"
-  3: "Fix implementation with appropriate persona"
-  4: "Validation with Playwright testing"
-  5: "Gradual re-deployment with monitoring"
+  1: 'Immediate rollback to last known good state'
+  2: 'Root cause analysis with Sequential MCP'
+  3: 'Fix implementation with appropriate persona'
+  4: 'Validation with Playwright testing'
+  5: 'Gradual re-deployment with monitoring'
 ```
 
 #### **Code Yellow: Quality Issues**
+
 **Trigger**: Quality gates failing, performance concerns, integration problems
 
 ```yaml
@@ -468,7 +505,7 @@ response_actions:
   - Assign primary persona for resolution
   - Set resolution timeline
   - Increase monitoring frequency
-  
+
 escalation_timeline:
   - 2_hours: Primary persona investigates
   - 4_hours: Secondary persona assists
@@ -483,12 +520,14 @@ escalation_timeline:
 ### Daily Progress Tracking
 
 #### **Individual Persona Metrics**
+
 - **Task Completion Rate**: % of daily tasks completed
 - **Quality Score**: % of tasks passing initial validation
 - **Collaboration Score**: Cross-persona interaction effectiveness
 - **MCP Utilization**: Tool usage efficiency and success rate
 
 #### **Cross-Stream Coordination Metrics**
+
 - **Handoff Success Rate**: % of smooth persona transitions
 - **Integration Issues**: Number of conflicts per day
 - **Communication Effectiveness**: Response time to coordination requests
@@ -497,6 +536,7 @@ escalation_timeline:
 ### Sprint Success Dashboard
 
 #### **Sprint Velocity Tracking**
+
 ```yaml
 sprint_1_targets:
   story_points: 25
@@ -526,6 +566,7 @@ sprint_4_targets:
 ### Final Success Criteria
 
 #### **Epic-Level Success Metrics**
+
 - **SEO Improvement**: Lighthouse SEO score increased by ≥20 points
 - **Mobile Performance**: Core Web Vitals all green
 - **User Experience**: No regressions, improved mobile usability
@@ -533,6 +574,7 @@ sprint_4_targets:
 - **Team Satisfaction**: ≥4.5/5 team satisfaction with delegation process
 
 #### **Long-term Success Tracking**
+
 - **1 Week Post-Launch**: No critical issues, user feedback positive
 - **1 Month Post-Launch**: SEO rankings improved, mobile usage increased
 - **3 Months Post-Launch**: Sustained improvements, no technical debt
@@ -542,23 +584,27 @@ sprint_4_targets:
 ## 🎯 Project Manager Action Items
 
 ### Pre-Sprint Setup
+
 - [ ] Configure project tracking with persona assignments
-- [ ] Setup daily standup agenda with coordination points  
+- [ ] Setup daily standup agenda with coordination points
 - [ ] Prepare MCP server access and fallback procedures
 - [ ] Brief all personas on coordination protocols
 
 ### Daily Management Tasks
+
 - [ ] **9:00 AM**: Facilitate morning standup with all personas
 - [ ] **1:00 PM**: Monitor cross-stream coordination progress
 - [ ] **3:00 PM**: Check integration checkpoint progress
 - [ ] **4:30 PM**: Review daily outcomes and plan next day
 
 ### Weekly Management Focus
+
 - [ ] **Monday**: Sprint planning and persona role clarity
 - [ ] **Wednesday**: Mid-sprint checkpoint and risk assessment
 - [ ] **Friday**: Sprint review, retrospective, and next sprint planning
 
 ### Success Factors for Delegation
+
 1. **Clear Accountability**: Each persona knows their primary responsibilities
 2. **Effective Handoffs**: Smooth transitions between specialists
 3. **Quality First**: Never compromise quality gates for speed
@@ -567,7 +613,7 @@ sprint_4_targets:
 
 ---
 
-*📋 **Project Manager Reference Guide**  
+_📋 **Project Manager Reference Guide**  
 📅 **Updated**: 2025-08-26  
 🎯 **Status**: Ready for Sprint 1 Kickoff  
-👥 **Coordination Strategy**: Multi-Persona + Intelligent MCP Routing*
+👥 **Coordination Strategy**: Multi-Persona + Intelligent MCP Routing_

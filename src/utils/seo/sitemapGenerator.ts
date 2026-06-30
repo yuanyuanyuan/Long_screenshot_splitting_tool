@@ -92,7 +92,7 @@ class SitemapGenerator {
   private generateUrlEntry(page: SitemapUrl): string {
     const baseUrl = this.config?.baseUrl || 'https://screenshot-splitter.com';
     const fullUrl = `${baseUrl}${page.url}`;
-    
+
     let entry = `  <url>
     <loc>${fullUrl}</loc>
     <lastmod>${page.lastmod}</lastmod>
@@ -107,7 +107,7 @@ class SitemapGenerator {
         entry += `
     <xhtml:link rel="alternate" hreflang="${hreflang}" href="${baseUrl}${langUrl}" />`;
       });
-      
+
       // 添加x-default
       const defaultUrl = this.generateLanguageUrl(page.url, 'zh-CN');
       entry += `
@@ -127,7 +127,7 @@ class SitemapGenerator {
     if (language === 'zh-CN') {
       return basePath; // 中文为默认语言，不需要前缀
     }
-    
+
     // 英文等其他语言添加语言前缀
     const langPrefix = `/${language}`;
     return basePath === '/' ? langPrefix : `${langPrefix}${basePath}`;
@@ -139,29 +139,29 @@ class SitemapGenerator {
   private generateMultilingualUrls(): string[] {
     const urls: string[] = [];
     const baseUrl = this.config?.baseUrl || 'https://screenshot-splitter.com';
-    
+
     // 页面类型和路径的映射
     const pageRoutes: Record<PageType, string> = {
       home: '/',
       upload: '/upload',
       split: '/split',
-      export: '/export'
+      export: '/export',
     };
 
     // 支持的语言
     const supportedLanguages: Language[] = ['zh-CN', 'en'];
-    
+
     // 为每个页面生成多语言版本
     Object.entries(pageRoutes).forEach(([pageType, route]) => {
       const page = pageType as PageType;
-      
+
       // 获取页面配置
       const pageConfig = this.getPageConfig(page);
-      
+
       supportedLanguages.forEach(lang => {
         const langUrl = this.generateLanguageUrl(route, lang);
         const fullUrl = `${baseUrl}${langUrl}`;
-        
+
         let entry = `  <url>
     <loc>${fullUrl}</loc>
     <lastmod>${pageConfig.lastmod}</lastmod>
@@ -196,34 +196,34 @@ class SitemapGenerator {
    */
   private getPageConfig(page: PageType): SitemapUrl {
     const today = new Date().toISOString().split('T')[0];
-    
+
     const defaultConfigs: Record<PageType, Omit<SitemapUrl, 'url' | 'languages'>> = {
       home: {
         lastmod: today,
         changefreq: 'weekly',
-        priority: 1.0
+        priority: 1.0,
       },
       upload: {
         lastmod: today,
         changefreq: 'monthly',
-        priority: 0.8
+        priority: 0.8,
       },
       split: {
         lastmod: today,
         changefreq: 'monthly',
-        priority: 0.9
+        priority: 0.9,
       },
       export: {
         lastmod: today,
         changefreq: 'monthly',
-        priority: 0.7
-      }
+        priority: 0.7,
+      },
     };
 
     return {
       url: '',
       languages: ['zh-CN', 'en'],
-      ...defaultConfigs[page]
+      ...defaultConfigs[page],
     };
   }
 
@@ -236,7 +236,7 @@ class SitemapGenerator {
       const cacheTime = new Date(this.cache.lastGenerated);
       const now = new Date();
       const hoursDiff = (now.getTime() - cacheTime.getTime()) / (1000 * 60 * 60);
-      
+
       if (hoursDiff < 6) {
         return this.cache;
       }
@@ -250,7 +250,7 @@ class SitemapGenerator {
         const cacheTime = new Date(parsed.lastGenerated);
         const now = new Date();
         const hoursDiff = (now.getTime() - cacheTime.getTime()) / (1000 * 60 * 60);
-        
+
         if (hoursDiff < 6) {
           this.cache = parsed;
           return parsed;
@@ -281,7 +281,7 @@ class SitemapGenerator {
     // 生成新内容
     const content = this.generateSitemapContent();
     const urlCount = (content.match(/<url>/g) || []).length;
-    
+
     const generated: GeneratedSitemap = {
       content,
       lastGenerated: new Date().toISOString(),
@@ -350,7 +350,7 @@ class SitemapGenerator {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -359,7 +359,7 @@ class SitemapGenerator {
    */
   private getFallbackConfig(): SitemapConfig {
     const today = new Date().toISOString().split('T')[0];
-    
+
     return {
       baseUrl: 'https://screenshot-splitter.com',
       generateStaticSitemap: true,
@@ -371,30 +371,30 @@ class SitemapGenerator {
           lastmod: today,
           changefreq: 'weekly',
           priority: 1.0,
-          languages: ['zh-CN', 'en']
+          languages: ['zh-CN', 'en'],
         },
         {
           url: '/upload',
           lastmod: today,
           changefreq: 'monthly',
           priority: 0.8,
-          languages: ['zh-CN', 'en']
+          languages: ['zh-CN', 'en'],
         },
         {
           url: '/split',
           lastmod: today,
           changefreq: 'monthly',
           priority: 0.9,
-          languages: ['zh-CN', 'en']
+          languages: ['zh-CN', 'en'],
         },
         {
           url: '/export',
           lastmod: today,
           changefreq: 'monthly',
           priority: 0.7,
-          languages: ['zh-CN', 'en']
-        }
-      ]
+          languages: ['zh-CN', 'en'],
+        },
+      ],
     };
   }
 

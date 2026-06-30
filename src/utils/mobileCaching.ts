@@ -9,7 +9,7 @@ export enum CacheType {
   IMAGE = 'image',
   DATA = 'data',
   RESOURCE = 'resource',
-  CONFIG = 'config'
+  CONFIG = 'config',
 }
 
 // 缓存策略
@@ -18,7 +18,7 @@ export enum CacheStrategy {
   NETWORK_FIRST = 'network-first',
   CACHE_ONLY = 'cache-only',
   NETWORK_ONLY = 'network-only',
-  STALE_WHILE_REVALIDATE = 'stale-while-revalidate'
+  STALE_WHILE_REVALIDATE = 'stale-while-revalidate',
 }
 
 // 缓存配置接口
@@ -63,14 +63,14 @@ class IndexedDBAdapter implements StorageAdapter {
   async init(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
       };
-      
-      request.onupgradeneeded = (event) => {
+
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(this.storeName)) {
           db.createObjectStore(this.storeName, { keyPath: 'key' });
@@ -81,12 +81,12 @@ class IndexedDBAdapter implements StorageAdapter {
 
   async getItem(key: string): Promise<string | null> {
     if (!this.db) await this.init();
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.storeName], 'readonly');
       const store = transaction.objectStore(this.storeName);
       const request = store.get(key);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         resolve(request.result ? request.result.value : null);
@@ -96,12 +96,12 @@ class IndexedDBAdapter implements StorageAdapter {
 
   async setItem(key: string, value: string): Promise<void> {
     if (!this.db) await this.init();
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
       const request = store.put({ key, value });
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
@@ -109,12 +109,12 @@ class IndexedDBAdapter implements StorageAdapter {
 
   async removeItem(key: string): Promise<void> {
     if (!this.db) await this.init();
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
       const request = store.delete(key);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
@@ -122,12 +122,12 @@ class IndexedDBAdapter implements StorageAdapter {
 
   async clear(): Promise<void> {
     if (!this.db) await this.init();
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
       const request = store.clear();
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
@@ -135,12 +135,12 @@ class IndexedDBAdapter implements StorageAdapter {
 
   async keys(): Promise<string[]> {
     if (!this.db) await this.init();
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([this.storeName], 'readonly');
       const store = transaction.objectStore(this.storeName);
       const request = store.getAllKeys();
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve(request.result as string[]);
     });
@@ -183,11 +183,11 @@ class LocalStorageAdapter implements StorageAdapter {
   private clearOldCache(): void {
     const keys = Object.keys(localStorage);
     const cacheKeys = keys.filter(key => key.startsWith('mobile-cache-'));
-    
+
     // 清理最旧的50%缓存
     const toRemove = Math.ceil(cacheKeys.length * 0.5);
     const sortedKeys = cacheKeys.sort();
-    
+
     for (let i = 0; i < toRemove; i++) {
       localStorage.removeItem(sortedKeys[i]);
     }
@@ -209,7 +209,7 @@ export class MobileCacheManager {
   private constructor() {
     // 优先使用IndexedDB，fallback到LocalStorage
     this.storage = 'indexedDB' in window ? new IndexedDBAdapter() : new LocalStorageAdapter();
-    
+
     // 默认配置
     this.setDefaultConfigs();
   }
@@ -229,7 +229,7 @@ export class MobileCacheManager {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7天
       maxSize: 20 * 1024 * 1024, // 20MB
       compression: true,
-      priority: 8
+      priority: 8,
     });
 
     // 数据缓存配置
@@ -239,7 +239,7 @@ export class MobileCacheManager {
       maxAge: 60 * 60 * 1000, // 1小时
       maxSize: 5 * 1024 * 1024, // 5MB
       compression: true,
-      priority: 9
+      priority: 9,
     });
 
     // 资源缓存配置
@@ -249,7 +249,7 @@ export class MobileCacheManager {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30天
       maxSize: 10 * 1024 * 1024, // 10MB
       compression: true,
-      priority: 6
+      priority: 6,
     });
 
     // 配置缓存
@@ -259,7 +259,7 @@ export class MobileCacheManager {
       maxAge: 24 * 60 * 60 * 1000, // 24小时
       maxSize: 1 * 1024 * 1024, // 1MB
       compression: false,
-      priority: 10
+      priority: 10,
     });
   }
 
@@ -274,10 +274,10 @@ export class MobileCacheManager {
 
       // 加载现有缓存到内存
       await this.loadCache();
-      
+
       // 清理过期缓存
       await this.cleanExpiredCache();
-      
+
       this.isInitialized = true;
       console.log('📱 移动端缓存管理器初始化完成');
     } catch (error) {
@@ -332,7 +332,7 @@ export class MobileCacheManager {
     if (!config) return;
 
     const now = Date.now();
-    
+
     // 序列化数据
     let serializedData: string;
     try {
@@ -348,7 +348,7 @@ export class MobileCacheManager {
     }
 
     const size = new Blob([serializedData]).size;
-    
+
     // 检查单个条目大小限制
     if (size > config.maxSize) {
       console.warn(`缓存条目过大 (${size} bytes)，跳过缓存`);
@@ -367,7 +367,7 @@ export class MobileCacheManager {
       type,
       compressed: config.compression && serializedData.length > 1024,
       accessCount: 1,
-      lastAccessed: now
+      lastAccessed: now,
     };
 
     // 更新内存缓存
@@ -375,7 +375,7 @@ export class MobileCacheManager {
     if (existingEntry) {
       this.totalSize -= existingEntry.size;
     }
-    
+
     this.cache.set(key, entry);
     this.totalSize += size;
 
@@ -397,7 +397,7 @@ export class MobileCacheManager {
     if (!entry) return null;
 
     const now = Date.now();
-    
+
     // 检查是否过期
     if (entry.expires < now) {
       await this.delete(key);
@@ -442,7 +442,7 @@ export class MobileCacheManager {
           keysToDelete.push(key);
         }
       }
-      
+
       for (const key of keysToDelete) {
         await this.delete(key);
       }
@@ -465,11 +465,14 @@ export class MobileCacheManager {
 
     // 获取可清理的条目（按优先级和最后访问时间排序）
     const entries = Array.from(this.cache.entries())
-.map(([cacheKey, entry]) => ({ cacheKey, ...entry }))
-      .filter(entry => entry.type !== type || this.configs.get(entry.type)!.priority < config.priority)
+      .map(([cacheKey, entry]) => ({ cacheKey, ...entry }))
+      .filter(
+        entry => entry.type !== type || this.configs.get(entry.type)!.priority < config.priority
+      )
       .sort((a, b) => {
         // 优先清理低优先级和长时间未访问的条目
-        const priorityDiff = this.configs.get(a.type)!.priority - this.configs.get(b.type)!.priority;
+        const priorityDiff =
+          this.configs.get(a.type)!.priority - this.configs.get(b.type)!.priority;
         if (priorityDiff !== 0) return priorityDiff;
         return a.lastAccessed - b.lastAccessed;
       });
@@ -478,7 +481,7 @@ export class MobileCacheManager {
     let freedSpace = 0;
     for (const entry of entries) {
       if (freedSpace >= requiredSize) break;
-      
+
       await this.delete(entry.cacheKey);
       freedSpace += entry.size;
     }
@@ -493,66 +496,70 @@ export class MobileCacheManager {
         const stream = new CompressionStream('gzip');
         const writer = stream.writable.getWriter();
         const reader = stream.readable.getReader();
-        
+
         writer.write(new TextEncoder().encode(data));
         writer.close();
-        
+
         const chunks: Uint8Array[] = [];
         let result = await reader.read();
-        
+
         while (!result.done) {
           chunks.push(result.value);
           result = await reader.read();
         }
-        
+
         const compressed = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
         let offset = 0;
         for (const chunk of chunks) {
           compressed.set(chunk, offset);
           offset += chunk.length;
         }
-        
+
         return btoa(String.fromCharCode(...compressed));
       }
     } catch (error) {
       console.warn('压缩失败，使用原始数据:', error);
     }
-    
+
     return data;
   }
 
   private async decompress(data: string): Promise<string> {
     try {
       if ('DecompressionStream' in window && data !== data) {
-        const compressed = new Uint8Array(atob(data).split('').map(c => c.charCodeAt(0)));
+        const compressed = new Uint8Array(
+          atob(data)
+            .split('')
+            .map(c => c.charCodeAt(0))
+        );
         const stream = new DecompressionStream('gzip');
         const writer = stream.writable.getWriter();
         const reader = stream.readable.getReader();
-        
+
         writer.write(compressed);
         writer.close();
-        
+
         const chunks: Uint8Array[] = [];
         let result = await reader.read();
-        
+
         while (!result.done) {
           chunks.push(result.value);
           result = await reader.read();
         }
-        
+
         const decompressed = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
         let offset = 0;
         for (const chunk of chunks) {
           decompressed.set(chunk, offset);
           offset += chunk.length;
         }
-        
+
         return new TextDecoder().decode(decompressed);
       }
     } catch (error) {
       console.warn('解压缩失败，使用原始数据:', error);
     }
-    
+
     return data;
   }
 
@@ -572,7 +579,7 @@ export class MobileCacheManager {
       if (!typeBreakdown[typeKey]) {
         typeBreakdown[typeKey] = { count: 0, size: 0 };
       }
-      
+
       typeBreakdown[typeKey].count++;
       typeBreakdown[typeKey].size += entry.size;
       totalAccess += entry.accessCount;
@@ -583,19 +590,19 @@ export class MobileCacheManager {
       totalSize: this.totalSize,
       totalEntries: this.cache.size,
       hitRate: totalAccess > 0 ? (totalHits / totalAccess) * 100 : 0,
-      typeBreakdown
+      typeBreakdown,
     };
   }
 
   // 预热缓存
   async preheat(urls: string[], type: CacheType = CacheType.IMAGE): Promise<void> {
     console.log(`🔥 开始预热 ${urls.length} 个资源`);
-    
+
     const promises = urls.map(async (url, index) => {
       try {
         // 延迟加载避免网络拥堵
         await new Promise(resolve => setTimeout(resolve, index * 100));
-        
+
         const response = await fetch(url);
         if (response.ok) {
           const data = await response.blob();
@@ -617,7 +624,7 @@ export const mobileCache = MobileCacheManager.getInstance();
 // React Hook
 export function useMobileCache() {
   const cache = MobileCacheManager.getInstance();
-  
+
   // Initialize cache on import
   cache.initialize();
 
@@ -639,25 +646,25 @@ export function withMobileCache(type: CacheType = CacheType.DATA, _maxAge?: numb
     descriptor: TypedPropertyDescriptor<T>
   ) {
     const method = descriptor.value!;
-    
+
     descriptor.value = async function (this: any, ...args: any[]) {
       const cache = MobileCacheManager.getInstance();
       const cacheKey = `${propertyName}-${JSON.stringify(args)}`;
-      
+
       // 尝试从缓存获取
       const cached = await cache.get(cacheKey, type);
       if (cached !== null) {
         return cached;
       }
-      
+
       // 执行原方法
       const result = await method.apply(this, args);
-      
+
       // 缓存结果
       if (result !== undefined && result !== null) {
         await cache.set(cacheKey, result, type);
       }
-      
+
       return result;
     } as any;
   };

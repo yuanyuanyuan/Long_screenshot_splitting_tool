@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({
   transparentOnMobile = true,
   blurBackground = true,
   safeAreaPadding = true,
-  children
+  children,
 }) => {
   const viewport = useViewport();
   const [isVisible, setIsVisible] = useState(true);
@@ -35,24 +35,24 @@ export const Footer: React.FC<FooterProps> = ({
   const [, setScrollDirection] = useState<'up' | 'down'>('up');
   const lastScrollY = useRef(0);
   const footerRef = useRef<HTMLDivElement>(null);
-  
+
   // 处理滚动显示/隐藏逻辑
   useEffect(() => {
     if (!hideOnScroll) return;
-    
+
     let ticking = false;
-    
+
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
           const windowHeight = window.innerHeight;
           const documentHeight = document.documentElement.scrollHeight;
-          
+
           // 检测是否在页面底部
           const atBottom = currentScrollY + windowHeight >= documentHeight - 50;
           setIsAtBottom(atBottom);
-          
+
           // 检测滚动方向
           if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
             // 向下滚动且不在顶部
@@ -65,23 +65,23 @@ export const Footer: React.FC<FooterProps> = ({
             setScrollDirection('up');
             setIsVisible(true);
           }
-          
+
           lastScrollY.current = currentScrollY;
           ticking = false;
         });
-        
+
         ticking = true;
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // 初始检查
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [hideOnScroll, viewport.isMobile]);
-  
+
   // 计算动态样式
   const footerStyles: React.CSSProperties = {
     position: fixed ? 'fixed' : 'relative',
@@ -93,36 +93,28 @@ export const Footer: React.FC<FooterProps> = ({
     transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease',
     opacity: isVisible ? 1 : 0,
     pointerEvents: isVisible ? 'auto' : 'none',
-    
+
     // 移动端特殊处理
     ...(viewport.isMobile && {
-      backgroundColor: transparentOnMobile 
-        ? 'rgba(255, 255, 255, 0.95)' 
-        : 'white',
+      backgroundColor: transparentOnMobile ? 'rgba(255, 255, 255, 0.95)' : 'white',
       backdropFilter: blurBackground ? 'blur(10px)' : 'none',
       WebkitBackdropFilter: blurBackground ? 'blur(10px)' : 'none',
       borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-      
+
       // iOS 安全区域适配
-      paddingBottom: safeAreaPadding 
-        ? 'env(safe-area-inset-bottom, 0px)' 
-        : '0',
-      paddingLeft: safeAreaPadding 
-        ? 'env(safe-area-inset-left, 0px)' 
-        : '0',
-      paddingRight: safeAreaPadding 
-        ? 'env(safe-area-inset-right, 0px)' 
-        : '0',
+      paddingBottom: safeAreaPadding ? 'env(safe-area-inset-bottom, 0px)' : '0',
+      paddingLeft: safeAreaPadding ? 'env(safe-area-inset-left, 0px)' : '0',
+      paddingRight: safeAreaPadding ? 'env(safe-area-inset-right, 0px)' : '0',
     }),
-    
+
     // 桌面端样式
     ...(!viewport.isMobile && {
       backgroundColor: 'rgba(255, 255, 255, 0.98)',
       borderTop: '1px solid #e0e0e0',
       boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)',
-    })
+    }),
   };
-  
+
   // 内容容器样式
   const contentStyles: React.CSSProperties = {
     padding: viewport.isMobile ? '12px 16px' : '16px 24px',
@@ -133,23 +125,23 @@ export const Footer: React.FC<FooterProps> = ({
     flexDirection: viewport.isMobile ? 'column' : 'row',
     gap: viewport.isMobile ? '8px' : '16px',
   };
-  
+
   // 占位符高度（防止内容被遮挡）
   const placeholderHeight = footerRef.current?.offsetHeight || (viewport.isMobile ? 60 : 80);
-  
+
   return (
     <>
       {/* 占位符，防止固定定位的页脚遮挡内容 */}
       {fixed && (
-        <div 
-          style={{ 
+        <div
+          style={{
             height: `${placeholderHeight}px`,
-            transition: 'height 0.3s ease'
-          }} 
+            transition: 'height 0.3s ease',
+          }}
           aria-hidden="true"
         />
       )}
-      
+
       {/* 页脚主体 */}
       <footer
         ref={footerRef}
@@ -160,22 +152,18 @@ export const Footer: React.FC<FooterProps> = ({
       >
         <div style={contentStyles}>
           {/* 版权信息 */}
-          <CopyrightInfo 
+          <CopyrightInfo
             className={styles.copyright}
             language={viewport.isMobile ? 'zh-CN' : undefined}
           />
-          
+
           {/* 自定义子内容 */}
-          {children && (
-            <div className={styles.additionalContent}>
-              {children}
-            </div>
-          )}
+          {children && <div className={styles.additionalContent}>{children}</div>}
         </div>
-        
+
         {/* 滚动提示（仅在移动端显示） */}
         {viewport.isMobile && !isVisible && isAtBottom && (
-          <div 
+          <div
             className={styles.scrollHint}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             role="button"
@@ -195,18 +183,16 @@ export const Footer: React.FC<FooterProps> = ({
 export const CompactFooter: React.FC<{ language?: 'zh-CN' | 'en' }> = ({ language }) => {
   const currentYear = new Date().getFullYear();
   const viewport = useViewport();
-  
+
   return (
-    <div 
+    <div
       style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         padding: viewport.isMobile ? '8px' : '12px',
-        paddingBottom: viewport.isMobile 
-          ? 'calc(8px + env(safe-area-inset-bottom, 0px))' 
-          : '12px',
+        paddingBottom: viewport.isMobile ? 'calc(8px + env(safe-area-inset-bottom, 0px))' : '12px',
         background: 'rgba(0, 0, 0, 0.02)',
         borderTop: '1px solid rgba(0, 0, 0, 0.05)',
         fontSize: '12px',

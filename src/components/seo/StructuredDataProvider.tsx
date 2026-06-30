@@ -1,12 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { structuredDataGenerator } from '../../utils/seo/structuredDataGenerator';
-import type {
-  PageType,
-  Language,
-  StructuredDataType,
-  SEOContext
-} from '../../types/seo.types';
+import type { PageType, Language, StructuredDataType, SEOContext } from '../../types/seo.types';
 
 /**
  * Props for StructuredDataProvider component
@@ -32,7 +27,7 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
   context = {},
   enableValidation = true,
   onLoad,
-  onError
+  onError,
 }) => {
   const [structuredData, setStructuredData] = useState<Record<string, any>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,61 +38,64 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
     const generateData = async () => {
       setIsLoading(true);
       setErrors([]);
-      
+
       try {
         const dataItems: Record<string, any>[] = [];
         const validationErrors: string[] = [];
-        
+
         for (const type of types) {
           try {
             let data: any;
-            
+
             switch (type) {
               case 'WebApplication':
                 data = structuredDataGenerator.generateWebApplication(page, language, context);
                 break;
-                
+
               case 'SoftwareApplication':
                 data = structuredDataGenerator.generateSoftwareApplication(language, context);
                 break;
-                
+
               case 'BreadcrumbList':
                 data = structuredDataGenerator.generateBreadcrumb(page, language);
                 break;
-                
+
               case 'FAQPage':
                 data = structuredDataGenerator.generateFAQ(language);
                 break;
-                
+
               case 'HowTo':
                 data = structuredDataGenerator.generateHowTo(language);
                 break;
-                
+
               default:
                 console.warn(`[StructuredDataProvider] Unknown type: ${type}`);
                 continue;
             }
-            
+
             // Validate if enabled
             if (enableValidation) {
               const validation = structuredDataGenerator.validateStructuredData(data);
               if (!validation.isValid) {
                 validationErrors.push(...validation.errors);
                 if (validation.warnings) {
-                  console.warn('[StructuredDataProvider] Validation warnings:', validation.warnings);
+                  console.warn(
+                    '[StructuredDataProvider] Validation warnings:',
+                    validation.warnings
+                  );
                 }
               }
             }
-            
+
             dataItems.push(data);
           } catch (error) {
             console.error(`[StructuredDataProvider] Failed to generate ${type}:`, error);
             validationErrors.push(`Failed to generate ${type}: ${(error as Error).message}`);
           }
         }
-        
+
         setStructuredData(dataItems);
-        
+
         if (validationErrors.length > 0) {
           setErrors(validationErrors);
           if (onError) {
@@ -114,23 +112,23 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
         setIsLoading(false);
       }
     };
-    
+
     generateData();
   }, [page, language, types, context, enableValidation, onLoad, onError]);
 
   // Generate combined structured data for page
   const combinedStructuredData = useMemo(() => {
     if (structuredData.length === 0) return null;
-    
+
     // If single item, return as-is
     if (structuredData.length === 1) {
       return structuredData[0];
     }
-    
+
     // Multiple items - combine into Graph
     return {
       '@context': 'https://schema.org',
-      '@graph': structuredData
+      '@graph': structuredData,
     };
   }, [structuredData]);
 
@@ -146,23 +144,25 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
           {JSON.stringify(combinedStructuredData, null, 2)}
         </script>
       </Helmet>
-      
+
       {/* Debug information in development */}
       {process.env.NODE_ENV === 'development' && errors.length > 0 && (
-        <div style={{
-          position: 'fixed',
-          bottom: 60,
-          right: 10,
-          background: '#ff5722',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '5px',
-          fontSize: '12px',
-          maxWidth: '300px',
-          maxHeight: '150px',
-          overflow: 'auto',
-          zIndex: 9998
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 60,
+            right: 10,
+            background: '#ff5722',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '5px',
+            fontSize: '12px',
+            maxWidth: '300px',
+            maxHeight: '150px',
+            overflow: 'auto',
+            zIndex: 9998,
+          }}
+        >
           <strong>Structured Data Errors:</strong>
           {errors.map((error, index) => (
             <div key={index} style={{ marginTop: '5px' }}>
@@ -178,40 +178,40 @@ export const StructuredDataProvider: React.FC<StructuredDataProviderProps> = ({
 /**
  * Enhanced component with additional features
  */
-export const EnhancedStructuredDataProvider: React.FC<StructuredDataProviderProps & {
-  enableAutoUpdate?: boolean;
-  updateInterval?: number;
-}> = ({
+export const EnhancedStructuredDataProvider: React.FC<
+  StructuredDataProviderProps & {
+    enableAutoUpdate?: boolean;
+    updateInterval?: number;
+  }
+> = ({
   enableAutoUpdate = false,
   updateInterval = 60000, // 1 minute default
   ...props
 }) => {
   const [updateCount, setUpdateCount] = useState(0);
-  
+
   // Auto-update structured data periodically
   useEffect(() => {
     if (!enableAutoUpdate) return;
-    
+
     const interval = setInterval(() => {
       setUpdateCount(prev => prev + 1);
     }, updateInterval);
-    
+
     return () => clearInterval(interval);
   }, [enableAutoUpdate, updateInterval]);
-  
+
   // Update context with refresh indicator
-  const enhancedContext = useMemo(() => ({
-    ...props.context,
-    lastUpdated: new Date().toISOString(),
-    updateCount
-  }), [props.context, updateCount]);
-  
-  return (
-    <StructuredDataProvider
-      {...props}
-      context={enhancedContext}
-    />
+  const enhancedContext = useMemo(
+    () => ({
+      ...props.context,
+      lastUpdated: new Date().toISOString(),
+      updateCount,
+    }),
+    [props.context, updateCount]
   );
+
+  return <StructuredDataProvider {...props} context={enhancedContext} />;
 };
 
 // For backward compatibility with lazy loading in SEOManager
@@ -221,14 +221,7 @@ export const StructuredDataGenerator: React.FC<{
   types: StructuredDataType[];
   onLoad: () => void;
 }> = ({ page, language, types, onLoad }) => {
-  return (
-    <StructuredDataProvider
-      page={page}
-      language={language}
-      types={types}
-      onLoad={onLoad}
-    />
-  );
+  return <StructuredDataProvider page={page} language={language} types={types} onLoad={onLoad} />;
 };
 
 export default StructuredDataProvider;

@@ -24,11 +24,11 @@ const devProcess = spawn('pnpm', ['--filter', packageName, 'dev'], {
   shell: true,
   env: {
     ...process.env,
-    PORT: port
-  }
+    PORT: port,
+  },
 });
 
-devProcess.on('close', (code) => {
+devProcess.on('close', code => {
   console.log(`\n开发服务器已停止，退出码: ${code}`);
 });
 

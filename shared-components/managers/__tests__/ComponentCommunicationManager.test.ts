@@ -19,7 +19,7 @@ describe('ComponentCommunicationManager', () => {
       destroy: jest.fn(),
       getState: jest.fn(() => ({ initialized: true })),
       setState: jest.fn(),
-      onMessage: jest.fn()
+      onMessage: jest.fn(),
     };
   });
 
@@ -56,7 +56,7 @@ describe('ComponentCommunicationManager', () => {
     test('应该能够发送消息给指定组件', () => {
       const message = { type: 'test', data: { value: 123 } };
       const result = manager.sendMessage('test-component', message);
-      
+
       expect(result).toBe(true);
       expect(mockComponent.onMessage).toHaveBeenCalledWith(message);
     });
@@ -64,7 +64,7 @@ describe('ComponentCommunicationManager', () => {
     test('发送消息给不存在的组件应该返回false', () => {
       const message = { type: 'test', data: {} };
       const result = manager.sendMessage('non-existent', message);
-      
+
       expect(result).toBe(false);
     });
 
@@ -72,14 +72,14 @@ describe('ComponentCommunicationManager', () => {
       const mockComponent2: ComponentInterface = {
         ...mockComponent,
         id: 'test-component-2',
-        onMessage: jest.fn()
+        onMessage: jest.fn(),
       };
-      
+
       manager.registerComponent(mockComponent2);
-      
+
       const message = { type: 'broadcast', data: { value: 456 } };
       manager.broadcastMessage(message);
-      
+
       expect(mockComponent.onMessage).toHaveBeenCalledWith(message);
       expect(mockComponent2.onMessage).toHaveBeenCalledWith(message);
     });
@@ -88,26 +88,26 @@ describe('ComponentCommunicationManager', () => {
   describe('事件监听', () => {
     test('应该能够添加和移除事件监听器', () => {
       const listener = jest.fn();
-      
+
       manager.addEventListener('test-event', listener);
       manager.emit('test-event', { data: 'test' });
-      
+
       expect(listener).toHaveBeenCalledWith({ data: 'test' });
-      
+
       manager.removeEventListener('test-event', listener);
       manager.emit('test-event', { data: 'test2' });
-      
+
       expect(listener).toHaveBeenCalledTimes(1);
     });
 
     test('应该能够处理多个监听器', () => {
       const listener1 = jest.fn();
       const listener2 = jest.fn();
-      
+
       manager.addEventListener('test-event', listener1);
       manager.addEventListener('test-event', listener2);
       manager.emit('test-event', { data: 'test' });
-      
+
       expect(listener1).toHaveBeenCalledWith({ data: 'test' });
       expect(listener2).toHaveBeenCalledWith({ data: 'test' });
     });
@@ -127,7 +127,7 @@ describe('ComponentCommunicationManager', () => {
     test('应该能够设置组件状态', () => {
       const newState = { initialized: false, data: 'test' };
       const result = manager.setComponentState('test-component', newState);
-      
+
       expect(result).toBe(true);
       expect(mockComponent.setState).toHaveBeenCalledWith(newState);
     });
@@ -141,25 +141,25 @@ describe('ComponentCommunicationManager', () => {
   describe('生命周期管理', () => {
     test('应该能够初始化所有组件', async () => {
       manager.registerComponent(mockComponent);
-      
+
       await manager.initializeAll();
-      
+
       expect(mockComponent.initialize).toHaveBeenCalled();
     });
 
     test('应该能够销毁所有组件', async () => {
       manager.registerComponent(mockComponent);
-      
+
       await manager.destroyAll();
-      
+
       expect(mockComponent.destroy).toHaveBeenCalled();
     });
 
     test('销毁管理器时应该清理所有资源', async () => {
       manager.registerComponent(mockComponent);
-      
+
       await manager.destroy();
-      
+
       expect(mockComponent.destroy).toHaveBeenCalled();
       expect(manager.getComponent('test-component')).toBeUndefined();
     });

@@ -1,6 +1,7 @@
 # 建议的开发命令
 
 ## 🚀 开发工作流
+
 ```bash
 # 安装和设置
 pnpm install              # 安装所有依赖
@@ -36,6 +37,7 @@ pnpm deploy              # 部署到GitHub Pages
 ```
 
 ## 🔧 工具命令
+
 ```bash
 # 构建分析
 node tools/build-scripts/bundle-analyzer.js      # 构建产物分析
@@ -49,6 +51,7 @@ node tools/build-scripts/deploy-rollback.js      # 部署回滚
 ```
 
 ## 📊 监控和优化
+
 ```bash
 # 性能监控
 node tools/build-scripts/build-cache-optimizer.js    # 构建缓存优化
@@ -60,6 +63,7 @@ node scripts/detect-memory-leaks.js                 # 内存泄漏检测
 ```
 
 ## 🐛 调试命令
+
 ```bash
 # 测试调试
 pnpm test:file <测试文件>    # 运行特定测试文件
@@ -72,6 +76,7 @@ VITE_ASSETS_BASE_URL=https://cdn.example.com/ pnpm build  # 带CDN配置构建
 ```
 
 ## 🔄 组件开发
+
 ```bash
 # 组件独立运行
 cd packages/screenshot-splitter
@@ -85,6 +90,7 @@ pnpm test:coverage        # 组件测试覆盖率
 ```
 
 ## 📦 包管理
+
 ```bash
 # Workspace操作
 pnpm --filter screenshot-splitter <command>  # 对特定包执行命令
@@ -97,6 +103,7 @@ pnpm update               # 更新依赖
 ```
 
 ## 🗑️ 清理命令
+
 ```bash
 pnpm clean                # 清理构建产物
 pnpm clean:all           # 彻底清理（包括node_modules）

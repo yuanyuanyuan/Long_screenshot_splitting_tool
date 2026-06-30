@@ -19,18 +19,18 @@ async function loadTranslations(language: 'zh-CN' | 'en'): Promise<CopyrightTran
     // 动态导入对应的语言文件
     const module = await import(`./locales/${language}.json`);
     const translations = module.default || module;
-    
+
     // 缓存翻译
     translationsCache.set(language, translations);
     return translations;
   } catch (error) {
     console.warn(`[CopyrightInfo] 无法加载 ${language} 语言资源:`, error);
-    
+
     // 回退到英文
     if (language !== 'en') {
       return loadTranslations('en');
     }
-    
+
     // 如果英文也加载失败，返回默认的英文翻译
     return {
       copyright: '© {year} {author}. All rights reserved.',
@@ -38,7 +38,7 @@ async function loadTranslations(language: 'zh-CN' | 'en'): Promise<CopyrightTran
       website: 'Website: {url}',
       poweredBy: 'Powered by {toolName}',
       license: 'Licensed under {license}',
-      attribution: 'Attribution required: {attributionText}'
+      attribution: 'Attribution required: {attributionText}',
     };
   }
 }
@@ -82,7 +82,7 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
   showAttribution = defaultCopyrightConfig.showAttribution,
   className = defaultCopyrightConfig.className,
   language,
-  onClick
+  onClick,
 }) => {
   const [translations, setTranslations] = useState<CopyrightTranslations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,10 +93,10 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -113,9 +113,7 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
   }, [language]);
 
   if (isLoading || !translations) {
-    const loadingClasses = [styles['copyright-info-loading'], className]
-      .filter(Boolean)
-      .join(' ');
+    const loadingClasses = [styles['copyright-info-loading'], className].filter(Boolean).join(' ');
     return (
       <div className={loadingClasses}>
         <span>Loading copyright information...</span>
@@ -131,10 +129,10 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
     if (showPoweredBy && toolName && website) {
       const websiteUrl = normalizeUrl(website);
       contentNodes.push(
-        <a 
-          href={websiteUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={websiteUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           aria-label="Visit StarkYuan's website"
           className={styles['mobile-powered-link']}
         >
@@ -183,17 +181,16 @@ export const CopyrightInfo: React.FC<CopyrightInfoProps> = ({
   const containerClasses = [
     styles['copyright-info'],
     onClick ? styles['copyright-info-clickable'] : '',
-    className
-  ].filter(Boolean).join(' ');
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // 调试日志：检查生效值
   console.log('[CopyrightInfo effective]', { author, email, website, toolName, year });
 
   return (
-    <div 
-      className={containerClasses}
-      onClick={onClick}
-    >
+    <div className={containerClasses} onClick={onClick}>
       {contentNodes.map((node, index) => (
         <div key={index}>{node}</div>
       ))}

@@ -54,7 +54,7 @@ describe('BuildConfig', () => {
 
       expect(devConfig.build.minify).toBe(false);
       expect(prodConfig.build.minify).toBe('esbuild');
-      
+
       expect(devConfig.build.sourcemap).toBe(true);
       expect(prodConfig.build.sourcemap).toBe(false);
     });

@@ -13,7 +13,7 @@ import { componentConfig } from '../../component.config.js';
  */
 export function getAssetPath(filename, type = 'js') {
   const { assets } = componentConfig.deploy;
-  
+
   // 根据资源类型选择对应的路径配置
   let path;
   switch (type) {
@@ -25,10 +25,10 @@ export function getAssetPath(filename, type = 'js') {
       path = assets.jsPath || assets.basePath || '/assets/';
       break;
   }
-  
+
   // 移除可能的前缀 ./
   const cleanFilename = filename.replace(/^\.\//, '');
-  
+
   return `${path}${cleanFilename}`;
 }
 
@@ -41,7 +41,7 @@ export function getAssetPath(filename, type = 'js') {
 export function generateScriptTag(filename, options = {}) {
   const { crossorigin = 'anonymous', type = 'module' } = options;
   const src = getAssetPath(filename, 'js');
-  
+
   return `<script type="${type}" crossorigin="${crossorigin}" src="${src}"></script>`;
 }
 
@@ -64,6 +64,6 @@ export function generateStyleTag(filename) {
 export function generateModulePreloadTag(filename, options = {}) {
   const { crossorigin = 'anonymous' } = options;
   const href = getAssetPath(filename, 'js');
-  
+
   return `<link rel="modulepreload" crossorigin="${crossorigin}" href="${href}">`;
 }

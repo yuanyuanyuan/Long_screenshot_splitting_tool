@@ -31,9 +31,11 @@ describe('DependencyResolver', () => {
       mockPath.resolve.mockReturnValue('/mock/path/shared-components');
       mockPath.join.mockReturnValue('/mock/path/shared-components/package.json');
       mockFs.access.mockResolvedValue(undefined);
-      mockFs.readFile.mockResolvedValue(JSON.stringify({
-        name: 'shared-components'
-      }));
+      mockFs.readFile.mockResolvedValue(
+        JSON.stringify({
+          name: 'shared-components',
+        })
+      );
 
       const result = await resolver.resolveDependency('shared-components', '../shared-components');
 
@@ -45,14 +47,16 @@ describe('DependencyResolver', () => {
     it('应该在主路径失败时使用fallback路径', async () => {
       // 第一次调用失败
       mockFs.access.mockRejectedValueOnce(new Error('File not found'));
-      
+
       // 第二次调用成功
       mockPath.resolve.mockReturnValue('/mock/fallback/shared-components');
       mockPath.join.mockReturnValue('/mock/fallback/shared-components/package.json');
       mockFs.access.mockResolvedValueOnce(undefined);
-      mockFs.readFile.mockResolvedValue(JSON.stringify({
-        name: 'shared-components'
-      }));
+      mockFs.readFile.mockResolvedValue(
+        JSON.stringify({
+          name: 'shared-components',
+        })
+      );
 
       resolver = new DependencyResolver({
         fallbackPaths: ['../../shared-components'],
@@ -83,19 +87,21 @@ describe('DependencyResolver', () => {
 
       mockFs.access.mockRejectedValue(new Error('File not found'));
 
-      await expect(
-        resolver.resolveDependency('non-existent-package')
-      ).rejects.toThrow('无法解析依赖');
+      await expect(resolver.resolveDependency('non-existent-package')).rejects.toThrow(
+        '无法解析依赖'
+      );
     });
   });
 
   describe('validateDependencies', () => {
     it('应该检测workspace配置残留', async () => {
       mockPath.join.mockReturnValue('/mock/package.json');
-      mockFs.readFile.mockResolvedValue(JSON.stringify({
-        name: 'test-package',
-        workspaces: ['packages/*']
-      }));
+      mockFs.readFile.mockResolvedValue(
+        JSON.stringify({
+          name: 'test-package',
+          workspaces: ['packages/*'],
+        })
+      );
 
       const result = await resolver.validateDependencies();
 
@@ -106,12 +112,14 @@ describe('DependencyResolver', () => {
 
     it('应该检测workspace依赖', async () => {
       mockPath.join.mockReturnValue('/mock/package.json');
-      mockFs.readFile.mockResolvedValue(JSON.stringify({
-        name: 'test-package',
-        dependencies: {
-          'shared-components': 'workspace:*'
-        }
-      }));
+      mockFs.readFile.mockResolvedValue(
+        JSON.stringify({
+          name: 'test-package',
+          dependencies: {
+            'shared-components': 'workspace:*',
+          },
+        })
+      );
 
       const result = await resolver.validateDependencies();
 
@@ -122,9 +130,11 @@ describe('DependencyResolver', () => {
     it('应该检查shared-components目录', async () => {
       mockPath.join.mockReturnValue('/mock/package.json');
       mockPath.resolve.mockReturnValue('/mock/shared-components');
-      mockFs.readFile.mockResolvedValue(JSON.stringify({
-        name: 'test-package'
-      }));
+      mockFs.readFile.mockResolvedValue(
+        JSON.stringify({
+          name: 'test-package',
+        })
+      );
       mockFs.access.mockRejectedValue(new Error('Directory not found'));
 
       const result = await resolver.validateDependencies();
@@ -136,12 +146,14 @@ describe('DependencyResolver', () => {
     it('应该在配置正确时返回valid为true', async () => {
       mockPath.join.mockReturnValue('/mock/package.json');
       mockPath.resolve.mockReturnValue('/mock/shared-components');
-      mockFs.readFile.mockResolvedValue(JSON.stringify({
-        name: 'test-package',
-        dependencies: {
-          'react': '^18.0.0'
-        }
-      }));
+      mockFs.readFile.mockResolvedValue(
+        JSON.stringify({
+          name: 'test-package',
+          dependencies: {
+            react: '^18.0.0',
+          },
+        })
+      );
       mockFs.access.mockResolvedValue(undefined);
 
       const result = await resolver.validateDependencies();

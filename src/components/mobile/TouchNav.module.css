@@ -71,7 +71,7 @@
   position: absolute;
   bottom: 0;
   height: 3px;
-  background: var(--primary-color, #007AFF);
+  background: var(--primary-color, #007aff);
   border-radius: 2px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -116,18 +116,18 @@
     font-size: 12px;
     padding: 10px 14px;
   }
-  
+
   .navIcon {
     width: 22px;
     height: 22px;
     font-size: 18px;
   }
-  
+
   .navLabel {
     max-width: 80px;
     font-size: 11px;
   }
-  
+
   .touchNav {
     gap: 4px;
     padding: 6px;
@@ -140,7 +140,7 @@
     min-height: 36px;
     padding: 8px 12px;
   }
-  
+
   .navIcon {
     width: 20px;
     height: 20px;
@@ -152,15 +152,15 @@
   .touchNav {
     background: rgba(30, 30, 30, 0.95);
   }
-  
+
   .navItem {
     color: #e0e0e0;
   }
-  
+
   .navItem:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
   }
-  
+
   .tabBar {
     background: rgba(20, 20, 20, 0.98);
     border-top-color: rgba(255, 255, 255, 0.1);
@@ -172,11 +172,11 @@
   .navItem {
     border: 2px solid transparent;
   }
-  
+
   .navItem:focus {
     border-color: currentColor;
   }
-  
+
   .activeIndicator {
     height: 4px;
   }
@@ -194,7 +194,7 @@
 
 /* 焦点可见性（键盘导航） */
 .navItem:focus-visible {
-  outline: 2px solid var(--primary-color, #007AFF);
+  outline: 2px solid var(--primary-color, #007aff);
   outline-offset: 2px;
 }
 

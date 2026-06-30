@@ -31,7 +31,7 @@ export class TouchOptimizationManager {
       preventGhostClick: true,
       touchFeedback: true,
       scrollOptimization: true,
-      ...options
+      ...options,
     };
   }
 
@@ -78,9 +78,11 @@ export class TouchOptimizationManager {
    * 检测是否为移动设备
    */
   private isMobileDevice(): boolean {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-      || ('ontouchstart' in window) 
-      || (navigator.maxTouchPoints > 0);
+    return (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0
+    );
   }
 
   /**
@@ -88,7 +90,7 @@ export class TouchOptimizationManager {
    */
   private addGlobalTouchStyles(): void {
     const styleId = 'touch-optimization-styles';
-    
+
     // 避免重复添加
     if (document.getElementById(styleId)) {
       return;
@@ -159,35 +161,43 @@ export class TouchOptimizationManager {
     let touchStartY = 0;
     let touchStartTime = 0;
 
-    document.addEventListener('touchstart', (e: TouchEvent) => {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchStartTime = Date.now();
-    }, { passive: true });
+    document.addEventListener(
+      'touchstart',
+      (e: TouchEvent) => {
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+      },
+      { passive: true }
+    );
 
-    document.addEventListener('touchend', (e: TouchEvent) => {
-      const touch = e.changedTouches[0];
-      const touchEndX = touch.clientX;
-      const touchEndY = touch.clientY;
-      const touchEndTime = Date.now();
+    document.addEventListener(
+      'touchend',
+      (e: TouchEvent) => {
+        const touch = e.changedTouches[0];
+        const touchEndX = touch.clientX;
+        const touchEndY = touch.clientY;
+        const touchEndTime = Date.now();
 
-      // 检查是否为有效点击（时间短且移动距离小）
-      const timeDiff = touchEndTime - touchStartTime;
-      const distanceX = Math.abs(touchEndX - touchStartX);
-      const distanceY = Math.abs(touchEndY - touchStartY);
-      const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        // 检查是否为有效点击（时间短且移动距离小）
+        const timeDiff = touchEndTime - touchStartTime;
+        const distanceX = Math.abs(touchEndX - touchStartX);
+        const distanceY = Math.abs(touchEndY - touchStartY);
+        const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-      if (timeDiff < 500 && totalDistance < this.touchMoveThreshold) {
-        const target = e.target as Element;
-        
-        // 检查目标元素是否需要快速点击
-        if (this.shouldUseFastClick(target)) {
-          e.preventDefault();
-          this.triggerFastClick(target, touch);
+        if (timeDiff < 500 && totalDistance < this.touchMoveThreshold) {
+          const target = e.target as Element;
+
+          // 检查目标元素是否需要快速点击
+          if (this.shouldUseFastClick(target)) {
+            e.preventDefault();
+            this.triggerFastClick(target, touch);
+          }
         }
-      }
-    }, { passive: false });
+      },
+      { passive: false }
+    );
   }
 
   /**
@@ -196,11 +206,13 @@ export class TouchOptimizationManager {
   private shouldUseFastClick(element: Element): boolean {
     const tagName = element.tagName.toLowerCase();
     const clickableElements = ['button', 'a', 'input', 'select', 'textarea'];
-    
-    return clickableElements.includes(tagName) ||
-           element.hasAttribute('role') && element.getAttribute('role') === 'button' ||
-           element.classList.contains('touchable') ||
-           this.fastClickElements.has(element);
+
+    return (
+      clickableElements.includes(tagName) ||
+      (element.hasAttribute('role') && element.getAttribute('role') === 'button') ||
+      element.classList.contains('touchable') ||
+      this.fastClickElements.has(element)
+    );
   }
 
   /**
@@ -214,7 +226,7 @@ export class TouchOptimizationManager {
       clientX: touch.clientX,
       clientY: touch.clientY,
       screenX: touch.screenX,
-      screenY: touch.screenY
+      screenY: touch.screenY,
     });
 
     // 延迟触发以避免与原生点击冲突
@@ -231,26 +243,34 @@ export class TouchOptimizationManager {
     let lastTouchEndX = 0;
     let lastTouchEndY = 0;
 
-    document.addEventListener('touchend', (e: TouchEvent) => {
-      const touch = e.changedTouches[0];
-      lastTouchEndTime = Date.now();
-      lastTouchEndX = touch.clientX;
-      lastTouchEndY = touch.clientY;
-    }, { passive: true });
+    document.addEventListener(
+      'touchend',
+      (e: TouchEvent) => {
+        const touch = e.changedTouches[0];
+        lastTouchEndTime = Date.now();
+        lastTouchEndX = touch.clientX;
+        lastTouchEndY = touch.clientY;
+      },
+      { passive: true }
+    );
 
-    document.addEventListener('click', (e: MouseEvent) => {
-      const timeDiff = Date.now() - lastTouchEndTime;
-      const distanceX = Math.abs(e.clientX - lastTouchEndX);
-      const distanceY = Math.abs(e.clientY - lastTouchEndY);
-      const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    document.addEventListener(
+      'click',
+      (e: MouseEvent) => {
+        const timeDiff = Date.now() - lastTouchEndTime;
+        const distanceX = Math.abs(e.clientX - lastTouchEndX);
+        const distanceY = Math.abs(e.clientY - lastTouchEndY);
+        const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-      // 如果点击事件紧跟触摸事件且位置相近，可能是幽灵点击
-      if (timeDiff < 350 && totalDistance < 25) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.debug('🚫 防止幽灵点击');
-      }
-    }, { passive: false });
+        // 如果点击事件紧跟触摸事件且位置相近，可能是幽灵点击
+        if (timeDiff < 350 && totalDistance < 25) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.debug('🚫 防止幽灵点击');
+        }
+      },
+      { passive: false }
+    );
   }
 
   /**
@@ -284,7 +304,7 @@ export class TouchOptimizationManager {
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
   }
 
@@ -301,7 +321,7 @@ export class TouchOptimizationManager {
       medium: [20],
       heavy: [30],
       selection: [10, 50, 10],
-      impact: [15, 25, 15]
+      impact: [15, 25, 15],
     };
 
     const pattern = patterns[type] || patterns.light;
@@ -342,7 +362,7 @@ export class TouchOptimizationManager {
   public destroy(): void {
     this.isEnabled = false;
     this.fastClickElements.clear();
-    
+
     // 移除样式
     const styleElement = document.getElementById('touch-optimization-styles');
     if (styleElement) {
@@ -357,7 +377,9 @@ export class TouchOptimizationManager {
 /**
  * 便捷函数：初始化触摸优化
  */
-export function initializeTouchOptimization(options?: TouchOptimizationOptions): TouchOptimizationManager {
+export function initializeTouchOptimization(
+  options?: TouchOptimizationOptions
+): TouchOptimizationManager {
   const manager = TouchOptimizationManager.getInstance(options);
   manager.initialize();
   return manager;
@@ -378,7 +400,7 @@ import React from 'react';
 
 export function useTouchOptimization(options?: TouchOptimizationOptions) {
   const manager = TouchOptimizationManager.getInstance(options);
-  
+
   // Initialize manager
   manager.initialize();
 

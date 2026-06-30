@@ -55,7 +55,7 @@ const ExamplePage: React.FC<{
   useEffect(() => {
     if (performanceMetrics) {
       console.log('Performance Metrics:', performanceMetrics);
-      
+
       // 如果性能不佳，可以触发优化
       if (!isPerformanceOptimal()) {
         console.warn('Performance needs optimization');
@@ -80,20 +80,22 @@ const ExamplePage: React.FC<{
       <main>
         <h1>{getPageTitle(page, language, { sliceCount, selectedCount })}</h1>
         <p>{getPageDescription(page, language, { sliceCount, selectedCount })}</p>
-        
+
         {/* 性能指标展示（开发环境） */}
         {process.env.NODE_ENV === 'development' && performanceMetrics && (
-          <div style={{ 
-            position: 'fixed', 
-            top: '10px', 
-            right: '10px', 
-            background: 'rgba(0,0,0,0.8)', 
-            color: 'white', 
-            padding: '10px',
-            borderRadius: '4px',
-            fontSize: '12px',
-            zIndex: 9999
-          }}>
+          <div
+            style={{
+              position: 'fixed',
+              top: '10px',
+              right: '10px',
+              background: 'rgba(0,0,0,0.8)',
+              color: 'white',
+              padding: '10px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              zIndex: 9999,
+            }}
+          >
             <h4>Core Web Vitals</h4>
             <div>LCP: {Math.round(performanceMetrics.lcp)}ms</div>
             <div>FID: {Math.round(performanceMetrics.fid)}ms</div>
@@ -112,42 +114,40 @@ const ExamplePage: React.FC<{
           {page === 'split' && (
             <div>
               <p>正在处理图片分割...</p>
-              {sliceCount > 0 && (
-                <p>已生成 {sliceCount} 张图片片段</p>
-              )}
+              {sliceCount > 0 && <p>已生成 {sliceCount} 张图片片段</p>}
             </div>
           )}
-          
+
           {page === 'export' && (
             <div>
               <p>图片分割完成</p>
-              {selectedCount > 0 && (
-                <p>已选择 {selectedCount} 张图片用于导出</p>
-              )}
+              {selectedCount > 0 && <p>已选择 {selectedCount} 张图片用于导出</p>}
             </div>
           )}
 
           {/* 实时更新SEO的按钮 */}
           <div style={{ marginTop: '20px' }}>
-            <button 
+            <button
               onClick={() => updateTitle(`更新的标题 - ${new Date().toLocaleTimeString()}`)}
               style={{ margin: '5px' }}
             >
               更新标题
             </button>
-            
-            <button 
+
+            <button
               onClick={() => updateDescription(`更新的描述 - ${new Date().toLocaleTimeString()}`)}
               style={{ margin: '5px' }}
             >
               更新描述
             </button>
-            
-            <button 
-              onClick={() => updateMetadata({
-                keywords: ['动态关键词', '实时更新', new Date().toISOString()],
-                modifiedTime: new Date().toISOString()
-              })}
+
+            <button
+              onClick={() =>
+                updateMetadata({
+                  keywords: ['动态关键词', '实时更新', new Date().toISOString()],
+                  modifiedTime: new Date().toISOString(),
+                })
+              }
               style={{ margin: '5px' }}
             >
               更新关键词
@@ -171,14 +171,14 @@ const MultiLanguageExample: React.FC = () => {
       {/* 语言切换器 */}
       <div style={{ padding: '20px', borderBottom: '1px solid #ccc' }}>
         <h3>语言切换</h3>
-        <button 
+        <button
           onClick={() => setCurrentLanguage('zh-CN')}
           disabled={currentLanguage === 'zh-CN'}
           style={{ margin: '5px' }}
         >
           中文
         </button>
-        <button 
+        <button
           onClick={() => setCurrentLanguage('en')}
           disabled={currentLanguage === 'en'}
           style={{ margin: '5px' }}
@@ -218,18 +218,15 @@ const EnhancedSEOExample: React.FC = () => {
       enableRealTimeUpdates={true}
       autoLoadConfig={true}
     >
-      <EnhancedHelmetProvider
-        enableRealTimeUpdates={true}
-        enablePerformanceOptimizations={true}
-      >
+      <EnhancedHelmetProvider enableRealTimeUpdates={true} enablePerformanceOptimizations={true}>
         <div>
           <header style={{ padding: '20px', background: '#f5f5f5' }}>
             <h1>增强SEO系统示例</h1>
             <p>展示动态元标签注入、性能优化钩子和React Helmet Async集成</p>
           </header>
-          
+
           <MultiLanguageExample />
-          
+
           <footer style={{ padding: '20px', marginTop: '40px', background: '#f5f5f5' }}>
             <h3>功能特点</h3>
             <ul>

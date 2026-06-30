@@ -104,18 +104,18 @@ export function useImageProcessor({
       // 创建并设置原始图片
       const img = new Image();
       const imageUrl = URL.createObjectURL(file);
-      
+
       img.onload = () => {
         console.log('[ImageProcessor] 原始图片加载完成，设置到状态中');
         actions.setOriginalImage(img);
         URL.revokeObjectURL(imageUrl); // 清理临时URL
       };
-      
-      img.onerror = (error) => {
+
+      img.onerror = error => {
         console.error('[ImageProcessor] 原始图片加载失败:', error);
         URL.revokeObjectURL(imageUrl);
       };
-      
+
       img.src = imageUrl;
 
       // 确保Worker已创建

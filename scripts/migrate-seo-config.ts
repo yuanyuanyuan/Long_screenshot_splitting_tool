@@ -22,29 +22,29 @@ const MIGRATION_TASKS: MigrationTask[] = [
       {
         from: /import { SEO_CONFIG, getCurrentSEOConfig } from.*?;/,
         to: `import { seoConfigManager } from '../utils/seo/SEOConfigManager';`,
-        description: '替换导入语句'
+        description: '替换导入语句',
       },
       {
         from: /SEO_CONFIG\.siteUrl/g,
         to: `seoConfigManager.getCurrentConfig()?.site?.url || 'https://screenshot-splitter.com'`,
-        description: '替换siteUrl引用'
+        description: '替换siteUrl引用',
       },
       {
         from: /SEO_CONFIG\.siteName/g,
         to: `seoConfigManager.getCurrentConfig()?.site?.name[language] || 'Long Screenshot Splitter'`,
-        description: '替换siteName引用'
+        description: '替换siteName引用',
       },
       {
         from: /SEO_CONFIG\.socialMedia/g,
         to: `seoConfigManager.getCurrentConfig()?.socialMedia`,
-        description: '替换socialMedia引用'
+        description: '替换socialMedia引用',
       },
       {
         from: /SEO_CONFIG\.structuredData/g,
         to: `seoConfigManager.getCurrentConfig()?.structuredData`,
-        description: '替换structuredData引用'
-      }
-    ]
+        description: '替换structuredData引用',
+      },
+    ],
   },
   {
     file: 'src/utils/seo/metadataGenerator.ts',
@@ -52,20 +52,20 @@ const MIGRATION_TASKS: MigrationTask[] = [
       {
         from: /import { SEO_CONFIG } from.*?;/,
         to: `import { seoConfigManager } from './SEOConfigManager';`,
-        description: '替换导入语句'
+        description: '替换导入语句',
       },
       {
         from: /SEO_CONFIG\.keywords\.primary/g,
         to: `seoConfigManager.getKeywords('zh-CN').primary`,
-        description: '替换关键词引用'
+        description: '替换关键词引用',
       },
       {
         from: /SEO_CONFIG\.siteUrl/g,
         to: `seoConfigManager.getCurrentConfig()?.site?.url || 'https://screenshot-splitter.com'`,
-        description: '替换siteUrl引用'
-      }
-    ]
-  }
+        description: '替换siteUrl引用',
+      },
+    ],
+  },
 ];
 
 /**
@@ -73,19 +73,19 @@ const MIGRATION_TASKS: MigrationTask[] = [
  */
 async function migrateConfigurations(): Promise<void> {
   console.log('🚀 开始SEO配置迁移...\n');
-  
+
   let totalReplacements = 0;
-  
+
   for (const task of MIGRATION_TASKS) {
     console.log(`📁 处理文件: ${task.file}`);
-    
+
     try {
       // 读取文件内容
       const filePath = join(process.cwd(), task.file);
       const content = await fs.readFile(filePath, 'utf-8');
       let newContent = content;
       let fileReplacements = 0;
-      
+
       // 执行替换
       for (const replacement of task.replacements) {
         const matches = newContent.match(replacement.from);
@@ -95,7 +95,7 @@ async function migrateConfigurations(): Promise<void> {
           console.log(`  ✅ ${replacement.description}: ${matches.length} 处替换`);
         }
       }
-      
+
       // 写回文件
       if (fileReplacements > 0) {
         await fs.writeFile(filePath, newContent, 'utf-8');
@@ -104,14 +104,13 @@ async function migrateConfigurations(): Promise<void> {
       } else {
         console.log(`  ℹ️ 文件无需修改\n`);
       }
-      
     } catch (error) {
       console.error(`  ❌ 处理文件失败: ${error}\n`);
     }
   }
-  
+
   console.log(`🎉 迁移完成！总共处理了 ${totalReplacements} 处替换`);
-  
+
   // 生成迁移报告
   await generateMigrationReport();
 }
@@ -152,13 +151,9 @@ async function generateMigrationReport(): Promise<void> {
  */
 async function cleanupLegacyReferences(): Promise<void> {
   console.log('\n🧹 检查旧配置文件引用...');
-  
-  const searchFiles = [
-    'src/components',
-    'src/utils',
-    'src/hooks'
-  ];
-  
+
+  const searchFiles = ['src/components', 'src/utils', 'src/hooks'];
+
   // 这里可以添加更多的清理逻辑
   // 例如搜索所有 SEO_CONFIG 的引用并报告
 }
@@ -168,26 +163,26 @@ async function cleanupLegacyReferences(): Promise<void> {
  */
 async function validateNewConfigSystem(): Promise<void> {
   console.log('\n✅ 验证新配置系统...');
-  
+
   try {
     // 检查配置文件是否存在
     const configPath = join(process.cwd(), 'src/config/seo.config.json');
     await fs.access(configPath);
     console.log('  ✅ seo.config.json 存在');
-    
+
     // 检查配置文件格式
     const configContent = await fs.readFile(configPath, 'utf-8');
     const config = JSON.parse(configContent);
-    
+
     const requiredFields = [
       'version',
       'site',
       'keywords',
       'robotsTxt',
       'sitemap',
-      'keywordOptimization'
+      'keywordOptimization',
     ];
-    
+
     for (const field of requiredFields) {
       if (config[field]) {
         console.log(`  ✅ ${field} 配置存在`);
@@ -195,7 +190,6 @@ async function validateNewConfigSystem(): Promise<void> {
         console.log(`  ⚠️ ${field} 配置缺失`);
       }
     }
-    
   } catch (error) {
     console.error('  ❌ 配置验证失败:', error);
   }

@@ -52,10 +52,10 @@ export function useLazyLoading({
     }
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         const [observerEntry] = entries;
         setEntry(observerEntry);
-        
+
         const isInView = observerEntry.isIntersecting;
         setInView(isInView);
 
@@ -78,7 +78,7 @@ export function useLazyLoading({
     };
   }, [enabled, threshold, rootMargin, triggerOnce, hasTriggered]);
 
-  return { ref, inView: triggerOnce ? (hasTriggered || inView) : inView, entry };
+  return { ref, inView: triggerOnce ? hasTriggered || inView : inView, entry };
 }
 
 /**
@@ -124,7 +124,7 @@ export function useImageLazyLoading({
     setHasError(false);
 
     const img = new Image();
-    
+
     img.onload = () => {
       setIsLoaded(true);
       setIsLoading(false);
@@ -202,7 +202,7 @@ export function useBatchImageLazyLoading({
   const [imageStates, setImageStates] = useState<BatchImageState>({});
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0);
   const viewport = useViewport();
-  
+
   // 初始化图片状态
   useEffect(() => {
     const initialStates: BatchImageState = {};
@@ -219,84 +219,90 @@ export function useBatchImageLazyLoading({
   }, [images]);
 
   // 加载单个图片
-  const loadSingleImage = useCallback((image: BatchImageItem): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      setImageStates(prev => ({
-        ...prev,
-        [image.id]: { ...prev[image.id], isLoading: true, hasError: false }
-      }));
-
-      const img = new Image();
-      
-      img.onload = () => {
+  const loadSingleImage = useCallback(
+    (image: BatchImageItem): Promise<void> => {
+      return new Promise((resolve, reject) => {
         setImageStates(prev => ({
           ...prev,
-          [image.id]: {
-            ...prev[image.id],
-            isLoaded: true,
-            isLoading: false,
-            currentSrc: image.src
-          }
+          [image.id]: { ...prev[image.id], isLoading: true, hasError: false },
         }));
-        resolve();
-      };
 
-      img.onerror = () => {
-        setImageStates(prev => ({
-          ...prev,
-          [image.id]: {
-            ...prev[image.id],
-            hasError: true,
-            isLoading: false,
-            currentSrc: image.placeholder || ''
-          }
-        }));
-        reject(new Error(`Failed to load image: ${image.src}`));
-      };
+        const img = new Image();
 
-      // 移动端质量优化
-      const quality = image.quality || (viewport.isMobile ? 60 : 80);
-      const optimizedSrc = quality < 100 ? `${image.src}?quality=${quality}` : image.src;
-      img.src = optimizedSrc;
-    });
-  }, [viewport.isMobile]);
+        img.onload = () => {
+          setImageStates(prev => ({
+            ...prev,
+            [image.id]: {
+              ...prev[image.id],
+              isLoaded: true,
+              isLoading: false,
+              currentSrc: image.src,
+            },
+          }));
+          resolve();
+        };
+
+        img.onerror = () => {
+          setImageStates(prev => ({
+            ...prev,
+            [image.id]: {
+              ...prev[image.id],
+              hasError: true,
+              isLoading: false,
+              currentSrc: image.placeholder || '',
+            },
+          }));
+          reject(new Error(`Failed to load image: ${image.src}`));
+        };
+
+        // 移动端质量优化
+        const quality = image.quality || (viewport.isMobile ? 60 : 80);
+        const optimizedSrc = quality < 100 ? `${image.src}?quality=${quality}` : image.src;
+        img.src = optimizedSrc;
+      });
+    },
+    [viewport.isMobile]
+  );
 
   // 批量加载图片
-  const loadBatch = useCallback(async (startIndex: number) => {
-    const batch = images.slice(startIndex, startIndex + batchSize);
-    const priorityImages = batch.filter(img => img.priority);
-    const normalImages = batch.filter(img => !img.priority);
+  const loadBatch = useCallback(
+    async (startIndex: number) => {
+      const batch = images.slice(startIndex, startIndex + batchSize);
+      const priorityImages = batch.filter(img => img.priority);
+      const normalImages = batch.filter(img => !img.priority);
 
-    // 优先加载高优先级图片
-    if (priorityImages.length > 0) {
-      try {
-        await Promise.all(priorityImages.map(loadSingleImage));
-      } catch (error) {
-        console.warn('Priority images loading failed:', error);
+      // 优先加载高优先级图片
+      if (priorityImages.length > 0) {
+        try {
+          await Promise.all(priorityImages.map(loadSingleImage));
+        } catch (error) {
+          console.warn('Priority images loading failed:', error);
+        }
       }
-    }
 
-    // 延迟加载普通图片
-    if (normalImages.length > 0) {
-      await new Promise(resolve => setTimeout(resolve, loadDelay));
-      
-      const loadPromises = normalImages.map(image => 
-        loadSingleImage(image).catch(() => {
-          // 忽略个别图片加载失败，继续加载其他图片
-        })
-      );
+      // 延迟加载普通图片
+      if (normalImages.length > 0) {
+        await new Promise(resolve => setTimeout(resolve, loadDelay));
 
-      await Promise.allSettled(loadPromises);
-    }
+        const loadPromises = normalImages.map(image =>
+          loadSingleImage(image).catch(() => {
+            // 忽略个别图片加载失败，继续加载其他图片
+          })
+        );
 
-    const loadedIds = batch.map(img => img.id);
-    onBatchLoad?.(loadedIds);
+        await Promise.allSettled(loadPromises);
+      }
 
-    // 检查是否所有图片都已处理
-    if (startIndex + batchSize >= images.length) {
-      onAllLoaded?.();
-    }
-  }, [images, batchSize, loadDelay, loadSingleImage, onBatchLoad, onAllLoaded]);
+      const loadedIds = batch.map(img => img.id);
+      onBatchLoad?.(loadedIds);
+
+      // 检查是否所有图片都已处理
+      if (startIndex + batchSize >= images.length) {
+        onAllLoaded?.();
+      }
+    },
+    [images, batchSize, loadDelay, loadSingleImage, onBatchLoad, onAllLoaded]
+  );
 
   // 加载下一批图片
   const loadNextBatch = useCallback(() => {
@@ -313,7 +319,10 @@ export function useBatchImageLazyLoading({
     loaded: Object.values(imageStates).filter(state => state.isLoaded).length,
     loading: Object.values(imageStates).filter(state => state.isLoading).length,
     errors: Object.values(imageStates).filter(state => state.hasError).length,
-    progress: images.length > 0 ? (Object.values(imageStates).filter(state => state.isLoaded).length / images.length) * 100 : 0,
+    progress:
+      images.length > 0
+        ? (Object.values(imageStates).filter(state => state.isLoaded).length / images.length) * 100
+        : 0,
   };
 
   return {
@@ -352,7 +361,7 @@ export function useContentLazyLoading({
   useEffect(() => {
     if (lazyResult.inView && loader && !isLoading && !content && !hasError) {
       setIsLoading(true);
-      
+
       loader()
         .then(result => {
           setContent(result);

@@ -39,10 +39,9 @@ export function useWorker(options: UseWorkerOptions = {}): UseWorkerReturn {
       // 创建新Worker
       // type: 'module' 必需：worker 通过 ESM import splitAnalyzer，classic worker 不支持顶层 import。
       // Vite 据此在 dev 用 module worker、build 打包为 ES module chunk。
-      workerRef.current = new Worker(
-        new URL('../workers/split.worker.js', import.meta.url),
-        { type: 'module' }
-      );
+      workerRef.current = new Worker(new URL('../workers/split.worker.js', import.meta.url), {
+        type: 'module',
+      });
 
       // 设置消息监听器
       workerRef.current.onmessage = (event: MessageEvent<WorkerMessage>) => {

@@ -10,44 +10,44 @@ import fs from 'fs';
 import path from 'path';
 
 const workflows = {
-  'setup': {
+  setup: {
     description: 'Setup parallel development environment',
     actions: [
-      'Create feature branches if they don\'t exist',
+      "Create feature branches if they don't exist",
       'Install dependencies',
-      'Run initial tests to validate setup'
-    ]
+      'Run initial tests to validate setup',
+    ],
   },
-  'seo': {
+  seo: {
     description: 'Switch to SEO optimization workflow',
     branch: 'seo-optimization',
     env: {
       VITE_ENABLE_SEO_DEV: 'true',
       VITE_ENABLE_MOBILE_DEV: 'false',
-      VITE_FEATURE_FOCUS: 'seo'
+      VITE_FEATURE_FOCUS: 'seo',
     },
-    testCommand: 'npm run test:seo'
+    testCommand: 'npm run test:seo',
   },
-  'mobile': {
+  mobile: {
     description: 'Switch to Mobile responsive workflow',
     branch: 'mobile-responsive',
     env: {
       VITE_ENABLE_SEO_DEV: 'false',
       VITE_ENABLE_MOBILE_DEV: 'true',
-      VITE_FEATURE_FOCUS: 'mobile'
+      VITE_FEATURE_FOCUS: 'mobile',
     },
-    testCommand: 'npm run test:mobile'
+    testCommand: 'npm run test:mobile',
   },
-  'integration': {
+  integration: {
     description: 'Integration testing workflow',
     branch: 'main',
     env: {
       VITE_ENABLE_SEO_DEV: 'true',
       VITE_ENABLE_MOBILE_DEV: 'true',
-      VITE_FEATURE_FOCUS: 'integration'
+      VITE_FEATURE_FOCUS: 'integration',
     },
-    testCommand: 'npm run test:integration'
-  }
+    testCommand: 'npm run test:integration',
+  },
 };
 
 function getCurrentBranch() {
@@ -95,7 +95,7 @@ function updateEnvFile(env) {
   const envPath = path.join(process.cwd(), '.env.development');
   try {
     let envContent = fs.readFileSync(envPath, 'utf-8');
-    
+
     Object.entries(env).forEach(([key, value]) => {
       const regex = new RegExp(`^${key}=.*$`, 'm');
       if (envContent.match(regex)) {
@@ -104,7 +104,7 @@ function updateEnvFile(env) {
         envContent += `\n${key}=${value}`;
       }
     });
-    
+
     fs.writeFileSync(envPath, envContent);
     console.log('✅ Environment configuration updated');
   } catch (error) {
@@ -114,16 +114,16 @@ function updateEnvFile(env) {
 
 function runSetup() {
   console.log('🚀 Setting up parallel development environment...\n');
-  
+
   const featureBranches = ['seo-optimization', 'mobile-responsive'];
   const currentBranch = getCurrentBranch();
-  
+
   // Ensure we're on main branch
   if (currentBranch !== 'main') {
     console.log('📍 Switching to main branch first...');
     if (!switchToBranch('main')) return false;
   }
-  
+
   // Create feature branches if they don't exist
   featureBranches.forEach(branch => {
     if (!branchExists(branch)) {
@@ -134,7 +134,7 @@ function runSetup() {
       console.log(`✅ Branch ${branch} already exists`);
     }
   });
-  
+
   // Install dependencies
   console.log('📦 Installing dependencies...');
   try {
@@ -143,7 +143,7 @@ function runSetup() {
     console.error('❌ Error installing dependencies:', error.message);
     return false;
   }
-  
+
   // Run initial test to validate setup
   console.log('🧪 Running initial tests...');
   try {
@@ -158,14 +158,14 @@ function runSetup() {
 
 function runWorkflow(workflowName) {
   const workflow = workflows[workflowName];
-  
+
   if (!workflow) {
     console.error(`❌ Unknown workflow: ${workflowName}`);
     return false;
   }
-  
+
   console.log(`🎯 Starting ${workflow.description}...\n`);
-  
+
   // Switch to appropriate branch
   if (workflow.branch) {
     const currentBranch = getCurrentBranch();
@@ -177,12 +177,12 @@ function runWorkflow(workflowName) {
       }
     }
   }
-  
+
   // Update environment configuration
   if (workflow.env) {
     updateEnvFile(workflow.env);
   }
-  
+
   // Run tests if specified
   if (workflow.testCommand) {
     console.log(`🧪 Running tests: ${workflow.testCommand}`);
@@ -194,7 +194,7 @@ function runWorkflow(workflowName) {
       return false;
     }
   }
-  
+
   console.log(`✅ ${workflow.description} setup complete!`);
   return true;
 }

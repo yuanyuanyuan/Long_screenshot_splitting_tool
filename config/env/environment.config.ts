@@ -53,14 +53,15 @@ export function getEnvironmentConfig(): EnvironmentConfig {
     isProduction,
     isDevelopment,
     isTest,
-    
+
     // API 配置
-    apiBaseUrl: process.env.VITE_API_BASE_URL || (isProduction ? '/api' : 'http://localhost:3001/api'),
-    
+    apiBaseUrl:
+      process.env.VITE_API_BASE_URL || (isProduction ? '/api' : 'http://localhost:3001/api'),
+
     // 调试配置
     debug: isDevelopment || process.env.VITE_DEBUG === 'true',
     sourcemap: isDevelopment || process.env.VITE_SOURCEMAP === 'true',
-    
+
     // 构建配置
     build: {
       minify: isProduction,

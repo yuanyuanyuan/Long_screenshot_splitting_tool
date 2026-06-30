@@ -6,10 +6,10 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { 
+  {
     ignores: [
-      'dist', 
-      'node_modules', 
+      'dist',
+      'node_modules',
       '**/*.d.ts',
       'old-astro-prj/**/*',
       'vite-migration/**/*',
@@ -21,8 +21,8 @@ export default tseslint.config(
       'test-setup/**/*',
       'tests/**/*',
       'scripts/**/*',
-      'tools/**/*'
-    ] 
+      'tools/**/*',
+    ],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended, prettier],
@@ -37,12 +37,9 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
     },
-  },
+  }
 );

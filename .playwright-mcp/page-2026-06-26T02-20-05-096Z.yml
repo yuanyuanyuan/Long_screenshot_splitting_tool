@@ -1,148 +1,148 @@
 - generic [ref=e8]:
-  - banner [ref=e9]:
-    - generic [ref=e11]:
-      - generic [ref=e12]: © 2025 StarkYuan. All rights reserved.
-      - generic [ref=e13]: "Contact: StarkYuan"
-      - generic [ref=e14]:
-        - text: "Website:"
-        - link "website" [ref=e15] [cursor=pointer]:
-          - /url: https://github.com/yuanyuanyuan/Long_screenshot_splitting_tool
-          - text: Long_screenshot_splitting_tool官网
-      - generic [ref=e16]: Powered by StarkYuan
-    - heading "Long Screenshot Splitter" [level=1] [ref=e17]
-    - paragraph [ref=e18]: Intelligently split long screenshots and easily export multiple images
-  - navigation "Main Navigation" [ref=e19]:
-    - progressbar [ref=e20]:
-      - generic [ref=e21]: Completed 2/4 steps
-    - group "Navigation Buttons" [ref=e22]:
-      - button "Home (Current Page)" [ref=e23] [cursor=pointer]:
-        - generic [ref=e24]: 🏠
-        - generic [ref=e25]: Home
-      - button "Upload" [ref=e26] [cursor=pointer]:
-        - generic [ref=e27]: 📤
-        - generic [ref=e28]: Upload
-      - button "Split" [ref=e103] [cursor=pointer]:
-        - generic [ref=e30]: ✂️
-        - generic [ref=e31]: Split
-      - button "Export (Unavailable)" [disabled] [ref=e32]:
-        - generic [ref=e33]: 💾
-        - generic [ref=e34]: Export
-    - group "Quick Navigation" [ref=e35]:
-      - button "Previous" [disabled] [ref=e36]: ← Previous
-      - button "Next" [ref=e37] [cursor=pointer]: Next →
-      - button "EN" [ref=e39] [cursor=pointer]:
-        - generic [ref=e40]: EN
-    - generic [ref=e41]: "Current Step: 1/4 | Progress: 50%"
-  - main [ref=e42]:
-    - generic [ref=e45] [cursor=pointer]:
-      - generic [ref=e46]: 📤
-      - generic [ref=e48]:
-        - paragraph [ref=e49]: Drag image here, or click to select file
-        - paragraph [ref=e104]: Supports PNG, JPEG, JPG, WEBP formats, max 30MB
-    - generic [ref=e106]:
-      - generic [ref=e107]:
-        - generic [ref=e108]:
-          - heading "Slice Preview (3 slices)" [level=3] [ref=e109]
-          - paragraph [ref=e110]: Click slices to select, selected slices will be exported
-        - button "Select All (0/3)" [ref=e112] [cursor=pointer]
-      - generic [ref=e114]:
-        - generic [ref=e115] [cursor=pointer]:
-          - generic [ref=e116]:
-            - generic [ref=e117]: Slice 1
-            - generic [ref=e119]: ○
-          - img "Slice 1" [ref=e122]
-          - generic [ref=e124]: 400 × 1000
-        - generic [ref=e125] [cursor=pointer]:
-          - generic [ref=e126]:
-            - generic [ref=e127]: Slice 2
-            - generic [ref=e129]: ○
-          - img "Slice 2" [ref=e132]
-          - generic [ref=e134]: 400 × 1400
-        - generic [ref=e135] [cursor=pointer]:
-          - generic [ref=e136]:
-            - generic [ref=e137]: Slice 3
-            - generic [ref=e139]: ○
-          - img "Slice 3" [ref=e142]
-          - generic [ref=e144]: 400 × 600
-    - generic [ref=e146]:
-      - generic [ref=e149]:
-        - heading "Export Results" [level=3] [ref=e150]
-        - paragraph [ref=e151]: Selected 0 slices
-      - generic [ref=e152]:
-        - generic [ref=e153]: Export Format
-        - generic [ref=e154]:
-          - generic [ref=e155] [cursor=pointer]:
-            - radio "📄 PDF Document (Suitable for printing and reading)" [checked] [ref=e156]
-            - generic [ref=e157]:
-              - generic [ref=e158]: 📄 PDF Document
-              - generic [ref=e159]: (Suitable for printing and reading)
-          - generic [ref=e160] [cursor=pointer]:
-            - radio "📦 ZIP Archive (Contains all image files)" [ref=e161]
-            - generic [ref=e162]:
-              - generic [ref=e163]: 📦 ZIP Archive
-              - generic [ref=e164]: (Contains all image files)
-      - generic [ref=e166]:
-        - generic [ref=e167]:
-          - generic [ref=e168]: Filename
-          - textbox [ref=e169]: screenshot-slices
-        - generic [ref=e170]:
-          - generic [ref=e171]: Image Quality
-          - combobox [ref=e172]:
-            - option "Highest Quality"
-            - option "High Quality" [selected]
-            - option "Medium Quality"
-            - option "Lower Quality"
-      - generic [ref=e173]:
-        - button "Export as PDF" [disabled] [ref=e174]
-        - paragraph [ref=e175]: Please select slices to export first
-  - button "🐛" [ref=e51] [cursor=pointer]
-  - generic [ref=e52]:
-    - generic [ref=e53]:
-      - heading "🌐 I18n Coverage Test" [level=3] [ref=e54]
-      - button "×" [ref=e55] [cursor=pointer]
-    - generic [ref=e56]:
-      - strong [ref=e57]: "Current Language: en"
-      - generic [ref=e58]:
-        - button "中文" [ref=e59] [cursor=pointer]
-        - button "English" [ref=e60] [cursor=pointer]
-    - button "🔄 Run Coverage Test" [ref=e61] [cursor=pointer]
-    - generic [ref=e62]:
-      - generic [ref=e63]:
-        - strong [ref=e64]: "✅Coverage: 100%"
-        - generic [ref=e65]: "Found: 146/146 keys"
-      - generic [ref=e66]:
-        - strong [ref=e67]: "📋 Category Breakdown:"
-        - generic [ref=e68]:
-          - generic [ref=e69]:
-            - generic [ref=e70]: ✅ header
-            - generic [ref=e71]: 100% (2/2)
-          - generic [ref=e72]:
-            - generic [ref=e73]: ✅ upload
-            - generic [ref=e74]: 100% (10/10)
-          - generic [ref=e75]:
-            - generic [ref=e76]: ✅ preview
-            - generic [ref=e77]: 100% (5/5)
-          - generic [ref=e78]:
-            - generic [ref=e79]: ✅ export
-            - generic [ref=e80]: 100% (18/18)
-          - generic [ref=e81]:
-            - generic [ref=e82]: ✅ split
-            - generic [ref=e83]: 100% (9/9)
-          - generic [ref=e84]:
-            - generic [ref=e85]: ✅ lang
-            - generic [ref=e86]: 100% (3/3)
-          - generic [ref=e87]:
-            - generic [ref=e88]: ✅ navigation
-            - generic [ref=e89]: 100% (51/51)
-          - generic [ref=e90]:
-            - generic [ref=e91]: ✅ app
-            - generic [ref=e92]: 100% (2/2)
-          - generic [ref=e93]:
-            - generic [ref=e94]: ✅ debug
-            - generic [ref=e95]: 100% (37/37)
-          - generic [ref=e96]:
-            - generic [ref=e97]: ✅ console
-            - generic [ref=e98]: 100% (8/8)
-          - generic [ref=e99]:
-            - generic [ref=e100]: ✅ alert
-            - generic [ref=e101]: 100% (1/1)
+    - banner [ref=e9]:
+        - generic [ref=e11]:
+            - generic [ref=e12]: © 2025 StarkYuan. All rights reserved.
+            - generic [ref=e13]: 'Contact: StarkYuan'
+            - generic [ref=e14]:
+                - text: 'Website:'
+                - link "website" [ref=e15] [cursor=pointer]:
+                    - /url: https://github.com/yuanyuanyuan/Long_screenshot_splitting_tool
+                    - text: Long_screenshot_splitting_tool官网
+            - generic [ref=e16]: Powered by StarkYuan
+        - heading "Long Screenshot Splitter" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Intelligently split long screenshots and easily export multiple images
+    - navigation "Main Navigation" [ref=e19]:
+        - progressbar [ref=e20]:
+            - generic [ref=e21]: Completed 2/4 steps
+        - group "Navigation Buttons" [ref=e22]:
+            - button "Home (Current Page)" [ref=e23] [cursor=pointer]:
+                - generic [ref=e24]: 🏠
+                - generic [ref=e25]: Home
+            - button "Upload" [ref=e26] [cursor=pointer]:
+                - generic [ref=e27]: 📤
+                - generic [ref=e28]: Upload
+            - button "Split" [ref=e103] [cursor=pointer]:
+                - generic [ref=e30]: ✂️
+                - generic [ref=e31]: Split
+            - button "Export (Unavailable)" [disabled] [ref=e32]:
+                - generic [ref=e33]: 💾
+                - generic [ref=e34]: Export
+        - group "Quick Navigation" [ref=e35]:
+            - button "Previous" [disabled] [ref=e36]: ← Previous
+            - button "Next" [ref=e37] [cursor=pointer]: Next →
+            - button "EN" [ref=e39] [cursor=pointer]:
+                - generic [ref=e40]: EN
+        - generic [ref=e41]: 'Current Step: 1/4 | Progress: 50%'
+    - main [ref=e42]:
+        - generic [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]: 📤
+            - generic [ref=e48]:
+                - paragraph [ref=e49]: Drag image here, or click to select file
+                - paragraph [ref=e104]: Supports PNG, JPEG, JPG, WEBP formats, max 30MB
+        - generic [ref=e106]:
+            - generic [ref=e107]:
+                - generic [ref=e108]:
+                    - heading "Slice Preview (3 slices)" [level=3] [ref=e109]
+                    - paragraph [ref=e110]: Click slices to select, selected slices will be exported
+                - button "Select All (0/3)" [ref=e112] [cursor=pointer]
+            - generic [ref=e114]:
+                - generic [ref=e115] [cursor=pointer]:
+                    - generic [ref=e116]:
+                        - generic [ref=e117]: Slice 1
+                        - generic [ref=e119]: ○
+                    - img "Slice 1" [ref=e122]
+                    - generic [ref=e124]: 400 × 1000
+                - generic [ref=e125] [cursor=pointer]:
+                    - generic [ref=e126]:
+                        - generic [ref=e127]: Slice 2
+                        - generic [ref=e129]: ○
+                    - img "Slice 2" [ref=e132]
+                    - generic [ref=e134]: 400 × 1400
+                - generic [ref=e135] [cursor=pointer]:
+                    - generic [ref=e136]:
+                        - generic [ref=e137]: Slice 3
+                        - generic [ref=e139]: ○
+                    - img "Slice 3" [ref=e142]
+                    - generic [ref=e144]: 400 × 600
+        - generic [ref=e146]:
+            - generic [ref=e149]:
+                - heading "Export Results" [level=3] [ref=e150]
+                - paragraph [ref=e151]: Selected 0 slices
+            - generic [ref=e152]:
+                - generic [ref=e153]: Export Format
+                - generic [ref=e154]:
+                    - generic [ref=e155] [cursor=pointer]:
+                        - radio "📄 PDF Document (Suitable for printing and reading)" [checked] [ref=e156]
+                        - generic [ref=e157]:
+                            - generic [ref=e158]: 📄 PDF Document
+                            - generic [ref=e159]: (Suitable for printing and reading)
+                    - generic [ref=e160] [cursor=pointer]:
+                        - radio "📦 ZIP Archive (Contains all image files)" [ref=e161]
+                        - generic [ref=e162]:
+                            - generic [ref=e163]: 📦 ZIP Archive
+                            - generic [ref=e164]: (Contains all image files)
+            - generic [ref=e166]:
+                - generic [ref=e167]:
+                    - generic [ref=e168]: Filename
+                    - textbox [ref=e169]: screenshot-slices
+                - generic [ref=e170]:
+                    - generic [ref=e171]: Image Quality
+                    - combobox [ref=e172]:
+                        - option "Highest Quality"
+                        - option "High Quality" [selected]
+                        - option "Medium Quality"
+                        - option "Lower Quality"
+            - generic [ref=e173]:
+                - button "Export as PDF" [disabled] [ref=e174]
+                - paragraph [ref=e175]: Please select slices to export first
+    - button "🐛" [ref=e51] [cursor=pointer]
+    - generic [ref=e52]:
+        - generic [ref=e53]:
+            - heading "🌐 I18n Coverage Test" [level=3] [ref=e54]
+            - button "×" [ref=e55] [cursor=pointer]
+        - generic [ref=e56]:
+            - strong [ref=e57]: 'Current Language: en'
+            - generic [ref=e58]:
+                - button "中文" [ref=e59] [cursor=pointer]
+                - button "English" [ref=e60] [cursor=pointer]
+        - button "🔄 Run Coverage Test" [ref=e61] [cursor=pointer]
+        - generic [ref=e62]:
+            - generic [ref=e63]:
+                - strong [ref=e64]: '✅Coverage: 100%'
+                - generic [ref=e65]: 'Found: 146/146 keys'
+            - generic [ref=e66]:
+                - strong [ref=e67]: '📋 Category Breakdown:'
+                - generic [ref=e68]:
+                    - generic [ref=e69]:
+                        - generic [ref=e70]: ✅ header
+                        - generic [ref=e71]: 100% (2/2)
+                    - generic [ref=e72]:
+                        - generic [ref=e73]: ✅ upload
+                        - generic [ref=e74]: 100% (10/10)
+                    - generic [ref=e75]:
+                        - generic [ref=e76]: ✅ preview
+                        - generic [ref=e77]: 100% (5/5)
+                    - generic [ref=e78]:
+                        - generic [ref=e79]: ✅ export
+                        - generic [ref=e80]: 100% (18/18)
+                    - generic [ref=e81]:
+                        - generic [ref=e82]: ✅ split
+                        - generic [ref=e83]: 100% (9/9)
+                    - generic [ref=e84]:
+                        - generic [ref=e85]: ✅ lang
+                        - generic [ref=e86]: 100% (3/3)
+                    - generic [ref=e87]:
+                        - generic [ref=e88]: ✅ navigation
+                        - generic [ref=e89]: 100% (51/51)
+                    - generic [ref=e90]:
+                        - generic [ref=e91]: ✅ app
+                        - generic [ref=e92]: 100% (2/2)
+                    - generic [ref=e93]:
+                        - generic [ref=e94]: ✅ debug
+                        - generic [ref=e95]: 100% (37/37)
+                    - generic [ref=e96]:
+                        - generic [ref=e97]: ✅ console
+                        - generic [ref=e98]: 100% (8/8)
+                    - generic [ref=e99]:
+                        - generic [ref=e100]: ✅ alert
+                        - generic [ref=e101]: 100% (1/1)

@@ -22,7 +22,7 @@ const mockPerformanceEntry = {
 
 Object.defineProperty(window, 'PerformanceObserver', {
   writable: true,
-  value: jest.fn().mockImplementation((callback) => {
+  value: jest.fn().mockImplementation(callback => {
     mockPerformanceObserver.mockImplementation(callback);
     return {
       observe: jest.fn(),
@@ -34,7 +34,7 @@ Object.defineProperty(window, 'PerformanceObserver', {
 // Mock requestAnimationFrame
 Object.defineProperty(window, 'requestAnimationFrame', {
   writable: true,
-  value: jest.fn((callback) => setTimeout(callback, 16)),
+  value: jest.fn(callback => setTimeout(callback, 16)),
 });
 
 // Mock matchMedia
@@ -55,9 +55,7 @@ const renderWithProviders = (component: React.ReactElement) => {
   return render(
     <SEOProvider>
       <EnhancedHelmetProvider>
-        <HelmetProvider>
-          {component}
-        </HelmetProvider>
+        <HelmetProvider>{component}</HelmetProvider>
       </EnhancedHelmetProvider>
     </SEOProvider>
   );
@@ -68,7 +66,7 @@ describe('Enhanced SEO Manager', () => {
     // Reset DOM
     document.head.innerHTML = '';
     document.title = '';
-    
+
     // Clear mocks
     jest.clearAllMocks();
   });
@@ -100,11 +98,7 @@ describe('Enhanced SEO Manager', () => {
     it('should generate different metadata for different pages', async () => {
       const { rerender } = render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -115,11 +109,7 @@ describe('Enhanced SEO Manager', () => {
       // Change page
       rerender(
         <HelmetProvider>
-          <SEOManager
-            page="upload"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="upload" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -131,11 +121,7 @@ describe('Enhanced SEO Manager', () => {
     it('should support multiple languages', async () => {
       const { rerender } = render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="en"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="en" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -146,11 +132,7 @@ describe('Enhanced SEO Manager', () => {
       // Change language
       rerender(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -184,11 +166,7 @@ describe('Enhanced SEO Manager', () => {
     it('should include preconnect links', async () => {
       render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -205,11 +183,7 @@ describe('Enhanced SEO Manager', () => {
     it('should include DNS prefetch links', async () => {
       render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -222,11 +196,7 @@ describe('Enhanced SEO Manager', () => {
     it('should optimize viewport for different devices', async () => {
       render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -305,11 +275,7 @@ describe('Enhanced SEO Manager', () => {
     it('should generate structured data script', async () => {
       render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
@@ -322,18 +288,14 @@ describe('Enhanced SEO Manager', () => {
     it('should include correct structured data for home page', async () => {
       render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
       await waitFor(() => {
         const structuredDataScript = document.querySelector('script[type="application/ld+json"]');
         expect(structuredDataScript?.textContent).toBeTruthy();
-        
+
         if (structuredDataScript?.textContent) {
           const data = JSON.parse(structuredDataScript.textContent);
           expect(data['@context']).toBe('https://schema.org');
@@ -345,17 +307,13 @@ describe('Enhanced SEO Manager', () => {
     it('should include viewport and device information in structured data', async () => {
       render(
         <HelmetProvider>
-          <SEOManager
-            page="upload"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="upload" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 
       await waitFor(() => {
         const structuredDataScript = document.querySelector('script[type="application/ld+json"]');
-        
+
         if (structuredDataScript?.textContent) {
           const data = JSON.parse(structuredDataScript.textContent);
           expect(data.device).toBeDefined();
@@ -441,11 +399,7 @@ describe('Enhanced SEO Manager', () => {
 
       render(
         <HelmetProvider>
-          <SEOManager
-            page="home"
-            language="zh-CN"
-            enableStructuredData={true}
-          />
+          <SEOManager page="home" language="zh-CN" enableStructuredData={true} />
         </HelmetProvider>
       );
 

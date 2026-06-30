@@ -1,94 +1,94 @@
 - generic [ref=e177]:
-  - banner [ref=e178]:
-    - generic [ref=e180]:
-      - generic [ref=e181]: © 2025 StarkYuan. All rights reserved.
-      - generic [ref=e182]: "Contact: StarkYuan"
-      - generic [ref=e183]:
-        - text: "Website:"
-        - link "website" [ref=e184] [cursor=pointer]:
-          - /url: https://github.com/yuanyuanyuan/Long_screenshot_splitting_tool
-          - text: Long_screenshot_splitting_tool官网
-      - generic [ref=e185]: Powered by StarkYuan
-    - heading "Long Screenshot Splitter" [level=1] [ref=e186]
-    - paragraph [ref=e187]: Intelligently split long screenshots and easily export multiple images
-  - navigation "Main Navigation" [ref=e188]:
-    - progressbar [ref=e189]:
-      - generic [ref=e190]: Completed 1/4 steps
-    - group "Navigation Buttons" [ref=e191]:
-      - button "Home" [ref=e192] [cursor=pointer]:
-        - generic [ref=e193]: 🏠
-        - generic [ref=e194]: Home
-      - button "Upload (Current Page)" [ref=e195] [cursor=pointer]:
-        - generic [ref=e196]: 📤
-        - generic [ref=e197]: Upload
-      - button "Split (Unavailable)" [disabled] [ref=e198]:
-        - generic [ref=e199]: ✂️
-        - generic [ref=e200]: Split
-      - button "Export (Unavailable)" [disabled] [ref=e201]:
-        - generic [ref=e202]: 💾
-        - generic [ref=e203]: Export
-    - group "Quick Navigation" [ref=e204]:
-      - button "Previous" [ref=e205] [cursor=pointer]: ← Previous
-      - button "Next" [disabled] [ref=e206]: Next →
-      - button "EN" [ref=e208] [cursor=pointer]:
-        - generic [ref=e209]: EN
-    - generic [ref=e210]: "Current Step: 2/4 | Progress: 25%"
-  - main [ref=e211]:
-    - generic [ref=e212]:
-      - heading "Upload Image" [level=2] [ref=e213]
-      - generic [ref=e215] [cursor=pointer]:
-        - generic [ref=e216]: 📤
-        - generic [ref=e218]:
-          - paragraph [ref=e219]: Drag image here, or click to select file
-          - paragraph [ref=e220]: Supports PNG, JPEG, JPG, WEBP formats, max 30MB
-  - button "🐛" [ref=e221] [cursor=pointer]
-  - generic [ref=e222]:
-    - generic [ref=e223]:
-      - heading "🌐 I18n Coverage Test" [level=3] [ref=e224]
-      - button "×" [ref=e225] [cursor=pointer]
-    - generic [ref=e226]:
-      - strong [ref=e227]: "Current Language: en"
-      - generic [ref=e228]:
-        - button "中文" [ref=e229] [cursor=pointer]
-        - button "English" [ref=e230] [cursor=pointer]
-    - button "🔄 Run Coverage Test" [ref=e231] [cursor=pointer]
-    - generic [ref=e232]:
-      - generic [ref=e233]:
-        - strong [ref=e234]: "✅Coverage: 100%"
-        - generic [ref=e235]: "Found: 146/146 keys"
-      - generic [ref=e236]:
-        - strong [ref=e237]: "📋 Category Breakdown:"
-        - generic [ref=e238]:
-          - generic [ref=e239]:
-            - generic [ref=e240]: ✅ header
-            - generic [ref=e241]: 100% (2/2)
-          - generic [ref=e242]:
-            - generic [ref=e243]: ✅ upload
-            - generic [ref=e244]: 100% (10/10)
-          - generic [ref=e245]:
-            - generic [ref=e246]: ✅ preview
-            - generic [ref=e247]: 100% (5/5)
-          - generic [ref=e248]:
-            - generic [ref=e249]: ✅ export
-            - generic [ref=e250]: 100% (18/18)
-          - generic [ref=e251]:
-            - generic [ref=e252]: ✅ split
-            - generic [ref=e253]: 100% (9/9)
-          - generic [ref=e254]:
-            - generic [ref=e255]: ✅ lang
-            - generic [ref=e256]: 100% (3/3)
-          - generic [ref=e257]:
-            - generic [ref=e258]: ✅ navigation
-            - generic [ref=e259]: 100% (51/51)
-          - generic [ref=e260]:
-            - generic [ref=e261]: ✅ app
-            - generic [ref=e262]: 100% (2/2)
-          - generic [ref=e263]:
-            - generic [ref=e264]: ✅ debug
-            - generic [ref=e265]: 100% (37/37)
-          - generic [ref=e266]:
-            - generic [ref=e267]: ✅ console
-            - generic [ref=e268]: 100% (8/8)
-          - generic [ref=e269]:
-            - generic [ref=e270]: ✅ alert
-            - generic [ref=e271]: 100% (1/1)
+    - banner [ref=e178]:
+        - generic [ref=e180]:
+            - generic [ref=e181]: © 2025 StarkYuan. All rights reserved.
+            - generic [ref=e182]: 'Contact: StarkYuan'
+            - generic [ref=e183]:
+                - text: 'Website:'
+                - link "website" [ref=e184] [cursor=pointer]:
+                    - /url: https://github.com/yuanyuanyuan/Long_screenshot_splitting_tool
+                    - text: Long_screenshot_splitting_tool官网
+            - generic [ref=e185]: Powered by StarkYuan
+        - heading "Long Screenshot Splitter" [level=1] [ref=e186]
+        - paragraph [ref=e187]: Intelligently split long screenshots and easily export multiple images
+    - navigation "Main Navigation" [ref=e188]:
+        - progressbar [ref=e189]:
+            - generic [ref=e190]: Completed 1/4 steps
+        - group "Navigation Buttons" [ref=e191]:
+            - button "Home" [ref=e192] [cursor=pointer]:
+                - generic [ref=e193]: 🏠
+                - generic [ref=e194]: Home
+            - button "Upload (Current Page)" [ref=e195] [cursor=pointer]:
+                - generic [ref=e196]: 📤
+                - generic [ref=e197]: Upload
+            - button "Split (Unavailable)" [disabled] [ref=e198]:
+                - generic [ref=e199]: ✂️
+                - generic [ref=e200]: Split
+            - button "Export (Unavailable)" [disabled] [ref=e201]:
+                - generic [ref=e202]: 💾
+                - generic [ref=e203]: Export
+        - group "Quick Navigation" [ref=e204]:
+            - button "Previous" [ref=e205] [cursor=pointer]: ← Previous
+            - button "Next" [disabled] [ref=e206]: Next →
+            - button "EN" [ref=e208] [cursor=pointer]:
+                - generic [ref=e209]: EN
+        - generic [ref=e210]: 'Current Step: 2/4 | Progress: 25%'
+    - main [ref=e211]:
+        - generic [ref=e212]:
+            - heading "Upload Image" [level=2] [ref=e213]
+            - generic [ref=e215] [cursor=pointer]:
+                - generic [ref=e216]: 📤
+                - generic [ref=e218]:
+                    - paragraph [ref=e219]: Drag image here, or click to select file
+                    - paragraph [ref=e220]: Supports PNG, JPEG, JPG, WEBP formats, max 30MB
+    - button "🐛" [ref=e221] [cursor=pointer]
+    - generic [ref=e222]:
+        - generic [ref=e223]:
+            - heading "🌐 I18n Coverage Test" [level=3] [ref=e224]
+            - button "×" [ref=e225] [cursor=pointer]
+        - generic [ref=e226]:
+            - strong [ref=e227]: 'Current Language: en'
+            - generic [ref=e228]:
+                - button "中文" [ref=e229] [cursor=pointer]
+                - button "English" [ref=e230] [cursor=pointer]
+        - button "🔄 Run Coverage Test" [ref=e231] [cursor=pointer]
+        - generic [ref=e232]:
+            - generic [ref=e233]:
+                - strong [ref=e234]: '✅Coverage: 100%'
+                - generic [ref=e235]: 'Found: 146/146 keys'
+            - generic [ref=e236]:
+                - strong [ref=e237]: '📋 Category Breakdown:'
+                - generic [ref=e238]:
+                    - generic [ref=e239]:
+                        - generic [ref=e240]: ✅ header
+                        - generic [ref=e241]: 100% (2/2)
+                    - generic [ref=e242]:
+                        - generic [ref=e243]: ✅ upload
+                        - generic [ref=e244]: 100% (10/10)
+                    - generic [ref=e245]:
+                        - generic [ref=e246]: ✅ preview
+                        - generic [ref=e247]: 100% (5/5)
+                    - generic [ref=e248]:
+                        - generic [ref=e249]: ✅ export
+                        - generic [ref=e250]: 100% (18/18)
+                    - generic [ref=e251]:
+                        - generic [ref=e252]: ✅ split
+                        - generic [ref=e253]: 100% (9/9)
+                    - generic [ref=e254]:
+                        - generic [ref=e255]: ✅ lang
+                        - generic [ref=e256]: 100% (3/3)
+                    - generic [ref=e257]:
+                        - generic [ref=e258]: ✅ navigation
+                        - generic [ref=e259]: 100% (51/51)
+                    - generic [ref=e260]:
+                        - generic [ref=e261]: ✅ app
+                        - generic [ref=e262]: 100% (2/2)
+                    - generic [ref=e263]:
+                        - generic [ref=e264]: ✅ debug
+                        - generic [ref=e265]: 100% (37/37)
+                    - generic [ref=e266]:
+                        - generic [ref=e267]: ✅ console
+                        - generic [ref=e268]: 100% (8/8)
+                    - generic [ref=e269]:
+                        - generic [ref=e270]: ✅ alert
+                        - generic [ref=e271]: 100% (1/1)

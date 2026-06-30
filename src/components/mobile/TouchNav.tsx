@@ -32,7 +32,7 @@ export const TouchNav: React.FC<TouchNavProps> = ({
   showLabels = true,
   hapticFeedback = true,
   swipeEnabled = false,
-  className = ''
+  className = '',
 }) => {
   const viewport = useViewport();
   const navRef = useRef<HTMLDivElement>(null);
@@ -40,70 +40,70 @@ export const TouchNav: React.FC<TouchNavProps> = ({
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isPressed, setIsPressed] = useState<string | null>(null);
-  
+
   // 处理触摸反馈
   const handleTouchFeedback = () => {
     if (hapticFeedback && 'vibrate' in navigator) {
       navigator.vibrate(10); // 短暂振动反馈
     }
   };
-  
+
   // 处理滑动手势
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!swipeEnabled) return;
     setTouchStart(e.targetTouches[0].clientX);
   };
-  
+
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!swipeEnabled) return;
     setTouchEnd(e.targetTouches[0].clientX);
   };
-  
+
   const handleTouchEnd = () => {
     if (!swipeEnabled || !touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
-    
+
     if (isLeftSwipe && activeIndex < items.length - 1) {
       setActiveIndex(activeIndex + 1);
       handleTouchFeedback();
     }
-    
+
     if (isRightSwipe && activeIndex > 0) {
       setActiveIndex(activeIndex - 1);
       handleTouchFeedback();
     }
-    
+
     setTouchStart(0);
     setTouchEnd(0);
   };
-  
+
   // 处理项目点击
-  const handleItemClick = (item: typeof items[0], index: number) => {
+  const handleItemClick = (item: (typeof items)[0], index: number) => {
     if (item.disabled) return;
-    
+
     setActiveIndex(index);
     handleTouchFeedback();
-    
+
     if (item.onClick) {
       item.onClick();
     } else if (item.href) {
       window.location.href = item.href;
     }
   };
-  
+
   // 处理按压状态
   const handlePressStart = (itemId: string) => {
     setIsPressed(itemId);
     handleTouchFeedback();
   };
-  
+
   const handlePressEnd = () => {
     setIsPressed(null);
   };
-  
+
   // 键盘导航支持
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -118,18 +118,18 @@ export const TouchNav: React.FC<TouchNavProps> = ({
         }
       }
     };
-    
+
     if (navRef.current) {
       navRef.current.addEventListener('keydown', handleKeyDown);
     }
-    
+
     return () => {
       if (navRef.current) {
         navRef.current.removeEventListener('keydown', handleKeyDown);
       }
     };
   }, [activeIndex, items]);
-  
+
   // 导航样式
   const navStyles: React.CSSProperties = {
     display: 'flex',
@@ -140,9 +140,9 @@ export const TouchNav: React.FC<TouchNavProps> = ({
     WebkitOverflowScrolling: 'touch', // iOS 平滑滚动
     scrollSnapType: orientation === 'horizontal' ? 'x mandatory' : 'none',
   };
-  
+
   // 项目样式
-  const getItemStyles = (item: typeof items[0], index: number): React.CSSProperties => ({
+  const getItemStyles = (item: (typeof items)[0], index: number): React.CSSProperties => ({
     minWidth: viewport.isMobile ? '44px' : '48px',
     minHeight: viewport.isMobile ? '44px' : '48px',
     padding: viewport.isMobile ? '12px 16px' : '14px 20px',
@@ -152,12 +152,8 @@ export const TouchNav: React.FC<TouchNavProps> = ({
     justifyContent: 'center',
     gap: '8px',
     borderRadius: '12px',
-    backgroundColor: activeIndex === index 
-      ? 'var(--primary-color, #007AFF)' 
-      : 'transparent',
-    color: activeIndex === index 
-      ? 'white' 
-      : 'var(--text-color, #333)',
+    backgroundColor: activeIndex === index ? 'var(--primary-color, #007AFF)' : 'transparent',
+    color: activeIndex === index ? 'white' : 'var(--text-color, #333)',
     opacity: item.disabled ? 0.5 : 1,
     cursor: item.disabled ? 'not-allowed' : 'pointer',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -168,7 +164,7 @@ export const TouchNav: React.FC<TouchNavProps> = ({
     WebkitTapHighlightColor: 'transparent',
     touchAction: 'manipulation', // 防止双击缩放
   });
-  
+
   return (
     <nav
       ref={navRef}
@@ -197,22 +193,14 @@ export const TouchNav: React.FC<TouchNavProps> = ({
           aria-current={activeIndex === index ? 'page' : undefined}
           role="menuitem"
         >
-          {item.icon && (
-            <span className={styles.navIcon}>
-              {item.icon}
-            </span>
-          )}
-          {showLabels && (
-            <span className={styles.navLabel}>
-              {item.label}
-            </span>
-          )}
+          {item.icon && <span className={styles.navIcon}>{item.icon}</span>}
+          {showLabels && <span className={styles.navLabel}>{item.label}</span>}
         </button>
       ))}
-      
+
       {/* 活动指示器（可选） */}
       {orientation === 'horizontal' && (
-        <div 
+        <div
           className={styles.activeIndicator}
           style={{
             transform: `translateX(${activeIndex * 100}%)`,
@@ -239,9 +227,9 @@ export const TabBar: React.FC<{
   onTabChange: (tabId: string) => void;
 }> = ({ tabs, activeTab, onTabChange }) => {
   const viewport = useViewport();
-  
+
   return (
-    <div 
+    <div
       className={styles.tabBar}
       style={{
         position: 'fixed',
@@ -250,9 +238,7 @@ export const TabBar: React.FC<{
         right: 0,
         backgroundColor: 'var(--bg-color, white)',
         borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-        paddingBottom: viewport.isMobile 
-          ? 'env(safe-area-inset-bottom, 0px)' 
-          : '0',
+        paddingBottom: viewport.isMobile ? 'env(safe-area-inset-bottom, 0px)' : '0',
         zIndex: 1000,
       }}
     >
@@ -266,9 +252,9 @@ export const TabBar: React.FC<{
         showLabels={true}
         hapticFeedback={true}
       />
-      
+
       {/* 徽章显示 */}
-      {tabs.map(tab => 
+      {tabs.map(tab =>
         tab.badge && tab.badge > 0 ? (
           <span
             key={`badge-${tab.id}`}

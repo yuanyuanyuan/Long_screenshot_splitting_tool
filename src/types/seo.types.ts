@@ -52,20 +52,27 @@ export type Language = 'zh-CN' | 'en';
 // 多语言字符串接口
 export interface MultiLanguageString {
   'zh-CN': string;
-  'en': string;
+  en: string;
 }
 
 // 多语言字符串数组接口
 export interface MultiLanguageStringArray {
   'zh-CN': string[];
-  'en': string[];
+  en: string[];
 }
 
 // 页面类型
 export type PageType = 'home' | 'upload' | 'split' | 'export';
 
 // 修改频率类型
-export type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+export type ChangeFrequency =
+  | 'always'
+  | 'hourly'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'yearly'
+  | 'never';
 
 // 标题结构接口
 export interface HeadingStructure {
@@ -591,7 +598,11 @@ export interface UseSEOI18nReturn {
   t: (key: string, variables?: Record<string, any>) => string;
   language: Language;
   setLanguage: (language: Language) => void;
-  getSEOText: (page: PageType, field: 'title' | 'description', context?: Record<string, any>) => string;
+  getSEOText: (
+    page: PageType,
+    field: 'title' | 'description',
+    context?: Record<string, any>
+  ) => string;
   getKeywords: (page: PageType, includeContext?: boolean) => string[];
 }
 
@@ -638,7 +649,10 @@ export interface SEOConfigManagerInterface {
   loadConfig(options?: SEOConfigLoadOptions): Promise<SEOConfigValidationResult>;
   validateConfig(configData: unknown): Promise<SEOConfigValidationResult>;
   getConfig(): SEOConfig;
-  getPageConfig(page: PageType, language?: Language): {
+  getPageConfig(
+    page: PageType,
+    language?: Language
+  ): {
     title: string;
     description: string;
     keywords: string[];
@@ -712,9 +726,9 @@ export interface LoaderStrategy {
 }
 
 // Configuration manager events
-export type ConfigManagerEventType = 
+export type ConfigManagerEventType =
   | 'config:loaded'
-  | 'config:validated' 
+  | 'config:validated'
   | 'config:error'
   | 'config:cache:cleared'
   | 'config:hot:reload';

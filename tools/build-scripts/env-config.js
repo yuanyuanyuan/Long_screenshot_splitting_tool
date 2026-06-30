@@ -64,9 +64,7 @@ export function getBasePath(component = '') {
  * @returns {string} 资源基础URL
  */
 export function getAssetsBaseUrl() {
-  return process.env.VITE_ASSETS_BASE_URL || 
-         process.env.ASSETS_BASE_URL || 
-         '';
+  return process.env.VITE_ASSETS_BASE_URL || process.env.ASSETS_BASE_URL || '';
 }
 
 /**
@@ -91,7 +89,7 @@ export function getBuildConfig(options = {}) {
   const mode = getBuildMode();
   const component = getComponentName();
   const env = getBuildEnv();
-  
+
   return {
     mode,
     component,
@@ -100,7 +98,7 @@ export function getBuildConfig(options = {}) {
     outDir: getOutputDir(component),
     base: getBasePath(component),
     assetsBaseUrl: getAssetsBaseUrl(),
-    ...options
+    ...options,
   };
 }
 
@@ -109,7 +107,7 @@ export function getBuildConfig(options = {}) {
  */
 export function printBuildInfo() {
   const config = getBuildConfig();
-  
+
   console.log('🔧 构建配置信息:');
   console.log(`   模式: ${config.mode}`);
   console.log(`   环境: ${config.env}`);

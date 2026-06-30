@@ -5,22 +5,28 @@
 
 // 重新导出所有配置
 export { defaultAppConfig as appConfig, getAppConfig, type AppConfig } from './app/app.config';
-export { routeConfig, navigationConfig, getRouteConfig, type RouteConfig, type NavigationConfig } from './app/routing.config';
-export { 
-  deploymentConfig, 
-  getDeploymentConfig, 
-  getAssetUrl, 
+export {
+  routeConfig,
+  navigationConfig,
+  getRouteConfig,
+  type RouteConfig,
+  type NavigationConfig,
+} from './app/routing.config';
+export {
+  deploymentConfig,
+  getDeploymentConfig,
+  getAssetUrl,
   getRouteUrl,
-  type DeploymentConfig 
+  type DeploymentConfig,
 } from './build/deployment.config';
-export { 
-  environmentConfig, 
-  getEnvironmentConfig, 
+export {
+  environmentConfig,
+  getEnvironmentConfig,
   getCurrentEnvironment,
   type Environment,
-  type EnvironmentConfig 
+  type EnvironmentConfig,
 } from './env/environment.config';
-export { 
+export {
   APP_INFO,
   SUPPORTED_FILE_TYPES,
   FILE_SIZE_LIMITS,
@@ -32,15 +38,24 @@ export {
   EVENT_NAMES,
   ERROR_CODES,
   HTTP_STATUS,
-  REGEX_PATTERNS
+  REGEX_PATTERNS,
 } from './constants/app.constants';
 
 // 导入用于创建统一配置对象
 import { defaultAppConfig, getAppConfig } from './app/app.config';
 import { routeConfig, navigationConfig, getRouteConfig } from './app/routing.config';
-import { deploymentConfig, getDeploymentConfig, getAssetUrl, getRouteUrl } from './build/deployment.config';
-import { environmentConfig, getEnvironmentConfig, getCurrentEnvironment } from './env/environment.config';
-import { 
+import {
+  deploymentConfig,
+  getDeploymentConfig,
+  getAssetUrl,
+  getRouteUrl,
+} from './build/deployment.config';
+import {
+  environmentConfig,
+  getEnvironmentConfig,
+  getCurrentEnvironment,
+} from './env/environment.config';
+import {
   APP_INFO,
   SUPPORTED_FILE_TYPES,
   FILE_SIZE_LIMITS,
@@ -52,7 +67,7 @@ import {
   EVENT_NAMES,
   ERROR_CODES,
   HTTP_STATUS,
-  REGEX_PATTERNS
+  REGEX_PATTERNS,
 } from './constants/app.constants';
 
 /**

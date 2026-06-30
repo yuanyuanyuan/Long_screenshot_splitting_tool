@@ -31,7 +31,10 @@ export interface UseSEOConfigReturn {
   warnings: string[];
   loadConfig: () => Promise<void>;
   reloadConfig: () => Promise<void>;
-  getPageConfig: (page: PageType, language?: Language) => ReturnType<typeof seoConfigManager.getPageConfig> | null;
+  getPageConfig: (
+    page: PageType,
+    language?: Language
+  ) => ReturnType<typeof seoConfigManager.getPageConfig> | null;
   getKeywords: (page: PageType, language?: Language, includeContext?: boolean) => string[];
   getStructuredData: (page: PageType, language?: Language) => Record<string, unknown> | null;
   stats: {
@@ -80,14 +83,14 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
         setConfig(result.config);
         setIsLoaded(true);
         setWarnings(result.warnings);
-        
+
         if (onWarning && result.warnings.length > 0) {
           onWarning(result.warnings);
         }
       } else {
         setErrors(result.errors);
         setIsLoaded(false);
-        
+
         if (onError) {
           onError(result.errors);
         }
@@ -96,7 +99,7 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setErrors([errorMessage]);
       setIsLoaded(false);
-      
+
       if (onError) {
         onError([errorMessage]);
       }
@@ -120,13 +123,13 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
         setConfig(result.config);
         setIsLoaded(true);
         setWarnings(result.warnings);
-        
+
         if (onWarning && result.warnings.length > 0) {
           onWarning(result.warnings);
         }
       } else {
         setErrors(result.errors);
-        
+
         if (onError) {
           onError(result.errors);
         }
@@ -134,7 +137,7 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setErrors([errorMessage]);
-      
+
       if (onError) {
         onError([errorMessage]);
       }
@@ -144,40 +147,49 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
   }, [isLoading, onError, onWarning]);
 
   // Page configuration getter
-  const getPageConfig = useCallback((page: PageType, lang?: Language) => {
-    if (!config) return null;
-    
-    try {
-      return seoConfigManager.getPageConfig(page, lang || language);
-    } catch (error) {
-      console.warn('Failed to get page config:', error);
-      return null;
-    }
-  }, [config, language]);
+  const getPageConfig = useCallback(
+    (page: PageType, lang?: Language) => {
+      if (!config) return null;
+
+      try {
+        return seoConfigManager.getPageConfig(page, lang || language);
+      } catch (error) {
+        console.warn('Failed to get page config:', error);
+        return null;
+      }
+    },
+    [config, language]
+  );
 
   // Keywords getter
-  const getKeywords = useCallback((page: PageType, lang?: Language, includeContext?: boolean) => {
-    if (!config) return [];
-    
-    try {
-      return seoConfigManager.getKeywords(page, lang || language, includeContext);
-    } catch (error) {
-      console.warn('Failed to get keywords:', error);
-      return [];
-    }
-  }, [config, language]);
+  const getKeywords = useCallback(
+    (page: PageType, lang?: Language, includeContext?: boolean) => {
+      if (!config) return [];
+
+      try {
+        return seoConfigManager.getKeywords(page, lang || language, includeContext);
+      } catch (error) {
+        console.warn('Failed to get keywords:', error);
+        return [];
+      }
+    },
+    [config, language]
+  );
 
   // Structured data getter
-  const getStructuredData = useCallback((page: PageType, lang?: Language) => {
-    if (!config) return null;
-    
-    try {
-      return seoConfigManager.getStructuredData(page, lang || language);
-    } catch (error) {
-      console.warn('Failed to get structured data:', error);
-      return null;
-    }
-  }, [config, language]);
+  const getStructuredData = useCallback(
+    (page: PageType, lang?: Language) => {
+      if (!config) return null;
+
+      try {
+        return seoConfigManager.getStructuredData(page, lang || language);
+      } catch (error) {
+        console.warn('Failed to get structured data:', error);
+        return null;
+      }
+    },
+    [config, language]
+  );
 
   // Configuration statistics
   const stats = useMemo(() => {
@@ -189,40 +201,40 @@ export function useSEOConfig(options: UseSEOConfigOptions = {}): UseSEOConfigRet
     if (!enableHotReload) return;
 
     // let isSubscribed = true;
-//     // const eventHandler: ConfigManagerEventHandler = (event: ConfigManagerEvent) => {
-//       if (!isSubscribed) return;
-// 
-//       switch (event.type) {
-//         case 'config:loaded':
-//           if (event.data?.config) {
-//             setConfig(event.data.config);
-//             setIsLoaded(true);
-//             setErrors([]);
-//           }
-//           break;
-//           
-//         case 'config:error':
-//           if (event.error) {
-//             setErrors([event.error.message]);
-//             setIsLoaded(false);
-//           }
-//           break;
-//           
-//         case 'config:hot:reload':
-//           // Trigger reload on hot reload event
-//           reloadConfig();
-//           break;
-//           
-//         default:
-//           break;
-//       }
-//     };
+    //     // const eventHandler: ConfigManagerEventHandler = (event: ConfigManagerEvent) => {
+    //       if (!isSubscribed) return;
+    //
+    //       switch (event.type) {
+    //         case 'config:loaded':
+    //           if (event.data?.config) {
+    //             setConfig(event.data.config);
+    //             setIsLoaded(true);
+    //             setErrors([]);
+    //           }
+    //           break;
+    //
+    //         case 'config:error':
+    //           if (event.error) {
+    //             setErrors([event.error.message]);
+    //             setIsLoaded(false);
+    //           }
+    //           break;
+    //
+    //         case 'config:hot:reload':
+    //           // Trigger reload on hot reload event
+    //           reloadConfig();
+    //           break;
+    //
+    //         default:
+    //           break;
+    //       }
+    //     };
 
     // Note: This would require implementing an event system in SEOConfigManager
     // For now, we'll use a simple polling mechanism in development
     // const _isSubscribed = true;
     let hotReloadInterval: NodeJS.Timeout | undefined;
-    
+
     if (process.env.NODE_ENV === 'development') {
       hotReloadInterval = setInterval(async () => {
         try {
@@ -274,7 +286,7 @@ export function withSEOConfig<P extends object>(
 ) {
   return function WrappedComponent(props: P) {
     const seoConfig = useSEOConfig();
-    
+
     return <Component {...props} seoConfig={seoConfig} />;
   };
 }
@@ -285,20 +297,16 @@ export function withSEOConfig<P extends object>(
 
 const SEOConfigContext = createContext<UseSEOConfigReturn | null>(null);
 
-export function SEOConfigProvider({ 
-  children, 
-  options = {} 
-}: { 
-  children: React.ReactNode; 
-  options?: UseSEOConfigOptions; 
+export function SEOConfigProvider({
+  children,
+  options = {},
+}: {
+  children: React.ReactNode;
+  options?: UseSEOConfigOptions;
 }) {
   const seoConfig = useSEOConfig(options);
-  
-  return (
-    <SEOConfigContext.Provider value={seoConfig}>
-      {children}
-    </SEOConfigContext.Provider>
-  );
+
+  return <SEOConfigContext.Provider value={seoConfig}>{children}</SEOConfigContext.Provider>;
 }
 
 export function useSEOConfigContext(): UseSEOConfigReturn {

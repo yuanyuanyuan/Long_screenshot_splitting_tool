@@ -12,7 +12,7 @@ export interface LanguageDetectionResult {
 export class LanguageDetector {
   private static readonly STORAGE_KEY = 'preferred-language';
   private static readonly SUPPORTED_LANGUAGES = ['en', 'zh-CN'];
-  
+
   /**
    * 检测用户首选语言
    */
@@ -23,7 +23,7 @@ export class LanguageDetector {
       return {
         language: storedLanguage,
         confidence: 1.0,
-        source: 'storage'
+        source: 'storage',
       };
     }
 
@@ -33,7 +33,7 @@ export class LanguageDetector {
       return {
         language: browserLanguage,
         confidence: 0.9,
-        source: 'browser'
+        source: 'browser',
       };
     }
 
@@ -43,7 +43,7 @@ export class LanguageDetector {
       return {
         language: systemLanguage,
         confidence: 0.8,
-        source: 'system'
+        source: 'system',
       };
     }
 
@@ -51,7 +51,7 @@ export class LanguageDetector {
     return {
       language: 'en',
       confidence: 0.5,
-      source: 'default'
+      source: 'default',
     };
   }
 
@@ -75,23 +75,21 @@ export class LanguageDetector {
    */
   private static getBrowserLanguage(): string | null {
     const browserLangs = navigator.languages || [navigator.language];
-    
+
     for (const lang of browserLangs) {
       // 直接匹配
       if (this.SUPPORTED_LANGUAGES.includes(lang)) {
         return lang;
       }
-      
+
       // 匹配语言代码前缀
       const langCode = lang.split('-')[0];
-      const matched = this.SUPPORTED_LANGUAGES.find(supported => 
-        supported.startsWith(langCode)
-      );
+      const matched = this.SUPPORTED_LANGUAGES.find(supported => supported.startsWith(langCode));
       if (matched) {
         return matched;
       }
     }
-    
+
     return null;
   }
 

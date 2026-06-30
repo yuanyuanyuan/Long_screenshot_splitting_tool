@@ -28,7 +28,7 @@ const useEnhancedSEO = (
       // 获取SEO配置
       const config = seoConfigManager.getCurrentConfig();
       const pageConfig = seoConfigManager.getPageConfig(page, language);
-      
+
       if (!config || !pageConfig) {
         return generateFallbackMetadata(page, language, context, customMetadata);
       }
@@ -56,7 +56,9 @@ const useEnhancedSEO = (
         ogDescription: customMetadata.ogDescription || pageConfig.description,
         ogType: 'website' as const,
         ogUrl: canonicalUrl,
-        ogImage: config.defaultImages?.ogImage ? `${baseUrl}${config.defaultImages.ogImage}` : `${baseUrl}/images/og-image-1200x630.jpg`,
+        ogImage: config.defaultImages?.ogImage
+          ? `${baseUrl}${config.defaultImages.ogImage}`
+          : `${baseUrl}/images/og-image-1200x630.jpg`,
         ogSiteName: config.site?.name[language] || 'Long Screenshot Splitter',
         ogLocale: language === 'zh-CN' ? 'zh_CN' : 'en_US',
 
@@ -64,12 +66,18 @@ const useEnhancedSEO = (
         twitterCard: 'summary_large_image' as const,
         twitterTitle: customMetadata.twitterTitle || pageConfig.title,
         twitterDescription: customMetadata.twitterDescription || pageConfig.description,
-        twitterImage: config.defaultImages?.twitterImage ? `${baseUrl}${config.defaultImages.twitterImage}` : `${baseUrl}/images/twitter-card-1200x600.jpg`,
+        twitterImage: config.defaultImages?.twitterImage
+          ? `${baseUrl}${config.defaultImages.twitterImage}`
+          : `${baseUrl}/images/twitter-card-1200x600.jpg`,
         twitterSite: config.socialMedia?.twitter || '@screenshot_tool',
         twitterCreator: config.socialMedia?.twitter || '@screenshot_tool',
 
         // 多语言支持
-        hreflang: generateHreflangTags(page, baseUrl, config.site?.supportedLanguages || ['zh-CN', 'en']),
+        hreflang: generateHreflangTags(
+          page,
+          baseUrl,
+          config.site?.supportedLanguages || ['zh-CN', 'en']
+        ),
 
         // 时间戳
         publishedTime: customMetadata.publishedTime,
@@ -104,13 +112,15 @@ const useEnhancedSEO = (
         browserRequirements: 'Requires JavaScript. Requires HTML5.',
         inLanguage: language,
         isAccessibleForFree: true,
-        
+
         // 组织信息
         author: {
           '@type': 'Organization',
           name: config.structuredData?.organization?.name || siteName,
           url: config.structuredData?.organization?.url || baseUrl,
-          logo: config.defaultImages?.logo ? `${baseUrl}${config.defaultImages.logo}` : `${baseUrl}/images/logo-512x512.png`
+          logo: config.defaultImages?.logo
+            ? `${baseUrl}${config.defaultImages.logo}`
+            : `${baseUrl}/images/logo-512x512.png`,
         },
 
         // 功能特性
@@ -119,7 +129,7 @@ const useEnhancedSEO = (
           language === 'zh-CN' ? '多格式支持' : 'Multi-format support',
           language === 'zh-CN' ? '批量导出' : 'Batch export',
           language === 'zh-CN' ? '在线处理' : 'Online processing',
-          language === 'zh-CN' ? '免费使用' : 'Free to use'
+          language === 'zh-CN' ? '免费使用' : 'Free to use',
         ],
 
         // 软件信息
@@ -133,7 +143,7 @@ const useEnhancedSEO = (
           ratingValue: '4.8',
           reviewCount: '150',
           bestRating: '5',
-          worstRating: '1'
+          worstRating: '1',
         },
 
         // 价格信息
@@ -141,8 +151,8 @@ const useEnhancedSEO = (
           '@type': 'Offer',
           price: '0',
           priceCurrency: 'USD',
-          availability: 'https://schema.org/InStock'
-        }
+          availability: 'https://schema.org/InStock',
+        },
       };
 
       // 根据页面类型添加特定信息
@@ -151,7 +161,7 @@ const useEnhancedSEO = (
           ...baseStructuredData,
           '@type': 'SoftwareApplication',
           downloadUrl: baseUrl,
-          screenshot: `${baseUrl}/images/screenshot-app.jpg`
+          screenshot: `${baseUrl}/images/screenshot-app.jpg`,
         };
       }
 
@@ -188,9 +198,9 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
           seoConfigManager.loadConfig(),
           robotsGenerator.initialize(),
           sitemapGenerator.initialize(),
-          keywordDensityManager.initialize()
+          keywordDensityManager.initialize(),
         ]);
-        
+
         console.log('🚀 All SEO managers initialized successfully');
       } catch (error) {
         console.error('Failed to initialize SEO managers:', error);
@@ -212,8 +222,8 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
     try {
       // 生成robots.txt
       const robotsContent = await robotsGenerator.generate();
-      
-      // 生成sitemap.xml  
+
+      // 生成sitemap.xml
       const sitemapContent = await sitemapGenerator.generate();
 
       // 在开发环境下显示生成的内容（用于调试）
@@ -227,7 +237,7 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
       if (typeof window !== 'undefined') {
         (window as any).__SEO_GENERATED_FILES__ = {
           'robots.txt': robotsContent,
-          'sitemap.xml': sitemapContent
+          'sitemap.xml': sitemapContent,
         };
       }
     } catch (error) {
@@ -254,8 +264,12 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
       <meta name="supported-color-schemes" content="light dark" />
 
       {/* 时间相关meta标签 */}
-      {metadata.publishedTime && <meta name="article:published_time" content={metadata.publishedTime} />}
-      {metadata.modifiedTime && <meta name="article:modified_time" content={metadata.modifiedTime} />}
+      {metadata.publishedTime && (
+        <meta name="article:published_time" content={metadata.publishedTime} />
+      )}
+      {metadata.modifiedTime && (
+        <meta name="article:modified_time" content={metadata.modifiedTime} />
+      )}
       <meta name="last-modified" content={metadata.modifiedTime || new Date().toISOString()} />
 
       {/* Canonical URL - 修复缺失问题 */}
@@ -278,22 +292,22 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
           <meta property="og:url" content={metadata.ogUrl} />
           <meta property="og:site_name" content={metadata.ogSiteName} />
           <meta property="og:locale" content={metadata.ogLocale} />
-          
+
           {/* 备用语言 */}
           {language === 'zh-CN' && <meta property="og:locale:alternate" content="en_US" />}
           {language === 'en' && <meta property="og:locale:alternate" content="zh_CN" />}
-          
+
           {/* 图片信息 */}
           <meta property="og:image" content={metadata.ogImage} />
           <meta property="og:image:alt" content={metadata.ogTitle} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
           <meta property="og:image:type" content="image/png" />
-          
+
           {/* 应用程序信息 */}
           <meta property="og:app_id" content="long-screenshot-splitter" />
           <meta property="article:author" content={metadata.author} />
-          
+
           {/* Facebook特定标签 */}
           <meta property="fb:app_id" content="123456789" />
         </>
@@ -307,11 +321,11 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
           <meta name="twitter:description" content={metadata.twitterDescription} />
           <meta name="twitter:image" content={metadata.twitterImage} />
           <meta name="twitter:image:alt" content={metadata.twitterTitle} />
-          
+
           {/* Twitter账号信息 */}
           <meta name="twitter:site" content={metadata.twitterSite} />
           <meta name="twitter:creator" content={metadata.twitterCreator} />
-          
+
           {/* Twitter应用信息 */}
           <meta name="twitter:app:name:iphone" content={metadata.title} />
           <meta name="twitter:app:name:googleplay" content={metadata.title} />
@@ -324,14 +338,17 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
       <meta property="linkedin:title" content={metadata.title} />
       <meta property="linkedin:description" content={metadata.description} />
       <meta property="linkedin:image" content={metadata.ogImage} />
-      
+
       {/* Pinterest */}
       <meta property="pinterest:title" content={metadata.title} />
       <meta property="pinterest:description" content={metadata.description} />
       <meta property="pinterest:image" content={metadata.ogImage} />
 
       {/* 移动端优化 */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
+      />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -346,9 +363,7 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
 
       {/* 结构化数据 */}
       {enableStructuredData && structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData, null, 2)}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(structuredData, null, 2)}</script>
       )}
 
       {/* 性能优化 - 预加载和DNS预解析 */}
@@ -356,29 +371,35 @@ export const EnhancedSEOManager: React.FC<SEOManagerProps> = ({
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://www.google-analytics.com" />
       <link rel="preconnect" href="https://www.googletagmanager.com" />
-      
+
       {/* DNS预解析 */}
       <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       <link rel="dns-prefetch" href="//fonts.gstatic.com" />
       <link rel="dns-prefetch" href="//www.google-analytics.com" />
       <link rel="dns-prefetch" href="//www.googletagmanager.com" />
       <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
-      
+
       {/* 预加载关键资源 */}
       {metadata.ogImage && <link rel="preload" href={metadata.ogImage} as="image" />}
-      <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-      
+      <link
+        rel="preload"
+        href="/fonts/inter-var.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+
       {/* Favicon完整支持 */}
       <link rel="icon" href="/favicon.ico" sizes="32x32" />
       <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1976d2" />
-      
+
       {/* 搜索引擎验证 */}
       <meta name="google-site-verification" content="your-google-verification-code" />
       <meta name="baidu-site-verification" content="your-baidu-verification-code" />
       <meta name="msvalidate.01" content="your-bing-verification-code" />
-      
+
       {/* 开发环境调试信息 */}
       {process.env.NODE_ENV === 'development' && (
         <meta name="seo-debug" content={`page:${page},lang:${language},timestamp:${Date.now()}`} />
@@ -394,7 +415,11 @@ function generatePagePath(page: PageType, language: Language): string {
   return `${langPrefix}${pagePath}`;
 }
 
-function generateHreflangTags(page: PageType, baseUrl: string, supportedLanguages: string[]): Record<string, string> {
+function generateHreflangTags(
+  page: PageType,
+  baseUrl: string,
+  supportedLanguages: string[]
+): Record<string, string> {
   const hreflang: Record<string, string> = {};
   const pagePath = page === 'home' ? '' : `/${page}`;
 
@@ -421,21 +446,34 @@ function generateFallbackMetadata(
   const canonicalUrl = `${baseUrl}${generatePagePath(page, language)}`;
 
   return {
-    title: customMetadata.title || `${siteName} - ${language === 'zh-CN' ? '免费在线截图处理工具' : 'Free Online Screenshot Processing Tool'}`,
-    description: customMetadata.description || (language === 'zh-CN' 
-      ? '专业的在线长截图分割工具，支持自动识别分割点，多格式导出，完全免费使用。' 
-      : 'Professional online long screenshot splitter with automatic split point detection, multiple export formats, completely free to use.'),
-    keywords: language === 'zh-CN' 
-      ? ['长截图分割', '截图切割', '图片分割工具', '在线截图工具', '免费图片处理']
-      : ['long screenshot splitter', 'screenshot cutter', 'image splitting tool', 'online screenshot tool', 'free image processing'],
+    title:
+      customMetadata.title ||
+      `${siteName} - ${language === 'zh-CN' ? '免费在线截图处理工具' : 'Free Online Screenshot Processing Tool'}`,
+    description:
+      customMetadata.description ||
+      (language === 'zh-CN'
+        ? '专业的在线长截图分割工具，支持自动识别分割点，多格式导出，完全免费使用。'
+        : 'Professional online long screenshot splitter with automatic split point detection, multiple export formats, completely free to use.'),
+    keywords:
+      language === 'zh-CN'
+        ? ['长截图分割', '截图切割', '图片分割工具', '在线截图工具', '免费图片处理']
+        : [
+            'long screenshot splitter',
+            'screenshot cutter',
+            'image splitting tool',
+            'online screenshot tool',
+            'free image processing',
+          ],
     author: 'Long Screenshot Splitter Team',
     robots: 'index,follow',
     language: language,
     canonicalUrl: canonicalUrl,
     ogTitle: customMetadata.ogTitle || siteName,
-    ogDescription: customMetadata.ogDescription || (language === 'zh-CN' 
-      ? '专业的在线长截图分割工具' 
-      : 'Professional online long screenshot splitter'),
+    ogDescription:
+      customMetadata.ogDescription ||
+      (language === 'zh-CN'
+        ? '专业的在线长截图分割工具'
+        : 'Professional online long screenshot splitter'),
     ogType: 'website' as const,
     ogUrl: canonicalUrl,
     ogImage: `${baseUrl}/images/og-image-1200x630.jpg`,
@@ -443,9 +481,11 @@ function generateFallbackMetadata(
     ogLocale: language === 'zh-CN' ? 'zh_CN' : 'en_US',
     twitterCard: 'summary_large_image' as const,
     twitterTitle: customMetadata.twitterTitle || siteName,
-    twitterDescription: customMetadata.twitterDescription || (language === 'zh-CN' 
-      ? '专业的在线长截图分割工具' 
-      : 'Professional online long screenshot splitter'),
+    twitterDescription:
+      customMetadata.twitterDescription ||
+      (language === 'zh-CN'
+        ? '专业的在线长截图分割工具'
+        : 'Professional online long screenshot splitter'),
     twitterImage: `${baseUrl}/images/twitter-card-1200x600.jpg`,
     twitterSite: '@screenshot_tool',
     twitterCreator: '@screenshot_tool',
@@ -475,9 +515,16 @@ function generateFallbackStructuredData(page: PageType, language: Language, meta
       name: siteName,
       url: baseUrl,
     },
-    featureList: language === 'zh-CN' 
-      ? ['长截图自动分割', '多格式支持', '批量导出', '在线处理', '免费使用']
-      : ['Automatic long screenshot splitting', 'Multi-format support', 'Batch export', 'Online processing', 'Free to use'],
+    featureList:
+      language === 'zh-CN'
+        ? ['长截图自动分割', '多格式支持', '批量导出', '在线处理', '免费使用']
+        : [
+            'Automatic long screenshot splitting',
+            'Multi-format support',
+            'Batch export',
+            'Online processing',
+            'Free to use',
+          ],
   };
 }
 

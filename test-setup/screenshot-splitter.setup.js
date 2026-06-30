@@ -10,13 +10,13 @@ HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
   getImageData: jest.fn(() => ({
     data: new Uint8ClampedArray(4),
     width: 1,
-    height: 1
+    height: 1,
   })),
   putImageData: jest.fn(),
   createImageData: jest.fn(() => ({
     data: new Uint8ClampedArray(4),
     width: 1,
-    height: 1
+    height: 1,
   })),
   fillRect: jest.fn(),
   clearRect: jest.fn(),
@@ -36,7 +36,7 @@ HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
   setTransform: jest.fn(),
   measureText: jest.fn(() => ({ width: 0 })),
   fillText: jest.fn(),
-  strokeText: jest.fn()
+  strokeText: jest.fn(),
 }));
 
 // 模拟 Image 对象
@@ -46,11 +46,11 @@ global.Image = class {
       this.onload && this.onload();
     }, 100);
   }
-  
+
   set src(value) {
     this._src = value;
   }
-  
+
   get src() {
     return this._src;
   }
@@ -61,7 +61,8 @@ global.FileReader = class {
   constructor() {
     this.readAsDataURL = jest.fn(() => {
       setTimeout(() => {
-        this.result = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+        this.result =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
         this.onload && this.onload();
       }, 100);
     });
@@ -101,15 +102,15 @@ global.ResizeObserver = class ResizeObserver {
   constructor(callback) {
     this.callback = callback;
   }
-  
+
   observe() {
     // Mock implementation
   }
-  
+
   unobserve() {
     // Mock implementation
   }
-  
+
   disconnect() {
     // Mock implementation
   }

@@ -7,10 +7,7 @@ import {
   type PerformanceStats,
   type CoreWebVitalsMetric,
 } from '../utils/analytics/performanceMonitor';
-import {
-  useLazyLoading,
-  type LazyLoadingOptions,
-} from '../hooks/useLazyLoading';
+import { useLazyLoading, type LazyLoadingOptions } from '../hooks/useLazyLoading';
 
 /**
  * 懒加载性能数据接口
@@ -578,11 +575,7 @@ export const BatchLazyLoader: React.FC<BatchLazyLoaderProps> = ({
         const isLoaded = true; // Simplified - assume all visible
         const error = null;
 
-        return (
-          <div key={item.id}>
-            {renderItem(item, isLoaded, error)}
-          </div>
-        );
+        return <div key={item.id}>{renderItem(item, isLoaded, error)}</div>;
       })}
     </div>
   );

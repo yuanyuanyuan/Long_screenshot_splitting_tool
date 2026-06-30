@@ -22,11 +22,23 @@
   "keywords": {
     "primary": {
       "zh-CN": ["长截图分割", "截图切割", "图片分割工具", "在线截图工具", "免费图片处理"],
-      "en": ["long screenshot splitter", "image splitter", "screenshot cutter", "online image tool", "free image processing"]
+      "en": [
+        "long screenshot splitter",
+        "image splitter",
+        "screenshot cutter",
+        "online image tool",
+        "free image processing"
+      ]
     },
     "secondary": {
       "zh-CN": ["长图切割", "截图处理", "图片编辑", "在线工具", "图片分割器"],
-      "en": ["long image cutting", "screenshot processing", "image editing", "online tool", "image splitter"]
+      "en": [
+        "long image cutting",
+        "screenshot processing",
+        "image editing",
+        "online tool",
+        "image splitter"
+      ]
     },
     "longTail": {
       "zh-CN": [
@@ -145,7 +157,13 @@
       "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "features": {
         "zh-CN": ["长截图自动分割", "多格式支持", "批量导出", "在线处理", "免费使用"],
-        "en": ["Automatic long screenshot splitting", "Multi-format support", "Batch export", "Online processing", "Free to use"]
+        "en": [
+          "Automatic long screenshot splitting",
+          "Multi-format support",
+          "Batch export",
+          "Online processing",
+          "Free to use"
+        ]
       }
     }
   },

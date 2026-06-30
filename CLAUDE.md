@@ -54,11 +54,13 @@ npm run test:integration    # tests/integration/**
 ## 核心架构（以代码为准）
 
 ### 分层与编排
+
 - **`src/App.tsx`** 是唯一编排入口（~700 行单组件）。它在 `AppContent` 内同时装配所有 hook 并通过 `switch(currentPath)` 手动渲染各页内容。新增页面逻辑几乎都要动这里。
 - **状态管理 = `useReducer`**（非 Redux、非全局 Context）。核心在 `src/hooks/useAppState.ts`：`AppState`（worker/blobs/objectUrls/originalImage/imageSlices/selectedSlices/isProcessing/splitHeight/fileName）+ 一组 `AppAction`。只有 I18n 和 SEO 用 Context。
 - **路由是自定义 hash 路由**（非 React Router）：`src/hooks/useRouter.ts`（运行时）+ `src/router/index.ts`（配置与匹配工具）。路径为 `/`、`/upload`、`/split`、`/export`。singlefile 构建模式切到 history 模式（`__BUILD_MODE__ === 'singlefile'`）。
 
 ### 切割流水线（最核心）
+
 ```
 File → useImageProcessor → useWorker → postMessage({file, splitHeight})
                                                  ↓
@@ -70,6 +72,7 @@ File → useImageProcessor → useWorker → postMessage({file, splitHeight})
 ```
 
 **Worker 消息契约 v1.1**（`split.worker.js` 顶部注释，改动 worker 必须同步）：
+
 - Main → Worker：`{ file: File, splitHeight: number }`
 - Worker → Main：
   - `{ type: 'progress', progress: 0..100 }`
@@ -80,13 +83,16 @@ File → useImageProcessor → useWorker → postMessage({file, splitHeight})
 类型见 `src/types/index.ts` 的 `WorkerMessage` / `AppAction` / `ImageSlice`。
 
 ### 导出
+
 - `src/utils/pdfExporter.ts`（jszip+ jspdf）与 `src/utils/zipExporter.ts` 接收 `imageSlices` + `selectedSlices: Set<number>`，按 `index` 过滤排序后产出。选中为空时 App 层拦截。
 
 ### 资源生命周期（易踩坑）
+
 - 每个 chunk 会 `URL.createObjectURL`，URL 记录在 `state.objectUrls`。**必须**经 `CLEANUP_SESSION` action 统一 `revokeObjectURL` + `worker.terminate()`。新会话前 `processImage` 会先 `cleanupSession`。
 - Worker 卸载时由 `useWorker` 的 cleanup `terminate`。
 
 ### 配置与部署
+
 - **统一配置入口** `config/index.ts`，聚合 `app/routing/deployment/environment/constants` 五块。部署相关全部从 `VITE_*` 环境变量读取，无硬编码（见 `config/build/deployment.config.ts`）。
 - **构建产物 base 路径**由部署配置动态决定：GitHub Pages 时根据仓库名算 `/<repo>/`，否则用 `VITE_BASE_PATH`。`getAssetUrl()` / `getRouteUrl()` 统一拼资源 URL。
 - **部署走 GitHub Pages**：`.github/workflows/deploy.yml` 在 push main 时构建并部署，注入 `GITHUB_PAGES=true` / `VITE_USE_ABSOLUTE_URLS=true` / `VITE_BASE_PATH=<repo>`。
@@ -94,6 +100,7 @@ File → useImageProcessor → useWorker → postMessage({file, splitHeight})
 - **CI**（`.github/workflows/ci.yml`）用 `dorny/paths-filter` 区分 seo / mobile / core 变更，按域选择性跑测试。
 
 ### 国际化
+
 - 自定义实现：`src/hooks/useI18n.ts` + `useI18nContext.tsx`，文案在 `src/locales/{zh-CN,en}.json`。所有展示文案走 `t('key', params)`，新增 UI 文案需同步两个 locale 文件并保证 key 覆盖（有 `I18nTestPanel` 仅开发环境显示）。
 
 ## 当前工作方向：内容感知切割
@@ -101,6 +108,7 @@ File → useImageProcessor → useWorker → postMessage({file, splitHeight})
 最近一次提交引入设计 spec：**`docs/superpowers/specs/2026-06-25-content-aware-split-design.md`**（状态：已获批，待实现）。
 
 目标是用「内容感知」替代当前 `split.worker.js` 的固定高度等分硬切（痛点：切口劈裂文字行/气泡）。关键设计原则：
+
 - **算法与 I/O 分离**：新增 `src/utils/splitAnalyzer.ts`（纯 TS 函数，无 DOM/canvas，可单测），worker 仅作 decode/getImageData/drawImage 胶水并调用它。
 - 信号选「行级低变化率」（水平投影方差），页高驱动选点，无解时**安全回退到固定高度等分**（绝不切得比现状差）。
 - 顺带修两个问题：`imageSlices` 按 index 写入（当前按异步到达顺序追加，潜在乱序）、JPEG 质量 0.9→0.92。

@@ -35,14 +35,14 @@ const ComponentLibraryIndex: React.FC = () => {
           version: '1.0.0',
           description: '智能分割长截图为多个部分，支持自动检测分割点和手动调整',
           author: 'CodeBuddy',
-          dependencies: ['react', 'typescript']
+          dependencies: ['react', 'typescript'],
         },
         demoUrl: '/screenshot-splitter',
         sourceUrl: 'https://github.com/your-repo/packages/screenshot-splitter',
         documentationUrl: '/docs/screenshot-splitter',
         tags: ['图片处理', '工具', '截图'],
         category: 'utilities',
-        screenshots: ['/assets/screenshot-splitter-demo.png']
+        screenshots: ['/assets/screenshot-splitter-demo.png'],
       },
       {
         id: 'shared-components',
@@ -52,13 +52,13 @@ const ComponentLibraryIndex: React.FC = () => {
           version: '1.0.0',
           description: '提供组件间通信、状态管理等基础功能的共享组件库',
           author: 'CodeBuddy',
-          dependencies: ['typescript']
+          dependencies: ['typescript'],
         },
         sourceUrl: 'https://github.com/your-repo/packages/shared-components',
         documentationUrl: '/docs/shared-components',
         tags: ['基础库', '通信', '状态管理'],
-        category: 'infrastructure'
-      }
+        category: 'infrastructure',
+      },
     ];
 
     setTimeout(() => {
@@ -73,21 +73,22 @@ const ComponentLibraryIndex: React.FC = () => {
   // 过滤组件
   const filteredComponents = components.filter(component => {
     const matchesCategory = selectedCategory === 'all' || component.category === selectedCategory;
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch =
+      searchTerm === '' ||
       component.info.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       component.info.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       component.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+
     return matchesCategory && matchesSearch;
   });
 
   const getCategoryDisplayName = (category: string): string => {
     const categoryMap: Record<string, string> = {
-      'all': '全部',
-      'utilities': '工具类',
-      'infrastructure': '基础设施',
-      'ui': 'UI组件',
-      'business': '业务组件'
+      all: '全部',
+      utilities: '工具类',
+      infrastructure: '基础设施',
+      ui: 'UI组件',
+      business: '业务组件',
     };
     return categoryMap[category] || category;
   };
@@ -116,7 +117,7 @@ const ComponentLibraryIndex: React.FC = () => {
             type="text"
             placeholder="搜索组件..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="search-input"
           />
         </div>
@@ -125,7 +126,7 @@ const ComponentLibraryIndex: React.FC = () => {
           <label>分类筛选：</label>
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={e => setSelectedCategory(e.target.value)}
             className="category-select"
           >
             {categories.map(category => (
@@ -156,7 +157,9 @@ const ComponentLibraryIndex: React.FC = () => {
 
               <div className="component-tags">
                 {component.tags.map(tag => (
-                  <span key={tag} className="tag">{tag}</span>
+                  <span key={tag} className="tag">
+                    {tag}
+                  </span>
                 ))}
               </div>
 
@@ -215,7 +218,7 @@ const ComponentLibraryIndex: React.FC = () => {
                       src={screenshot}
                       alt={`${component.info.name} 截图 ${index + 1}`}
                       className="screenshot"
-                      onError={(e) => {
+                      onError={e => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
@@ -242,11 +245,17 @@ const ComponentLibraryIndex: React.FC = () => {
             <span>当前显示</span>
           </div>
         </div>
-        
+
         <div className="footer-links">
-          <a href="/docs" className="footer-link">开发文档</a>
-          <a href="/contributing" className="footer-link">贡献指南</a>
-          <a href="https://github.com/your-repo" className="footer-link">GitHub</a>
+          <a href="/docs" className="footer-link">
+            开发文档
+          </a>
+          <a href="/contributing" className="footer-link">
+            贡献指南
+          </a>
+          <a href="https://github.com/your-repo" className="footer-link">
+            GitHub
+          </a>
         </div>
       </footer>
     </div>

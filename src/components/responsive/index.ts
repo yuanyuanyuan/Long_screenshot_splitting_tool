@@ -13,10 +13,7 @@ export {
 } from '../ResponsiveContainer';
 
 // Development debugging components
-export {
-  ViewportDebugger,
-  ResponsiveGridOverlay,
-} from '../ViewportDebugger';
+export { ViewportDebugger, ResponsiveGridOverlay } from '../ViewportDebugger';
 
 // Responsive hooks
 export {
@@ -28,7 +25,4 @@ export {
   BREAKPOINTS,
 } from '../../hooks/useViewport';
 
-export type {
-  ViewportState,
-  Breakpoint,
-} from '../../hooks/useViewport';
+export type { ViewportState, Breakpoint } from '../../hooks/useViewport';

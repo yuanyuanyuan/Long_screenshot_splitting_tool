@@ -38,9 +38,9 @@ const mockProps = {
 };
 
 // 测试组件包装器
-const TestWrapper: React.FC<{ children: React.ReactNode; language?: string }> = ({ 
-  children, 
-  language = 'zh-CN' 
+const TestWrapper: React.FC<{ children: React.ReactNode; language?: string }> = ({
+  children,
+  language = 'zh-CN',
 }) => (
   <I18nProvider>
     <div data-testid="test-wrapper" data-language={language}>
@@ -114,7 +114,7 @@ describe('ImagePreview 国际化测试', () => {
 
     it('应该在没有切片时显示中文空状态文本', () => {
       const emptyProps = { ...mockProps, slices: [] };
-      
+
       render(
         <TestWrapper language="zh-CN">
           <ImagePreview {...emptyProps} />
@@ -146,13 +146,13 @@ describe('ImagePreview 国际化测试', () => {
           };
 
           let translation = englishTranslations[key] || key;
-          
+
           if (params) {
             Object.entries(params).forEach(([paramKey, value]) => {
               translation = translation.replace(`{${paramKey}}`, String(value));
             });
           }
-          
+
           return translation;
         },
         currentLanguage: 'en',
@@ -192,7 +192,7 @@ describe('ImagePreview 国际化测试', () => {
   describe('参数化文本测试', () => {
     it('应该正确处理切片数量参数', () => {
       const singleSliceProps = { ...mockProps, slices: [mockSlices[0]] };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...singleSliceProps} />
@@ -205,7 +205,7 @@ describe('ImagePreview 国际化测试', () => {
 
     it('应该正确处理选择数量参数', () => {
       const singleSelectionProps = { ...mockProps, selectedSlices: [1] };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...singleSelectionProps} />
@@ -234,7 +234,7 @@ describe('ImagePreview 国际化测试', () => {
     it('应该在点击全选按钮时更新文本', () => {
       const mockOnSelectionChange = vi.fn();
       const propsWithCallback = { ...mockProps, onSelectionChange: mockOnSelectionChange };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...propsWithCallback} />
@@ -252,7 +252,7 @@ describe('ImagePreview 国际化测试', () => {
     it('应该在点击切片时触发选择变更', () => {
       const mockOnSelectionChange = vi.fn();
       const propsWithCallback = { ...mockProps, onSelectionChange: mockOnSelectionChange };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...propsWithCallback} />
@@ -271,7 +271,7 @@ describe('ImagePreview 国际化测试', () => {
   describe('边界情况测试', () => {
     it('应该处理空切片数组', () => {
       const emptyProps = { ...mockProps, slices: [] };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...emptyProps} />
@@ -283,7 +283,7 @@ describe('ImagePreview 国际化测试', () => {
 
     it('应该处理空选择数组', () => {
       const noSelectionProps = { ...mockProps, selectedSlices: [] };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...noSelectionProps} />
@@ -296,7 +296,7 @@ describe('ImagePreview 国际化测试', () => {
 
     it('应该处理所有切片都被选中的情况', () => {
       const allSelectedProps = { ...mockProps, selectedSlices: [0, 1, 2] };
-      
+
       render(
         <TestWrapper>
           <ImagePreview {...allSelectedProps} />

@@ -32,8 +32,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 头部区域 */
@@ -337,38 +341,38 @@
   .component-library-index {
     padding: 15px;
   }
-  
+
   .library-header h1 {
     font-size: 2rem;
   }
-  
+
   .library-controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .category-section {
     justify-content: space-between;
   }
-  
+
   .components-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .component-actions {
     flex-direction: column;
   }
-  
+
   .action-button {
     text-align: center;
   }
-  
+
   .stats {
     flex-direction: column;
     gap: 20px;
   }
-  
+
   .footer-links {
     flex-direction: column;
     gap: 15px;
@@ -379,12 +383,12 @@
   .component-card {
     padding: 16px;
   }
-  
+
   .component-header {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .component-version {
     align-self: flex-start;
   }
@@ -396,50 +400,50 @@
     background: #1a1a1a;
     color: #e9ecef;
   }
-  
+
   .library-header {
     border-bottom-color: #495057;
   }
-  
+
   .library-header h1 {
     color: #f8f9fa;
   }
-  
+
   .library-controls {
     background: #2d3748;
     border-color: #495057;
   }
-  
+
   .search-input,
   .category-select {
     background: #374151;
     border-color: #6b7280;
     color: #f9fafb;
   }
-  
+
   .search-input:focus,
   .category-select:focus {
     border-color: #3b82f6;
   }
-  
+
   .component-card {
     background: #2d3748;
     border-color: #4a5568;
   }
-  
+
   .component-card:hover {
     border-color: #3b82f6;
   }
-  
+
   .component-name {
     color: #f7fafc;
   }
-  
+
   .component-version {
     background: #4a5568;
     color: #e2e8f0;
   }
-  
+
   .library-footer {
     border-top-color: #495057;
   }

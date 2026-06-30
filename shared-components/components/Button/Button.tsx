@@ -44,8 +44,10 @@ export const Button: React.FC<ButtonProps> = ({
     styles[variantKey],
     disabled ? styles['btn--disabled'] : '',
     loading ? styles['btn--loading'] : '',
-    className
-  ].filter(Boolean).join(' ');
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && !loading && onClick) {

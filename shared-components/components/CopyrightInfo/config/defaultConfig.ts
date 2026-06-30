@@ -10,7 +10,7 @@ console.log('[ENV] COPYRIGHT DEBUG', {
   VITE_COPYRIGHT_WEBSITE: (import.meta as any).env.VITE_COPYRIGHT_WEBSITE,
   VITE_COPYRIGHT_TOOL_NAME: (import.meta as any).env.VITE_COPYRIGHT_TOOL_NAME,
   VITE_COPYRIGHT_YEAR: (import.meta as any).env.VITE_COPYRIGHT_YEAR,
-  allEnv: (import.meta as any).env
+  allEnv: (import.meta as any).env,
 });
 
 const toNumber = (v: string | undefined, fallback: number) => {

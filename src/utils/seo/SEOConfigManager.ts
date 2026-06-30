@@ -158,7 +158,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
    */
   async loadConfig(options: SEOConfigLoadOptions = {}): Promise<SEOConfigValidationResult> {
     const startTime = performance.now();
-    
+
     try {
       // Return existing promise if already loading
       if (this.loadPromise && !options.force) {
@@ -172,27 +172,28 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
           config: this.config,
           errors: [],
           warnings: [],
-          loadTime: 0
+          loadTime: 0,
         };
       }
 
       this.loadPromise = this._loadConfigInternal(options);
       const result = await this.loadPromise;
-      
+
       const loadTime = performance.now() - startTime;
       this._updateMetrics(result.success, loadTime);
-      
+
       return result;
-      
     } catch (error) {
       const loadTime = performance.now() - startTime;
       this._updateMetrics(false, loadTime);
-      
+
       return {
         success: false,
-        errors: [`Configuration load error: ${error instanceof Error ? error.message : 'Unknown error'}`],
+        errors: [
+          `Configuration load error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        ],
         warnings: [],
-        loadTime
+        loadTime,
       };
     } finally {
       this.loadPromise = null;
@@ -202,13 +203,15 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
   /**
    * Internal configuration loading logic
    */
-  private async _loadConfigInternal(options: SEOConfigLoadOptions): Promise<SEOConfigValidationResult> {
+  private async _loadConfigInternal(
+    options: SEOConfigLoadOptions
+  ): Promise<SEOConfigValidationResult> {
     try {
       // Dynamic import of configuration file
       const configPath = options.configPath || this.defaultConfigPath;
-      
+
       let configData: unknown;
-      
+
       if (configPath.endsWith('.json')) {
         // Load JSON configuration
         const response = await fetch(configPath);
@@ -223,13 +226,14 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
       }
 
       return this.validateConfig(configData);
-      
     } catch (error) {
       return {
         success: false,
-        errors: [`Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`],
+        errors: [
+          `Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        ],
         warnings: [],
-        loadTime: 0
+        loadTime: 0,
       };
     }
   }
@@ -248,47 +252,46 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
           success: false,
           errors: ['Configuration data is null or not an object'],
           warnings: [],
-          loadTime: performance.now() - startTime
+          loadTime: performance.now() - startTime,
         };
       }
 
       // Basic structure validation
       this._validateBasicStructure(configData as Record<string, any>, errors);
-      
+
       // Content validation
       this._validateContent(configData as SEOConfig, errors, warnings);
-      
+
       // SEO-specific validations
       this._validateSEORequirements(configData as SEOConfig, errors, warnings);
-      
+
       const loadTime = performance.now() - startTime;
-      
+
       if (errors.length === 0) {
         this.config = configData as SEOConfig;
         this._buildCache();
-        
+
         return {
           success: true,
           config: this.config,
           errors: [],
           warnings,
-          loadTime
+          loadTime,
         };
       } else {
         return {
           success: false,
           errors,
           warnings,
-          loadTime
+          loadTime,
         };
       }
-      
     } catch (error) {
       return {
         success: false,
         errors: [`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`],
         warnings,
-        loadTime: performance.now() - startTime
+        loadTime: performance.now() - startTime,
       };
     }
   }
@@ -298,7 +301,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
    */
   private _validateBasicStructure(config: Record<string, any>, errors: string[]): void {
     const requiredFields = ['version', 'site', 'keywords', 'pages', 'structuredData'];
-    
+
     for (const field of requiredFields) {
       if (!config[field]) {
         errors.push(`Missing required field: ${field}`);
@@ -310,11 +313,11 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
       if (!config.site.name?.['zh-CN'] || !config.site.name?.['en']) {
         errors.push('Site name must include both zh-CN and en translations');
       }
-      
+
       if (!config.site.url || !this._isValidUrl(config.site.url)) {
         errors.push('Site URL is required and must be valid');
       }
-      
+
       if (!config.site.supportedLanguages?.includes(config.site.defaultLanguage)) {
         errors.push('Default language must be included in supported languages');
       }
@@ -343,7 +346,9 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
           errors.push(`Page ${pageKey} title too short for ${lang}: minimum 10 characters`);
         }
         if (title.length > 60) {
-          warnings.push(`Page ${pageKey} title too long for ${lang}: recommended max 60 characters`);
+          warnings.push(
+            `Page ${pageKey} title too long for ${lang}: recommended max 60 characters`
+          );
         }
       });
 
@@ -353,7 +358,9 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
           errors.push(`Page ${pageKey} description too short for ${lang}: minimum 50 characters`);
         }
         if (description.length > 160) {
-          warnings.push(`Page ${pageKey} description too long for ${lang}: recommended max 160 characters`);
+          warnings.push(
+            `Page ${pageKey} description too long for ${lang}: recommended max 160 characters`
+          );
         }
       });
 
@@ -381,14 +388,16 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
     // Check for duplicate keywords across languages
     const allKeywords = new Set<string>();
     const duplicates = new Set<string>();
-    
-    Object.values(config.keywords.primary).flat().forEach(keyword => {
-      if (allKeywords.has(keyword.toLowerCase())) {
-        duplicates.add(keyword);
-      }
-      allKeywords.add(keyword.toLowerCase());
-    });
-    
+
+    Object.values(config.keywords.primary)
+      .flat()
+      .forEach(keyword => {
+        if (allKeywords.has(keyword.toLowerCase())) {
+          duplicates.add(keyword);
+        }
+        allKeywords.add(keyword.toLowerCase());
+      });
+
     if (duplicates.size > 0) {
       warnings.push(`Duplicate keywords found: ${Array.from(duplicates).join(', ')}`);
     }
@@ -399,7 +408,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
         if (!pageConfig.headingStructure.h1) {
           errors.push(`Page ${pageKey} missing H1 heading`);
         }
-        
+
         const h1Count = Object.keys(pageConfig.headingStructure.h1).length;
         if (h1Count > 1) {
           errors.push(`Page ${pageKey} should have only one H1 heading per language`);
@@ -411,7 +420,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
     if (!config.structuredData.webApplication.name) {
       errors.push('Web application structured data missing name');
     }
-    
+
     if (!config.structuredData.organization.name) {
       errors.push('Organization structured data missing name');
     }
@@ -441,7 +450,10 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
   /**
    * Get page-specific configuration with language support
    */
-  getPageConfig(page: PageType, language: Language = 'zh-CN'): {
+  getPageConfig(
+    page: PageType,
+    language: Language = 'zh-CN'
+  ): {
     title: string;
     description: string;
     keywords: string[];
@@ -449,27 +461,32 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
   } {
     const config = this.getConfig();
     const pageConfig = config.pages[page];
-    
+
     if (!pageConfig) {
       throw new Error(`Page configuration not found: ${page}`);
     }
 
     return {
       title: pageConfig.title[language] || pageConfig.title[config.site.defaultLanguage],
-      description: pageConfig.description[language] || pageConfig.description[config.site.defaultLanguage],
+      description:
+        pageConfig.description[language] || pageConfig.description[config.site.defaultLanguage],
       keywords: this.getKeywords(page, language, true),
-      headingStructure: this._getHeadingStructure(pageConfig, language)
+      headingStructure: this._getHeadingStructure(pageConfig, language),
     };
   }
 
   /**
    * Get keywords for specific page and language
    */
-  getKeywords(page: PageType, language: Language = 'zh-CN', includeContext: boolean = false): string[] {
+  getKeywords(
+    page: PageType,
+    language: Language = 'zh-CN',
+    includeContext: boolean = false
+  ): string[] {
     const config = this.getConfig();
     const keywords = [
       ...(config.keywords.primary[language] || []),
-      ...(config.keywords.secondary?.[language] || [])
+      ...(config.keywords.secondary?.[language] || []),
     ];
 
     if (includeContext && config.keywords.longTail) {
@@ -485,7 +502,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
   getStructuredData(page: PageType, language: Language = 'zh-CN'): Record<string, unknown> {
     const config = this.getConfig();
     // const pageConfig = config.pages[page]; // 临时注释避免未使用警告
-    
+
     const baseStructuredData = {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
@@ -500,13 +517,13 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
       offers: {
         '@type': 'Offer',
         price: '0',
-        priceCurrency: 'USD'
+        priceCurrency: 'USD',
       },
       author: {
         '@type': 'Organization',
         name: config.structuredData.organization.name,
-        url: config.structuredData.organization.url
-      }
+        url: config.structuredData.organization.url,
+      },
     };
 
     // Page-specific structured data enhancements
@@ -514,7 +531,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
       return {
         ...baseStructuredData,
         '@type': 'SoftwareApplication',
-        featureList: config.structuredData.webApplication.features?.[language] || []
+        featureList: config.structuredData.webApplication.features?.[language] || [],
       };
     }
 
@@ -550,7 +567,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
       loaded: this.config !== null,
       cacheSize: this.cache.size,
       lastLoadTime: this.metrics.lastLoadTime,
-      cacheValid: this.config !== null && this.cache.size > 0
+      cacheValid: this.config !== null && this.cache.size > 0,
     };
   }
 
@@ -561,7 +578,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
     if (!this.config) return;
 
     this.cache.clear();
-    
+
     // Cache page configs by language
     for (const [pageKey, pageConfig] of Object.entries(this.config.pages)) {
       for (const lang of this.config.site.supportedLanguages) {
@@ -569,7 +586,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
         this.cache.set(cacheKey, {
           title: pageConfig.title[lang],
           description: pageConfig.description[lang],
-          keywords: this.getKeywords(pageKey as PageType, lang as Language, true)
+          keywords: this.getKeywords(pageKey as PageType, lang as Language, true),
         });
       }
     }
@@ -584,11 +601,14 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
   /**
    * Get heading structure for page and language
    */
-  private _getHeadingStructure(pageConfig: any, language: Language): Record<string, string | string[]> {
+  private _getHeadingStructure(
+    pageConfig: any,
+    language: Language
+  ): Record<string, string | string[]> {
     if (!pageConfig.headingStructure) return {};
 
     const structure: Record<string, string | string[]> = {};
-    
+
     for (const [level, content] of Object.entries(pageConfig.headingStructure)) {
       if (typeof content === 'object' && content !== null) {
         const langContent = (content as Record<string, any>)[language];
@@ -597,7 +617,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
         }
       }
     }
-    
+
     return structure;
   }
 
@@ -609,7 +629,7 @@ export class SEOConfigManager implements SEOConfigManagerInterface {
     this.metrics.totalLoadTime += loadTime;
     this.metrics.avgLoadTime = this.metrics.totalLoadTime / this.metrics.loadCount;
     this.metrics.lastLoadTime = loadTime;
-    
+
     if (success) {
       this.metrics.successCount++;
     } else {
@@ -652,7 +672,7 @@ export class SEOConfigLoader {
       validateOnLoad: true,
       retryOnFailure: true,
       maxRetries: 3,
-      ...options
+      ...options,
     };
   }
 
@@ -662,7 +682,7 @@ export class SEOConfigLoader {
   async initialize(): Promise<SEOConfigValidationResult> {
     const result = await this.manager.loadConfig({
       validateOnly: this.options.validateOnLoad,
-      ...this.options
+      ...this.options,
     });
 
     if (this.options.autoReload && result.success) {

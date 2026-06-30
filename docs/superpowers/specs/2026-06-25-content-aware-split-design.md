@@ -20,6 +20,7 @@
 ## 2. 目标与非目标
 
 ### 目标
+
 - 切割线落在内容空白带（文字行间、段落间隙），保证每页内容完整、连续。
 - 对**聊天记录**（A 场景，主力）追求最佳效果；对**网页长截图**（B 场景）做到尽力而为 + 安全回退。
 - 保持「目标页高驱动」——用户对每页大致高度有预期（不同于「按所有间隙细碎切割」）。
@@ -27,6 +28,7 @@
 - 全程在 Web Worker 内完成，主线程零阻塞，无后端、无外部引擎依赖。
 
 ### 非目标（明确排除，守 YAGNI）
+
 - ❌ 不引入 OCR（Tesseract/tesseract.js）：浏览器成本过高，且 OCR 路线与「页高驱动」产品逻辑错位。
 - ❌ 不做手动切割线微调（现有 `TouchImageSlicer` 空壳不落地）。
 - ❌ 不做多语言/多模型适配。
@@ -55,6 +57,7 @@ File → [Worker: split.worker.js]
 ```
 
 **核心设计原则：算法与 I/O 分离。**
+
 - `src/utils/splitAnalyzer.ts`（纯 TS，可单测）：接收像素数据 + 参数，返回切割点 `number[]`。无 DOM/canvas 依赖。
 - `src/workers/split.worker.js`（I/O 胶水）：decode / getImageData / drawImage / convertToBlob + 调用 splitAnalyzer。
 
@@ -86,21 +89,22 @@ chooseSplitPoints(bands, targetHeight, searchWindow, mergeThreshold, minPageHeig
 
 ### 4.3 参数与默认值
 
-| 参数 | 含义 | 起始默认值 | 说明 |
-|---|---|---|---|
-| `targetHeight` | 目标页高 | 1200 | 复用现有 `splitHeight` 语义 |
-| `variationThreshold` | 低变化判定 | `0.3 × mean(profile)` | **相对值**：阈值 = 行变化率均值的 30%，低于此值视为「低变化」。相对值适配不同图，见 §4.4 |
-| `minBandHeight` | 空白带最小高度 | 8 px | 约一行文字行距 |
-| `searchWindow` | 目标页高附近搜索范围 | ±20% × targetHeight | 平衡精度与页高可控性 |
-| `mergeThreshold` | 最小切割间距 | 0.5 × targetHeight | 防碎页 |
-| `minPageHeight` | 单页最小高度 | 0.5 × targetHeight | 末页合并依据 |
-| `columnStep` | 列降采样步长 | 4 | 性能与精度平衡 |
+| 参数                 | 含义                 | 起始默认值            | 说明                                                                                     |
+| -------------------- | -------------------- | --------------------- | ---------------------------------------------------------------------------------------- |
+| `targetHeight`       | 目标页高             | 1200                  | 复用现有 `splitHeight` 语义                                                              |
+| `variationThreshold` | 低变化判定           | `0.3 × mean(profile)` | **相对值**：阈值 = 行变化率均值的 30%，低于此值视为「低变化」。相对值适配不同图，见 §4.4 |
+| `minBandHeight`      | 空白带最小高度       | 8 px                  | 约一行文字行距                                                                           |
+| `searchWindow`       | 目标页高附近搜索范围 | ±20% × targetHeight   | 平衡精度与页高可控性                                                                     |
+| `mergeThreshold`     | 最小切割间距         | 0.5 × targetHeight    | 防碎页                                                                                   |
+| `minPageHeight`      | 单页最小高度         | 0.5 × targetHeight    | 末页合并依据                                                                             |
+| `columnStep`         | 列降采样步长         | 4                     | 性能与精度平衡                                                                           |
 
 ### 4.4 待校准项（诚实风险标注）
 
 `variationThreshold` 与 `minBandHeight` 是起始经验值，**必须用真实长截图调试校准**——变化率绝对值高度依赖计算方式（RGB 差之和 vs 灰度差 vs 归一化）与图片特征，不能拍脑袋定死。
 
 **校准方法**（实现阶段执行）：
+
 1. 取 3~5 张代表性长截图（含聊天记录、网页）。
 2. 用 worker 导出 `variationProfile` 原始曲线（临时调试输出）。
 3. 人工标注「真实可切的空白带」位置，反推合理 threshold / minBandHeight。
@@ -108,27 +112,28 @@ chooseSplitPoints(bands, targetHeight, searchWindow, mergeThreshold, minPageHeig
 
 ### 4.5 Fallback 与边界
 
-| 场景 | 行为 |
-|---|---|
-| 整图无合格空白带（纯图片/密集表格） | 回退当前固定高度等分（保证不比现状差） |
-| 某搜索窗口内无合格带 | 该刀回退精确 `targetHeight` |
-| 末页剩余 < `minPageHeight` | 并入上一页 |
-| 图片高度 < `targetHeight` | 不切，整图作为唯一切片 |
-| `OffscreenCanvas`/`createImageBitmap` 不支持 | 走现有 error 路径 |
+| 场景                                         | 行为                                   |
+| -------------------------------------------- | -------------------------------------- |
+| 整图无合格空白带（纯图片/密集表格）          | 回退当前固定高度等分（保证不比现状差） |
+| 某搜索窗口内无合格带                         | 该刀回退精确 `targetHeight`            |
+| 末页剩余 < `minPageHeight`                   | 并入上一页                             |
+| 图片高度 < `targetHeight`                    | 不切，整图作为唯一切片                 |
+| `OffscreenCanvas`/`createImageBitmap` 不支持 | 走现有 error 路径                      |
 
 **安全原则**：任何不确定情况回退固定高度等分。内容感知是「尽力切更好」，绝不切得比现状差。
 
 ### 4.6 性能策略
+
 - 列降采样（`columnStep=4`）：计算量降 75%，行级信号精度无损。
 - 大图分块 `getImageData`：高度 > 4000px 时分段读取，避免单次数十 MB 像素数组。
 - 全程 Worker：主线程零阻塞；`progress` 上报分「解码 25% / 分析 / 切片」三段。
 
 ## 5. 顺手修掉的加重因素
 
-| 问题 | 修法 | 文件 |
-|---|---|---|
-| `imageSlices` 按到达顺序追加（潜在乱序） | reducer 改为按 `index` 写入 | `useAppState.ts` |
-| JPEG 0.9 文字伪影 | 切片编码质量提到 0.92 | `split.worker.js` |
+| 问题                                     | 修法                        | 文件              |
+| ---------------------------------------- | --------------------------- | ----------------- |
+| `imageSlices` 按到达顺序追加（潜在乱序） | reducer 改为按 `index` 写入 | `useAppState.ts`  |
+| JPEG 0.9 文字伪影                        | 切片编码质量提到 0.92       | `split.worker.js` |
 
 两者均低成本且与切割质量强相关，纳入本次改动。
 
@@ -147,15 +152,15 @@ chooseSplitPoints(bands, targetHeight, searchWindow, mergeThreshold, minPageHeig
 
 ## 7. 改动文件清单（Surgical）
 
-| 文件 | 动作 | 说明 |
-|---|---|---|
-| `src/utils/splitAnalyzer.ts` | 新增 | 算法纯函数（单测核心） |
-| `src/utils/__tests__/splitAnalyzer.test.ts` | 新增 | 单元测试 |
-| `src/workers/split.worker.js` | 改 | 插入 analyze 阶段，调 splitAnalyzer；JPEG 质量 0.9→0.92 |
-| `src/hooks/useAppState.ts` | 小改 | `imageSlices` 按 index 写入 |
-| `src/hooks/useImageProcessor.ts` | 小改 | 可选透传灵敏度参数 |
-| `src/types/index.ts` | 小改 | 新增分析参数类型 |
-| UI 组件 / pdfExporter / zipExporter | 不动 | 纯自动，UI 零改动 |
+| 文件                                        | 动作 | 说明                                                    |
+| ------------------------------------------- | ---- | ------------------------------------------------------- |
+| `src/utils/splitAnalyzer.ts`                | 新增 | 算法纯函数（单测核心）                                  |
+| `src/utils/__tests__/splitAnalyzer.test.ts` | 新增 | 单元测试                                                |
+| `src/workers/split.worker.js`               | 改   | 插入 analyze 阶段，调 splitAnalyzer；JPEG 质量 0.9→0.92 |
+| `src/hooks/useAppState.ts`                  | 小改 | `imageSlices` 按 index 写入                             |
+| `src/hooks/useImageProcessor.ts`            | 小改 | 可选透传灵敏度参数                                      |
+| `src/types/index.ts`                        | 小改 | 新增分析参数类型                                        |
+| UI 组件 / pdfExporter / zipExporter         | 不动 | 纯自动，UI 零改动                                       |
 
 ## 8. 成功标准
 

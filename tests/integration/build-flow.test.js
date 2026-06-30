@@ -26,7 +26,9 @@ describe('单仓库构建流程（符合前端规范）', () => {
     expect(tsconfig.compilerOptions.paths['@/*']).toBeDefined();
     // 新规范别名
     expect(tsconfig.compilerOptions.paths['@shared']).toBeDefined();
-    expect(tsconfig.include).toEqual(expect.arrayContaining(['config', 'shared-components', 'src']));
+    expect(tsconfig.include).toEqual(
+      expect.arrayContaining(['config', 'shared-components', 'src'])
+    );
     // 测试排除
     expect(tsconfig.exclude.join(' ')).toMatch(/__tests__|\.test\.|tests/);
   });
@@ -36,7 +38,7 @@ describe('单仓库构建流程（符合前端规范）', () => {
     expect(fs.existsSync(viteConfigPath)).toBe(true);
     const content = fs.readFileSync(viteConfigPath, 'utf8');
     expect(content).toContain("'@shared'");
-    expect(content).toContain("shared-components");
+    expect(content).toContain('shared-components');
   });
 
   it('不应存在 Jest 配置', () => {
@@ -60,7 +62,7 @@ describe('单仓库构建流程（符合前端规范）', () => {
     // 使用临时环境变量触发绝对URL
     try {
       execSync(
-        "VITE_USE_ABSOLUTE_URLS=true VITE_ASSETS_BASE_URL=https://example.com/app npm run build",
+        'VITE_USE_ABSOLUTE_URLS=true VITE_ASSETS_BASE_URL=https://example.com/app npm run build',
         { cwd: projectRoot, stdio: 'pipe', env: { ...process.env } }
       );
     } catch (e) {

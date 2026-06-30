@@ -8,7 +8,7 @@ import {
   IComponentCommunicationManager,
   ComponentRegistry,
   ComponentMessage,
-  ComponentEvent
+  ComponentEvent,
 } from '../interfaces/ComponentInterface';
 
 export class ComponentCommunicationManager implements IComponentCommunicationManager {
@@ -22,7 +22,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
    */
   register(component: IComponent): void {
     const componentId = component.info.id;
-    
+
     if (this.components[componentId]) {
       console.warn(`Component ${componentId} is already registered`);
       return;
@@ -33,7 +33,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
       instance: undefined,
       mountPoint: undefined,
       isRegistered: true,
-      registeredAt: Date.now()
+      registeredAt: Date.now(),
     };
 
     // 设置组件的消息处理器
@@ -42,13 +42,13 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     });
 
     console.log(`Component ${componentId} registered successfully`);
-    
+
     // 发布组件注册事件
     this.publish({
       type: 'component:registered',
       source: 'communication-manager',
       payload: { componentId, component: component.info },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -62,7 +62,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     }
 
     const componentInfo = this.components[componentId];
-    
+
     // 清理组件实例
     if (componentInfo.instance) {
       try {
@@ -73,15 +73,15 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     }
 
     delete this.components[componentId];
-    
+
     console.log(`Component ${componentId} unregistered successfully`);
-    
+
     // 发布组件注销事件
     this.publish({
       type: 'component:unregistered',
       source: 'communication-manager',
       payload: { componentId },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -106,7 +106,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     const broadcastMessage: ComponentMessage = {
       ...message,
       id: message.id || this.generateMessageId(),
-      type: 'notification'
+      type: 'notification',
     };
 
     Object.keys(this.components).forEach(componentId => {
@@ -122,14 +122,14 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
    */
   async sendTo(targetId: string, message: ComponentMessage): Promise<any> {
     const targetComponent = this.components[targetId];
-    
+
     if (!targetComponent) {
       throw new Error(`Target component ${targetId} not found`);
     }
 
     const messageWithId: ComponentMessage = {
       ...message,
-      id: message.id || this.generateMessageId()
+      id: message.id || this.generateMessageId(),
     };
 
     return this.sendToComponent(targetId, messageWithId);
@@ -142,7 +142,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     if (!this.eventHandlers.has(eventType)) {
       this.eventHandlers.set(eventType, new Set());
     }
-    
+
     this.eventHandlers.get(eventType)!.add(handler);
     console.log(`Subscribed to event: ${eventType}`);
   }
@@ -152,7 +152,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
    */
   unsubscribe(eventType: string, handler?: (event: ComponentEvent) => void): void {
     const handlers = this.eventHandlers.get(eventType);
-    
+
     if (!handlers) {
       return;
     }
@@ -165,7 +165,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     } else {
       this.eventHandlers.delete(eventType);
     }
-    
+
     console.log(`Unsubscribed from event: ${eventType}`);
   }
 
@@ -174,7 +174,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
    */
   publish(event: ComponentEvent): void {
     const handlers = this.eventHandlers.get(event.type);
-    
+
     if (handlers) {
       handlers.forEach(handler => {
         try {
@@ -204,7 +204,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
     // 将消息添加到队列
     this.messageQueue.push({
       ...message,
-      id: message.id || this.generateMessageId()
+      id: message.id || this.generateMessageId(),
     });
 
     // 处理消息队列
@@ -223,7 +223,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
 
     while (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift()!;
-      
+
       try {
         await this.processMessage(message);
       } catch (error) {
@@ -283,7 +283,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
    */
   private async sendToComponent(componentId: string, message: ComponentMessage): Promise<any> {
     const component = this.components[componentId]?.component;
-    
+
     if (!component) {
       throw new Error(`Component ${componentId} not found`);
     }
@@ -316,7 +316,7 @@ export class ComponentCommunicationManager implements IComponentCommunicationMan
       registeredComponents: Object.keys(this.components).length,
       activeEventTypes: this.eventHandlers.size,
       queuedMessages: this.messageQueue.length,
-      isProcessingQueue: this.isProcessingQueue
+      isProcessingQueue: this.isProcessingQueue,
     };
   }
 

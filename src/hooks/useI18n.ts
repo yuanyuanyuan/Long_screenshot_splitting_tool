@@ -53,10 +53,10 @@ function saveLanguage(language: SupportedLanguage) {
   try {
     // 使用智能检测器保存偏好
     LanguageDetector.saveLanguagePreference(language);
-    
+
     // 保持向后兼容
     localStorage.setItem('app-language', language);
-    
+
     console.log(`[I18n] 语言偏好已保存: ${language}`);
   } catch (error) {
     console.warn('[I18n] 无法保存语言设置:', error);

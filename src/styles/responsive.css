@@ -6,24 +6,24 @@
 
 :root {
   /* Breakpoint variables */
-  --breakpoint-xs: 320px;   /* Extra small devices */
-  --breakpoint-sm: 640px;   /* Small tablets */  
-  --breakpoint-md: 768px;   /* Medium tablets */
-  --breakpoint-lg: 1024px;  /* Laptops */
-  --breakpoint-xl: 1280px;  /* Desktops */
+  --breakpoint-xs: 320px; /* Extra small devices */
+  --breakpoint-sm: 640px; /* Small tablets */
+  --breakpoint-md: 768px; /* Medium tablets */
+  --breakpoint-lg: 1024px; /* Laptops */
+  --breakpoint-xl: 1280px; /* Desktops */
   --breakpoint-2xl: 1536px; /* Large desktops */
 
   /* Touch targets */
   --touch-target-min: 44px;
   --touch-target-optimal: 48px;
-  
+
   /* Mobile spacing scale */
-  --spacing-xs: 0.25rem;  /* 4px */
-  --spacing-sm: 0.5rem;   /* 8px */
-  --spacing-md: 0.75rem;  /* 12px */
-  --spacing-lg: 1rem;     /* 16px */
-  --spacing-xl: 1.5rem;   /* 24px */
-  --spacing-2xl: 2rem;    /* 32px */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 0.75rem; /* 12px */
+  --spacing-lg: 1rem; /* 16px */
+  --spacing-xl: 1.5rem; /* 24px */
+  --spacing-2xl: 2rem; /* 32px */
 }
 
 /* ==========================================================================
@@ -83,18 +83,34 @@
    ========================================================================== */
 
 /* Mobile-first responsive visibility */
-.hide-mobile { display: none; }
-.show-mobile { display: block; }
+.hide-mobile {
+  display: none;
+}
+.show-mobile {
+  display: block;
+}
 
-.hide-tablet { display: block; }
-.show-tablet { display: none; }
+.hide-tablet {
+  display: block;
+}
+.show-tablet {
+  display: none;
+}
 
-.hide-desktop { display: block; }
-.show-desktop { display: none; }
+.hide-desktop {
+  display: block;
+}
+.show-desktop {
+  display: none;
+}
 
 /* Responsive text alignment */
-.text-mobile-center { text-align: center; }
-.text-mobile-left { text-align: left; }
+.text-mobile-center {
+  text-align: center;
+}
+.text-mobile-left {
+  text-align: left;
+}
 
 /* ==========================================================================
    RESPONSIVE BREAKPOINT STYLES
@@ -109,26 +125,32 @@
     padding-left: var(--spacing-lg);
     padding-right: var(--spacing-lg);
   }
-  
+
   .container {
     padding-left: var(--spacing-lg);
     padding-right: var(--spacing-lg);
   }
-  
+
   .flex-mobile {
     flex-direction: row;
     gap: var(--spacing-lg);
   }
-  
+
   .flex-tablet {
     flex-direction: row;
     gap: var(--spacing-xl);
   }
-  
-  .hide-tablet { display: none; }
-  .show-tablet { display: block; }
-  
-  .text-mobile-center { text-align: left; }
+
+  .hide-tablet {
+    display: none;
+  }
+  .show-tablet {
+    display: block;
+  }
+
+  .text-mobile-center {
+    text-align: left;
+  }
 }
 
 /* Medium devices (tablets, 768px and up) */
@@ -145,19 +167,23 @@
     padding-left: var(--spacing-xl);
     padding-right: var(--spacing-xl);
   }
-  
+
   .container {
     padding-left: var(--spacing-xl);
     padding-right: var(--spacing-xl);
   }
-  
+
   .grid-desktop {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-2xl);
   }
-  
-  .hide-desktop { display: none; }
-  .show-desktop { display: block; }
+
+  .hide-desktop {
+    display: none;
+  }
+  .show-desktop {
+    display: block;
+  }
 }
 
 /* Extra large devices (large desktops, 1280px and up) */
@@ -166,7 +192,7 @@
     padding-left: var(--spacing-2xl);
     padding-right: var(--spacing-2xl);
   }
-  
+
   .container {
     padding-left: var(--spacing-2xl);
     padding-right: var(--spacing-2xl);
@@ -203,9 +229,15 @@
 }
 
 /* Mobile-optimized spacing */
-.space-mobile-sm { margin: var(--spacing-sm) 0; }
-.space-mobile-md { margin: var(--spacing-md) 0; }
-.space-mobile-lg { margin: var(--spacing-lg) 0; }
+.space-mobile-sm {
+  margin: var(--spacing-sm) 0;
+}
+.space-mobile-md {
+  margin: var(--spacing-md) 0;
+}
+.space-mobile-lg {
+  margin: var(--spacing-lg) 0;
+}
 
 /* Responsive text sizes */
 .text-responsive {
@@ -241,7 +273,7 @@
   .container {
     border: 2px solid currentColor;
   }
-  
+
   .btn-touch {
     border: 2px solid currentColor;
   }

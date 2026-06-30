@@ -24,13 +24,7 @@
   },
   "keywords": {
     "primary": {
-      "zh-CN": [
-        "长截图分割",
-        "截图切割",
-        "图片分割工具",
-        "在线截图工具",
-        "免费图片处理"
-      ],
+      "zh-CN": ["长截图分割", "截图切割", "图片分割工具", "在线截图工具", "免费图片处理"],
       "en": [
         "long screenshot splitter",
         "screenshot cutter",
@@ -40,13 +34,7 @@
       ]
     },
     "secondary": {
-      "zh-CN": [
-        "长图切割",
-        "截图处理",
-        "图片编辑",
-        "在线工具",
-        "图片分割器"
-      ],
+      "zh-CN": ["长图切割", "截图处理", "图片编辑", "在线工具", "图片分割器"],
       "en": [
         "long image cutter",
         "screenshot processing",
@@ -97,26 +85,11 @@
           "en": "Long Screenshot Splitter"
         },
         "h2": {
-          "zh-CN": [
-            "功能特点",
-            "使用方法",
-            "支持格式",
-            "常见问题"
-          ],
-          "en": [
-            "Features",
-            "How to Use",
-            "Supported Formats", 
-            "FAQ"
-          ]
+          "zh-CN": ["功能特点", "使用方法", "支持格式", "常见问题"],
+          "en": ["Features", "How to Use", "Supported Formats", "FAQ"]
         },
         "h3": {
-          "zh-CN": [
-            "自动识别分割点",
-            "多种导出格式",
-            "批量处理功能",
-            "隐私安全保护"
-          ],
+          "zh-CN": ["自动识别分割点", "多种导出格式", "批量处理功能", "隐私安全保护"],
           "en": [
             "Auto Split Point Detection",
             "Multiple Export Formats",
@@ -143,16 +116,8 @@
           "en": "Upload Long Screenshot"
         },
         "h2": {
-          "zh-CN": [
-            "上传方式",
-            "支持格式",
-            "文件要求"
-          ],
-          "en": [
-            "Upload Methods",
-            "Supported Formats",
-            "File Requirements"
-          ]
+          "zh-CN": ["上传方式", "支持格式", "文件要求"],
+          "en": ["Upload Methods", "Supported Formats", "File Requirements"]
         }
       }
     },
@@ -173,16 +138,8 @@
           "en": "Split Settings"
         },
         "h2": {
-          "zh-CN": [
-            "自动分割",
-            "手动调整",
-            "预览效果"
-          ],
-          "en": [
-            "Auto Split",
-            "Manual Adjustment", 
-            "Preview Effects"
-          ]
+          "zh-CN": ["自动分割", "手动调整", "预览效果"],
+          "en": ["Auto Split", "Manual Adjustment", "Preview Effects"]
         }
       }
     },
@@ -203,16 +160,8 @@
           "en": "Export Settings"
         },
         "h2": {
-          "zh-CN": [
-            "选择片段",
-            "导出选项",
-            "下载文件"
-          ],
-          "en": [
-            "Select Segments",
-            "Export Options",
-            "Download Files"
-          ]
+          "zh-CN": ["选择片段", "导出选项", "下载文件"],
+          "en": ["Select Segments", "Export Options", "Download Files"]
         }
       }
     }
@@ -240,17 +189,10 @@
       "operatingSystem": "Web Browser",
       "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "features": {
-        "zh-CN": [
-          "长截图自动分割",
-          "多格式支持",
-          "批量导出",
-          "在线处理",
-          "免费使用",
-          "隐私保护"
-        ],
+        "zh-CN": ["长截图自动分割", "多格式支持", "批量导出", "在线处理", "免费使用", "隐私保护"],
         "en": [
           "Automatic long screenshot splitting",
-          "Multi-format support", 
+          "Multi-format support",
           "Batch export",
           "Online processing",
           "Free to use",
@@ -282,13 +224,7 @@
   "robotsTxt": {
     "userAgent": "*",
     "allow": ["/"],
-    "disallow": [
-      "/api/",
-      "/admin/",
-      "/temp/",
-      "/*.json",
-      "/node_modules/"
-    ],
+    "disallow": ["/api/", "/admin/", "/temp/", "/*.json", "/node_modules/"],
     "crawlDelay": 1,
     "sitemapUrl": "https://screenshot-splitter.com/sitemap.xml",
     "customRules": [
@@ -325,7 +261,7 @@
       },
       {
         "url": "/upload",
-        "lastmod": "2024-01-01", 
+        "lastmod": "2024-01-01",
         "changefreq": "monthly",
         "priority": 0.8,
         "languages": ["zh-CN", "en"]
@@ -333,7 +269,7 @@
       {
         "url": "/split",
         "lastmod": "2024-01-01",
-        "changefreq": "monthly", 
+        "changefreq": "monthly",
         "priority": 0.9,
         "languages": ["zh-CN", "en"]
       },

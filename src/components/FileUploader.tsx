@@ -37,12 +37,15 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 触摸反馈
-  const triggerHapticFeedback = useCallback((type: 'light' | 'medium' | 'heavy' = 'light') => {
-    if (enableTouchOptimization && viewport.isMobile && 'vibrate' in navigator) {
-      const patterns = { light: 10, medium: 20, heavy: 30 };
-      navigator.vibrate(patterns[type]);
-    }
-  }, [enableTouchOptimization, viewport.isMobile]);
+  const triggerHapticFeedback = useCallback(
+    (type: 'light' | 'medium' | 'heavy' = 'light') => {
+      if (enableTouchOptimization && viewport.isMobile && 'vibrate' in navigator) {
+        const patterns = { light: 10, medium: 20, heavy: 30 };
+        navigator.vibrate(patterns[type]);
+      }
+    },
+    [enableTouchOptimization, viewport.isMobile]
+  );
 
   // 验证文件
   const validateFile = useCallback(
@@ -151,11 +154,12 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         className={`
           upload-area border-2 border-dashed rounded-lg text-center cursor-pointer transition-all duration-200
           ${viewport.isMobile ? 'p-8 min-h-[200px]' : 'p-6 min-h-[160px]'}
-          ${isDragOver 
-            ? 'border-blue-500 bg-blue-50 scale-[1.02]' 
-            : isActive
-            ? 'border-blue-400 bg-blue-25 scale-[0.98]'
-            : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+          ${
+            isDragOver
+              ? 'border-blue-500 bg-blue-50 scale-[1.02]'
+              : isActive
+                ? 'border-blue-400 bg-blue-25 scale-[0.98]'
+                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
           }
           ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
           ${viewport.isMobile ? 'active:scale-[0.98] shadow-sm' : ''}
@@ -170,7 +174,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
           touchAction: 'manipulation',
           WebkitTapHighlightColor: 'transparent',
           userSelect: 'none',
-          WebkitUserSelect: 'none'
+          WebkitUserSelect: 'none',
         }}
       >
         {/* 上传图标 */}
@@ -182,13 +186,15 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         <div className="upload-text">
           {isProcessing ? (
             <div className="processing-state">
-              <p className={`${viewport.isMobile ? 'text-xl' : 'text-lg'} font-medium text-blue-600 mb-3`}>
+              <p
+                className={`${viewport.isMobile ? 'text-xl' : 'text-lg'} font-medium text-blue-600 mb-3`}
+              >
                 {t('upload.processing')}
               </p>
               {progress > 0 && (
                 <div className="progress-container mb-4">
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     ></div>
@@ -199,15 +205,16 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             </div>
           ) : (
             <div className="upload-state">
-              <p className={`${viewport.isMobile ? 'text-xl' : 'text-lg'} font-medium text-gray-700 mb-3`}>
-                {isDragOver 
-                  ? t('upload.dropToUpload') 
-                  : viewport.isMobile 
-                  ? t('upload.tapToUpload') 
-                  : t('upload.dragText')
-                }
+              <p
+                className={`${viewport.isMobile ? 'text-xl' : 'text-lg'} font-medium text-gray-700 mb-3`}
+              >
+                {isDragOver
+                  ? t('upload.dropToUpload')
+                  : viewport.isMobile
+                    ? t('upload.tapToUpload')
+                    : t('upload.dragText')}
               </p>
-              
+
               {/* 移动端额外提示 */}
               {viewport.isMobile && !isDragOver && (
                 <div className="mobile-instructions mb-4">
@@ -226,11 +233,11 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                   </div>
                 </div>
               )}
-              
+
               <p className={`${viewport.isMobile ? 'text-base' : 'text-sm'} text-gray-500`}>
-                {t('upload.supportedFormats', { 
+                {t('upload.supportedFormats', {
                   formats: supportedFormats.map(f => f.split('/')[1].toUpperCase()).join(', '),
-                  maxSize: Math.round(maxFileSize / 1024 / 1024)
+                  maxSize: Math.round(maxFileSize / 1024 / 1024),
                 })}
               </p>
             </div>
@@ -246,7 +253,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
           className="hidden"
           disabled={isDisabled}
           /* 移动端支持相机拍照 */
-          capture={viewport.isMobile ? "environment" : undefined}
+          capture={viewport.isMobile ? 'environment' : undefined}
         />
       </div>
 
@@ -264,13 +271,13 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             "
             style={{
               touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent'
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
             <span className="mr-2">📁</span>
             {t('upload.selectFile')}
           </button>
-          
+
           {/* 相机按钮（如果设备支持） */}
           {'capture' in HTMLInputElement.prototype && (
             <button
@@ -290,7 +297,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
               "
               style={{
                 touchAction: 'manipulation',
-                WebkitTapHighlightColor: 'transparent'
+                WebkitTapHighlightColor: 'transparent',
               }}
             >
               <span className="mr-2">📷</span>
@@ -302,7 +309,9 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
       {/* 错误提示 */}
       {error && (
-        <div className={`error-message ${viewport.isMobile ? 'mt-6 p-4' : 'mt-4 p-3'} bg-red-100 border border-red-400 text-red-700 rounded-lg`}>
+        <div
+          className={`error-message ${viewport.isMobile ? 'mt-6 p-4' : 'mt-4 p-3'} bg-red-100 border border-red-400 text-red-700 rounded-lg`}
+        >
           <div className="flex items-start">
             <span className="mr-2 text-lg">⚠️</span>
             <div className="flex-1">
@@ -311,9 +320,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
               </p>
               {/* 移动端错误解决提示 */}
               {viewport.isMobile && (
-                <p className="text-sm text-red-600 mt-2">
-                  💡 {t('upload.errorHint')}
-                </p>
+                <p className="text-sm text-red-600 mt-2">💡 {t('upload.errorHint')}</p>
               )}
             </div>
           </div>

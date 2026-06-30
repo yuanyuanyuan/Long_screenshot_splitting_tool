@@ -72,10 +72,11 @@ export function isGitHubPages(): boolean {
 export async function dynamicImport(modulePath: string): Promise<any> {
   try {
     // 如果是相对路径，使用配置的基础路径
-    const fullPath = modulePath.startsWith('./') || modulePath.startsWith('../') 
-      ? modulePath 
-      : getAssetUrl(modulePath);
-    
+    const fullPath =
+      modulePath.startsWith('./') || modulePath.startsWith('../')
+        ? modulePath
+        : getAssetUrl(modulePath);
+
     return await import(/* @vite-ignore */ fullPath);
   } catch (error) {
     console.error(`Failed to dynamically import module: ${modulePath}`, error);
@@ -90,9 +91,9 @@ export function createFullUrl(path: string): string {
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
-  
+
   const baseUrl = window.location.origin;
   const basePath = getBasePath();
-  
+
   return `${baseUrl}${basePath}${path}`.replace(/\/+/g, '/');
 }

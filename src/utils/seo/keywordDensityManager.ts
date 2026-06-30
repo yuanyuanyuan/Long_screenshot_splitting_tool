@@ -46,13 +46,16 @@ interface ContentOptimization {
 
 class KeywordDensityManager {
   private config: KeywordDensityConfig | null = null;
-  private keywords: Record<Language, {
-    primary: string[];
-    secondary: string[];
-    longTail: string[];
-  }> = {
+  private keywords: Record<
+    Language,
+    {
+      primary: string[];
+      secondary: string[];
+      longTail: string[];
+    }
+  > = {
     'zh-CN': { primary: [], secondary: [], longTail: [] },
-    'en': { primary: [], secondary: [], longTail: [] }
+    en: { primary: [], secondary: [], longTail: [] },
   };
 
   /**
@@ -69,13 +72,13 @@ class KeywordDensityManager {
             'zh-CN': {
               primary: result.config.keywords.primary?.['zh-CN'] || [],
               secondary: result.config.keywords.secondary?.['zh-CN'] || [],
-              longTail: result.config.keywords.longTail?.['zh-CN'] || []
+              longTail: result.config.keywords.longTail?.['zh-CN'] || [],
             },
-            'en': {
+            en: {
               primary: result.config.keywords.primary?.['en'] || [],
               secondary: result.config.keywords.secondary?.['en'] || [],
-              longTail: result.config.keywords.longTail?.['en'] || []
-            }
+              longTail: result.config.keywords.longTail?.['en'] || [],
+            },
           };
         } else {
           this.keywords = this.getDefaultKeywords();
@@ -124,9 +127,9 @@ class KeywordDensityManager {
    * 分析单个关键词
    */
   private analyzeKeyword(
-    text: string, 
-    keyword: string, 
-    totalWords: number, 
+    text: string,
+    keyword: string,
+    totalWords: number,
     type: 'primary' | 'secondary' | 'longTail'
   ): KeywordAnalysis {
     const regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
@@ -156,7 +159,7 @@ class KeywordDensityManager {
       frequency,
       positions,
       isOptimal,
-      suggestions
+      suggestions,
     };
   }
 
@@ -187,11 +190,7 @@ class KeywordDensityManager {
         );
       } else if (keywordAnalysis.density > 5.0) {
         // 关键词过度优化的处理
-        optimizedText = this.reduceKeywordOveruse(
-          optimizedText,
-          keywordAnalysis.keyword,
-          language
-        );
+        optimizedText = this.reduceKeywordOveruse(optimizedText, keywordAnalysis.keyword, language);
         recommendations.push(
           `减少关键词 "${keywordAnalysis.keyword}" 的使用频率，避免过度优化 (当前密度: ${keywordAnalysis.density.toFixed(2)}%)`
         );
@@ -204,7 +203,9 @@ class KeywordDensityManager {
     const seoScore = this.calculateSEOScore(optimizedAnalysis, page, language);
 
     // 添加结构化建议
-    recommendations.push(...this.generateStructuralRecommendations(optimizedAnalysis, page, language));
+    recommendations.push(
+      ...this.generateStructuralRecommendations(optimizedAnalysis, page, language)
+    );
 
     return {
       originalText,
@@ -212,7 +213,7 @@ class KeywordDensityManager {
       keywordAnalysis: optimizedAnalysis,
       overallDensity,
       recommendations,
-      seoScore
+      seoScore,
     };
   }
 
@@ -235,22 +236,16 @@ class KeywordDensityManager {
 
     // 生成包含关键词的自然语句
     const keywordPhrase = this.generateKeywordPhrase(keyword, language, context);
-    
+
     // 将关键词短语自然地集成到句子中
     let enhancedSentence = targetSentence;
-    
+
     if (language === 'zh-CN') {
       // 中文的自然集成
-      enhancedSentence = targetSentence.replace(
-        /^([^，。]*)(，|。|$)/,
-        `$1，${keywordPhrase}$2`
-      );
+      enhancedSentence = targetSentence.replace(/^([^，。]*)(，|。|$)/, `$1，${keywordPhrase}$2`);
     } else {
       // 英文的自然集成
-      enhancedSentence = targetSentence.replace(
-        /^([^,.]*)(,|\.|\s|$)/,
-        `$1, ${keywordPhrase}$2`
-      );
+      enhancedSentence = targetSentence.replace(/^([^,.]*)(,|\.|\s|$)/, `$1, ${keywordPhrase}$2`);
     }
 
     sentences[targetSentenceIndex] = enhancedSentence;
@@ -260,27 +255,31 @@ class KeywordDensityManager {
   /**
    * 生成包含关键词的自然短语
    */
-  private generateKeywordPhrase(keyword: string, language: Language, _context: Record<string, any>): string {
+  private generateKeywordPhrase(
+    keyword: string,
+    language: Language,
+    _context: Record<string, any>
+  ): string {
     const phraseTemplates = {
       'zh-CN': [
         `提供专业的${keyword}服务`,
         `${keyword}功能强大且易用`,
         `支持${keyword}的完整解决方案`,
         `作为优秀的${keyword}`,
-        `实现高效的${keyword}处理`
+        `实现高效的${keyword}处理`,
       ],
-      'en': [
+      en: [
         `providing professional ${keyword} services`,
         `${keyword} functionality that is powerful and easy to use`,
         `complete ${keyword} solution support`,
         `as an excellent ${keyword}`,
-        `achieving efficient ${keyword} processing`
-      ]
+        `achieving efficient ${keyword} processing`,
+      ],
     };
 
     const templates = phraseTemplates[language] || phraseTemplates['en'];
     const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-    
+
     return randomTemplate;
   }
 
@@ -290,7 +289,7 @@ class KeywordDensityManager {
   private reduceKeywordOveruse(text: string, keyword: string, language: Language): string {
     const regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
     const matches = text.match(regex) || [];
-    
+
     if (matches.length <= 2) return text; // 如果关键词数量合理，不需要减少
 
     // 替换部分关键词为同义词或代词
@@ -313,24 +312,46 @@ class KeywordDensityManager {
   private getSynonyms(keyword: string, language: Language): string[] {
     const synonymMap = {
       'zh-CN': {
-        '长截图分割': ['长图切割', '截图处理', '图片分割'],
-        '截图切割': ['图片切割', '长图分割', '截图处理'],
-        '图片分割工具': ['图像分割器', '截图分割器', '图片切割工具'],
-        '在线截图工具': ['在线图片处理', '网页截图工具', '在线分割工具'],
-        '免费图片处理': ['免费图像处理', '免费在线工具', '免费分割服务']
+        长截图分割: ['长图切割', '截图处理', '图片分割'],
+        截图切割: ['图片切割', '长图分割', '截图处理'],
+        图片分割工具: ['图像分割器', '截图分割器', '图片切割工具'],
+        在线截图工具: ['在线图片处理', '网页截图工具', '在线分割工具'],
+        免费图片处理: ['免费图像处理', '免费在线工具', '免费分割服务'],
       },
-      'en': {
-        'long screenshot splitter': ['long image cutter', 'screenshot divider', 'image splitting tool'],
+      en: {
+        'long screenshot splitter': [
+          'long image cutter',
+          'screenshot divider',
+          'image splitting tool',
+        ],
         'screenshot cutter': ['image cutter', 'screenshot splitter', 'image divider'],
-        'image splitting tool': ['image splitting software', 'screenshot splitting tool', 'image divider tool'],
-        'online screenshot tool': ['online image processor', 'web screenshot tool', 'online splitting tool'],
-        'free image processing': ['free image editing', 'free online tool', 'free splitting service']
-      }
+        'image splitting tool': [
+          'image splitting software',
+          'screenshot splitting tool',
+          'image divider tool',
+        ],
+        'online screenshot tool': [
+          'online image processor',
+          'web screenshot tool',
+          'online splitting tool',
+        ],
+        'free image processing': [
+          'free image editing',
+          'free online tool',
+          'free splitting service',
+        ],
+      },
     };
 
     const languageMap = synonymMap[language];
     if (languageMap && typeof languageMap === 'object') {
-      return (languageMap as Record<string, string[]>)[keyword.toLowerCase()] || ['it', 'this tool', 'the service'];
+      return (
+        (languageMap as Record<string, string[]>)[keyword.toLowerCase()] || [
+          'it',
+          'this tool',
+          'the service',
+        ]
+      );
     }
     return ['it', 'this tool', 'the service'];
   }
@@ -346,13 +367,17 @@ class KeywordDensityManager {
   /**
    * 计算SEO评分
    */
-  private calculateSEOScore(analysis: KeywordAnalysis[], _page: PageType, _language: Language): number {
+  private calculateSEOScore(
+    analysis: KeywordAnalysis[],
+    _page: PageType,
+    _language: Language
+  ): number {
     let score = 0;
     let maxScore = 0;
 
     analysis.forEach(item => {
       maxScore += 100;
-      
+
       if (item.isOptimal) {
         score += 100;
       } else if (item.density >= 1.0 && item.density <= 5.0) {
@@ -405,21 +430,21 @@ class KeywordDensityManager {
     const recommendations: string[] = [];
 
     // 检查主要关键词是否在标题中
-    const primaryKeywords = analysis.filter(item => 
+    const primaryKeywords = analysis.filter(item =>
       this.keywords[language].primary.includes(item.keyword)
     );
 
     if (primaryKeywords.length > 0 && primaryKeywords[0].density < 2.0) {
       recommendations.push(
-        language === 'zh-CN' 
+        language === 'zh-CN'
           ? `建议在H1标题中使用主要关键词 "${primaryKeywords[0].keyword}"`
           : `Consider using primary keyword "${primaryKeywords[0].keyword}" in H1 title`
       );
     }
 
     // 检查关键词在文章开头的使用
-    const firstParagraphKeywords = analysis.filter(item => 
-      item.positions.some(pos => pos < 200) // 前200字符
+    const firstParagraphKeywords = analysis.filter(
+      item => item.positions.some(pos => pos < 200) // 前200字符
     );
 
     if (firstParagraphKeywords.length < 2) {
@@ -431,8 +456,8 @@ class KeywordDensityManager {
     }
 
     // 检查长尾关键词的使用
-    const longTailUsage = analysis.filter(item => 
-      this.keywords[language].longTail.includes(item.keyword) && item.density > 0
+    const longTailUsage = analysis.filter(
+      item => this.keywords[language].longTail.includes(item.keyword) && item.density > 0
     );
 
     if (longTailUsage.length < this.keywords[language].longTail.length / 2) {
@@ -494,38 +519,45 @@ class KeywordDensityManager {
       targetDensity: {
         primary: 2.5,
         secondary: 1.8,
-        longTail: 1.2
+        longTail: 1.2,
       },
       contentStructure: {
         titleKeywordPosition: 'beginning',
         keywordVariations: true,
         semanticKeywords: true,
-        keywordProximity: 50
+        keywordProximity: 50,
       },
       densityRules: {
         minDensity: 0.5,
         maxDensity: 5.0,
         optimalRange: [1.5, 3.0],
-        avoidOverOptimization: true
-      }
+        avoidOverOptimization: true,
+      },
     };
   }
 
   /**
    * 获取默认关键词
    */
-  private getDefaultKeywords(): Record<Language, { primary: string[]; secondary: string[]; longTail: string[] }> {
+  private getDefaultKeywords(): Record<
+    Language,
+    { primary: string[]; secondary: string[]; longTail: string[] }
+  > {
     return {
       'zh-CN': {
         primary: ['长截图分割', '截图切割', '图片分割工具'],
         secondary: ['在线截图工具', '免费图片处理', '长图切割'],
-        longTail: ['如何分割长截图', '长截图怎么切割', '免费在线图片分割工具']
+        longTail: ['如何分割长截图', '长截图怎么切割', '免费在线图片分割工具'],
       },
-      'en': {
+      en: {
         primary: ['long screenshot splitter', 'screenshot cutter', 'image splitting tool'],
         secondary: ['online screenshot tool', 'free image processing', 'long image cutter'],
-        longTail: ['how to split long screenshots', 'cut long screenshots online', 'free online image splitting tool']
-      }
+        longTail: [
+          'how to split long screenshots',
+          'cut long screenshots online',
+          'free online image splitting tool',
+        ],
+      },
     };
   }
 
@@ -543,10 +575,10 @@ class KeywordDensityManager {
   getStats() {
     return {
       configLoaded: this.config !== null,
-      keywordsLoaded: Object.values(this.keywords).some(lang => 
-        lang.primary.length > 0 || lang.secondary.length > 0 || lang.longTail.length > 0
+      keywordsLoaded: Object.values(this.keywords).some(
+        lang => lang.primary.length > 0 || lang.secondary.length > 0 || lang.longTail.length > 0
       ),
-      supportedLanguages: Object.keys(this.keywords) as Language[]
+      supportedLanguages: Object.keys(this.keywords) as Language[],
     };
   }
 }

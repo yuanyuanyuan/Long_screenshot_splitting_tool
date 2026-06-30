@@ -62,49 +62,49 @@ export interface ComponentLifecycle {
 export interface IComponent {
   // 基础信息
   info: ComponentInfo;
-  
+
   // 当前状态
   state: ComponentState;
-  
+
   // 配置信息
   config: ComponentConfig;
-  
+
   // 生命周期方法
   lifecycle: ComponentLifecycle;
-  
+
   // 初始化组件
   initialize(config?: Partial<ComponentConfig>): Promise<void>;
-  
+
   // 启动组件
   start(): Promise<void>;
-  
+
   // 停止组件
   stop(): Promise<void>;
-  
+
   // 更新配置
   updateConfig(config: Partial<ComponentConfig>): void;
-  
+
   // 发送消息
   sendMessage(message: ComponentMessage): Promise<any>;
-  
+
   // 接收消息
   onMessage(handler: (message: ComponentMessage) => void): void;
-  
+
   // 发送事件
   emit(event: ComponentEvent): void;
-  
+
   // 监听事件
   on(eventType: string, handler: (event: ComponentEvent) => void): void;
-  
+
   // 移除事件监听
   off(eventType: string, handler?: (event: ComponentEvent) => void): void;
-  
+
   // 获取组件状态
   getState(): ComponentState;
-  
+
   // 更新组件状态
   setState(state: Partial<ComponentState>): void;
-  
+
   // 销毁组件
   destroy(): Promise<void>;
 }
@@ -124,28 +124,28 @@ export interface ComponentRegistry {
 export interface IComponentCommunicationManager {
   // 注册组件
   register(component: IComponent): void;
-  
+
   // 注销组件
   unregister(componentId: string): void;
-  
+
   // 获取组件
   getComponent(componentId: string): IComponent | undefined;
-  
+
   // 获取所有组件
   getAllComponents(): ComponentRegistry;
-  
+
   // 广播消息
   broadcast(message: ComponentMessage): void;
-  
+
   // 发送消息给特定组件
   sendTo(targetId: string, message: ComponentMessage): Promise<any>;
-  
+
   // 订阅全局事件
   subscribe(eventType: string, handler: (event: ComponentEvent) => void): void;
-  
+
   // 取消订阅
   unsubscribe(eventType: string, handler?: (event: ComponentEvent) => void): void;
-  
+
   // 发布全局事件
   publish(event: ComponentEvent): void;
 }
@@ -168,29 +168,28 @@ export interface StateChangeEvent {
 export interface ISharedStateManager {
   // 获取状态值
   get<T = any>(key: string): T | undefined;
-  
+
   // 设置状态值
   set<T = any>(key: string, value: T, source?: string): void;
-  
+
   // 删除状态值
   delete(key: string, source?: string): void;
-  
+
   // 清空所有状态
   clear(source?: string): void;
-  
+
   // 获取所有状态
   getAll(): SharedState;
-  
+
   // 监听状态变更
   watch(key: string, handler: (event: StateChangeEvent) => void): void;
-  
+
   // 监听所有状态变更
   watchAll(handler: (event: StateChangeEvent) => void): void;
-  
+
   // 取消监听
   unwatch(key: string, handler?: (event: StateChangeEvent) => void): void;
-  
+
   // 取消所有监听
   unwatchAll(handler?: (event: StateChangeEvent) => void): void;
 }
-

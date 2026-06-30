@@ -1,6 +1,7 @@
 # 系统命令参考 (Linux环境)
 
 ## 📁 文件和目录操作
+
 ```bash
 # 导航
 cd /www/Long_screenshot_splitting_tool  # 进入项目目录
@@ -25,6 +26,7 @@ tail -f logfile.log                    # 实时查看日志
 ```
 
 ## 🔍 搜索和查找
+
 ```bash
 # 内容搜索
 grep -r "functionName" src/            # 递归搜索内容
@@ -38,6 +40,7 @@ git status                             # 查看状态
 ```
 
 ## 🐛 调试和监控
+
 ```bash
 # 进程管理
 ps aux | grep node                     # 查找Node进程
@@ -53,6 +56,7 @@ netstat -tlnp                          # 查看端口占用
 ```
 
 ## 📊 系统信息
+
 ```bash
 # 系统信息
 uname -a                               # 系统信息
@@ -69,6 +73,7 @@ echo $PATH                             # 查看PATH变量
 ```
 
 ## 🔧 开发工具
+
 ```bash
 # 编辑器命令
 code .                                 # 用VSCode打开当前目录
@@ -83,6 +88,7 @@ yarn install                          # yarn安装
 ```
 
 ## 📝 日志和输出
+
 ```bash
 # 输出重定向
 command > output.log 2>&1              # 重定向标准输出和错误
@@ -94,6 +100,7 @@ tail -100 output.log                   # 查看最后100行
 ```
 
 ## 🛠️ 实用命令
+
 ```bash
 # 权限管理
 chmod +x script.sh                     # 添加执行权限
@@ -108,6 +115,7 @@ rsync -av source/ destination/         # 同步文件
 ```
 
 ## ⚡ 性能命令
+
 ```bash
 # 性能测试
 time pnpm build                        # 测量构建时间

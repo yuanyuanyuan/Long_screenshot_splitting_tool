@@ -76,11 +76,11 @@
     background: rgba(30, 30, 30, 0.95);
     border-top-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .copyright {
     color: #aaa;
   }
-  
+
   .scrollHint {
     background: rgba(255, 255, 255, 0.9);
     color: #222;
@@ -93,7 +93,7 @@
     background: white;
     border-top: 2px solid black;
   }
-  
+
   .copyright {
     color: black;
     font-weight: bold;

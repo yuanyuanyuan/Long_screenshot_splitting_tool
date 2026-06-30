@@ -3,18 +3,29 @@
  * 集成所有SEO相关功能，提供统一的API
  */
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from 'react';
 import { seoConfigManager } from '../utils/seo/SEOConfigManager';
-import { useCoreWebVitals, useResponsiveBreakpoint, useSEOPerformanceReport } from '../hooks/useSEOOptimization';
+import {
+  useCoreWebVitals,
+  useResponsiveBreakpoint,
+  useSEOPerformanceReport,
+} from '../hooks/useSEOOptimization';
 import { realTimeUpdater } from '../utils/seo/dynamicMetaInjection';
-import type { 
-  SEOMetadata, 
-  SEOConfig, 
-  PageType, 
-  Language, 
+import type {
+  SEOMetadata,
+  SEOConfig,
+  PageType,
+  Language,
   PerformanceMetrics,
   SEOPerformanceReport,
-  ViewportInfo
+  ViewportInfo,
 } from '../types/seo.types';
 
 // SEO状态接口
@@ -55,7 +66,11 @@ interface SEOContextValue {
   };
   utils: {
     getPageTitle: (page: PageType, language?: Language, context?: Record<string, any>) => string;
-    getPageDescription: (page: PageType, language?: Language, context?: Record<string, any>) => string;
+    getPageDescription: (
+      page: PageType,
+      language?: Language,
+      context?: Record<string, any>
+    ) => string;
     getKeywords: (page: PageType, language?: Language) => string[];
     generateCanonicalUrl: (page: PageType, language?: Language) => string;
     isPerformanceOptimal: () => boolean;
@@ -130,7 +145,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
   autoLoadConfig = true,
 }) => {
   const [state, dispatch] = useReducer(seoReducer, initialState);
-  
+
   // 性能监控Hooks
   const performanceMetrics = useCoreWebVitals();
   const { current: deviceType, width, height, orientation } = useResponsiveBreakpoint();
@@ -154,7 +169,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
       isDesktop: deviceType === 'desktop',
       orientation,
     };
-    
+
     dispatch({ type: 'SET_VIEWPORT_INFO', payload: viewportInfo });
   }, [deviceType, width, height, orientation]);
 
@@ -169,9 +184,9 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
   const loadConfig = useCallback(async (): Promise<boolean> => {
     try {
       dispatch({ type: 'SET_ERROR', payload: null });
-      
+
       const result = await seoConfigManager.loadConfig();
-      
+
       if (result.success && result.config) {
         dispatch({ type: 'SET_CONFIG', payload: result.config });
         dispatch({ type: 'SET_CONFIG_LOADED', payload: true });
@@ -187,61 +202,63 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     }
   }, []);
 
-  const updateMetadata = useCallback((metadata: Partial<SEOMetadata>) => {
-    const updatedMetadata: SEOMetadata = {
-      ...state.currentMetadata,
-      ...metadata,
-    } as SEOMetadata;
-    
-    dispatch({ type: 'SET_METADATA', payload: updatedMetadata });
-    
-    if (enableRealTimeUpdates) {
-      realTimeUpdater.updateMetadata(metadata);
-    }
-  }, [state.currentMetadata, enableRealTimeUpdates]);
+  const updateMetadata = useCallback(
+    (metadata: Partial<SEOMetadata>) => {
+      const updatedMetadata: SEOMetadata = {
+        ...state.currentMetadata,
+        ...metadata,
+      } as SEOMetadata;
 
-  const updatePage = useCallback((
-    page: PageType, 
-    language: Language = 'zh-CN', 
-    context: Record<string, any> = {}
-  ) => {
-    if (!state.config) return;
-    
-    try {
-      const pageConfig = seoConfigManager.getPageConfig(page, language);
-      // const structuredData = seoConfigManager.getStructuredData(page, language);
-      
-      // 生成增强的元数据
-      const metadata: SEOMetadata = {
-        title: addContextToTitle(pageConfig.title, context, language),
-        description: addContextToDescription(pageConfig.description, context, language),
-        keywords: pageConfig.keywords,
-        ogTitle: addContextToTitle(pageConfig.title, context, language),
-        ogDescription: addContextToDescription(pageConfig.description, context, language),
-        ogImage: state.config.defaultImages?.ogImage || '/og-image.png',
-        ogType: 'website',
-        ogUrl: generateCanonicalUrl(page, language),
-        twitterCard: 'summary_large_image',
-        twitterTitle: addContextToTitle(pageConfig.title, context, language),
-        twitterDescription: addContextToDescription(pageConfig.description, context, language),
-        twitterImage: state.config.defaultImages?.twitterImage || '/twitter-card.png',
-        canonicalUrl: generateCanonicalUrl(page, language),
-        hreflang: generateHreflangMapping(page),
-        robots: 'index,follow',
-        author: state.config.structuredData.organization.name,
-        modifiedTime: new Date().toISOString(),
-      };
-      
-      dispatch({ type: 'SET_METADATA', payload: metadata });
-      
+      dispatch({ type: 'SET_METADATA', payload: updatedMetadata });
+
       if (enableRealTimeUpdates) {
         realTimeUpdater.updateMetadata(metadata);
       }
-    } catch (error) {
-      console.error('Failed to update page metadata:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to update page metadata' });
-    }
-  }, [state.config, enableRealTimeUpdates]);
+    },
+    [state.currentMetadata, enableRealTimeUpdates]
+  );
+
+  const updatePage = useCallback(
+    (page: PageType, language: Language = 'zh-CN', context: Record<string, any> = {}) => {
+      if (!state.config) return;
+
+      try {
+        const pageConfig = seoConfigManager.getPageConfig(page, language);
+        // const structuredData = seoConfigManager.getStructuredData(page, language);
+
+        // 生成增强的元数据
+        const metadata: SEOMetadata = {
+          title: addContextToTitle(pageConfig.title, context, language),
+          description: addContextToDescription(pageConfig.description, context, language),
+          keywords: pageConfig.keywords,
+          ogTitle: addContextToTitle(pageConfig.title, context, language),
+          ogDescription: addContextToDescription(pageConfig.description, context, language),
+          ogImage: state.config.defaultImages?.ogImage || '/og-image.png',
+          ogType: 'website',
+          ogUrl: generateCanonicalUrl(page, language),
+          twitterCard: 'summary_large_image',
+          twitterTitle: addContextToTitle(pageConfig.title, context, language),
+          twitterDescription: addContextToDescription(pageConfig.description, context, language),
+          twitterImage: state.config.defaultImages?.twitterImage || '/twitter-card.png',
+          canonicalUrl: generateCanonicalUrl(page, language),
+          hreflang: generateHreflangMapping(page),
+          robots: 'index,follow',
+          author: state.config.structuredData.organization.name,
+          modifiedTime: new Date().toISOString(),
+        };
+
+        dispatch({ type: 'SET_METADATA', payload: metadata });
+
+        if (enableRealTimeUpdates) {
+          realTimeUpdater.updateMetadata(metadata);
+        }
+      } catch (error) {
+        console.error('Failed to update page metadata:', error);
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to update page metadata' });
+      }
+    },
+    [state.config, enableRealTimeUpdates]
+  );
 
   const generatePerformanceReport = useCallback(() => {
     if (enablePerformanceMonitoring) {
@@ -252,17 +269,20 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     }
   }, [generateReport, enablePerformanceMonitoring]);
 
-  const optimizeForDevice = useCallback((deviceType: 'mobile' | 'tablet' | 'desktop') => {
-    if (!state.currentMetadata) return;
-    
-    const optimizedMetadata = optimizeMetadataForDevice(state.currentMetadata, deviceType);
-    dispatch({ type: 'SET_METADATA', payload: optimizedMetadata });
-    dispatch({ type: 'SET_OPTIMIZED', payload: true });
-    
-    if (enableRealTimeUpdates) {
-      realTimeUpdater.updateMetadata(optimizedMetadata);
-    }
-  }, [state.currentMetadata, enableRealTimeUpdates]);
+  const optimizeForDevice = useCallback(
+    (deviceType: 'mobile' | 'tablet' | 'desktop') => {
+      if (!state.currentMetadata) return;
+
+      const optimizedMetadata = optimizeMetadataForDevice(state.currentMetadata, deviceType);
+      dispatch({ type: 'SET_METADATA', payload: optimizedMetadata });
+      dispatch({ type: 'SET_OPTIMIZED', payload: true });
+
+      if (enableRealTimeUpdates) {
+        realTimeUpdater.updateMetadata(optimizedMetadata);
+      }
+    },
+    [state.currentMetadata, enableRealTimeUpdates]
+  );
 
   const resetSEO = useCallback(() => {
     dispatch({ type: 'RESET' });
@@ -271,81 +291,79 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     }
   }, [enableRealTimeUpdates]);
 
-  const prefetchPageMetadata = useCallback(async (
-    page: PageType, 
-    language: Language = 'zh-CN'
-  ): Promise<void> => {
-    try {
-      if (state.config || state.isConfigLoaded) {
-        // 预生成页面元数据以提高性能
-        seoConfigManager.getPageConfig(page, language);
-        seoConfigManager.getStructuredData(page, language);
-        
-        // 可以在这里添加缓存逻辑
-        console.log(`Prefetched metadata for ${page} (${language})`);
+  const prefetchPageMetadata = useCallback(
+    async (page: PageType, language: Language = 'zh-CN'): Promise<void> => {
+      try {
+        if (state.config || state.isConfigLoaded) {
+          // 预生成页面元数据以提高性能
+          seoConfigManager.getPageConfig(page, language);
+          seoConfigManager.getStructuredData(page, language);
+
+          // 可以在这里添加缓存逻辑
+          console.log(`Prefetched metadata for ${page} (${language})`);
+        }
+      } catch (error) {
+        console.warn(`Failed to prefetch metadata for ${page}:`, error);
       }
-    } catch (error) {
-      console.warn(`Failed to prefetch metadata for ${page}:`, error);
-    }
-  }, [state.config, state.isConfigLoaded]);
+    },
+    [state.config, state.isConfigLoaded]
+  );
 
   // 工具函数
-  const getPageTitle = useCallback((
-    page: PageType,
-    language: Language = 'zh-CN',
-    context: Record<string, any> = {}
-  ): string => {
-    if (!state.config) return '';
-    
-    try {
-      const pageConfig = seoConfigManager.getPageConfig(page, language);
-      return addContextToTitle(pageConfig.title, context, language);
-    } catch {
-      return '';
-    }
-  }, [state.config]);
+  const getPageTitle = useCallback(
+    (page: PageType, language: Language = 'zh-CN', context: Record<string, any> = {}): string => {
+      if (!state.config) return '';
 
-  const getPageDescription = useCallback((
-    page: PageType,
-    language: Language = 'zh-CN',
-    context: Record<string, any> = {}
-  ): string => {
-    if (!state.config) return '';
-    
-    try {
-      const pageConfig = seoConfigManager.getPageConfig(page, language);
-      return addContextToDescription(pageConfig.description, context, language);
-    } catch {
-      return '';
-    }
-  }, [state.config]);
+      try {
+        const pageConfig = seoConfigManager.getPageConfig(page, language);
+        return addContextToTitle(pageConfig.title, context, language);
+      } catch {
+        return '';
+      }
+    },
+    [state.config]
+  );
 
-  const getKeywords = useCallback((
-    page: PageType,
-    language: Language = 'zh-CN'
-  ): string[] => {
-    if (!state.config) return [];
-    
-    try {
-      return seoConfigManager.getKeywords(page, language, true);
-    } catch {
-      return [];
-    }
-  }, [state.config]);
+  const getPageDescription = useCallback(
+    (page: PageType, language: Language = 'zh-CN', context: Record<string, any> = {}): string => {
+      if (!state.config) return '';
 
-  const generateCanonicalUrl = useCallback((
-    page: PageType,
-    language: Language = 'zh-CN'
-  ): string => {
-    const baseUrl = state.config?.site?.url || 'https://screenshot-splitter.com';
-    const langPrefix = language === 'zh-CN' ? '' : `/${language}`;
-    const pagePath = page === 'home' ? '' : `/${page}`;
-    return `${baseUrl}${langPrefix}${pagePath}`;
-  }, [state.config]);
+      try {
+        const pageConfig = seoConfigManager.getPageConfig(page, language);
+        return addContextToDescription(pageConfig.description, context, language);
+      } catch {
+        return '';
+      }
+    },
+    [state.config]
+  );
+
+  const getKeywords = useCallback(
+    (page: PageType, language: Language = 'zh-CN'): string[] => {
+      if (!state.config) return [];
+
+      try {
+        return seoConfigManager.getKeywords(page, language, true);
+      } catch {
+        return [];
+      }
+    },
+    [state.config]
+  );
+
+  const generateCanonicalUrl = useCallback(
+    (page: PageType, language: Language = 'zh-CN'): string => {
+      const baseUrl = state.config?.site?.url || 'https://screenshot-splitter.com';
+      const langPrefix = language === 'zh-CN' ? '' : `/${language}`;
+      const pagePath = page === 'home' ? '' : `/${page}`;
+      return `${baseUrl}${langPrefix}${pagePath}`;
+    },
+    [state.config]
+  );
 
   const isPerformanceOptimal = useCallback((): boolean => {
     if (!state.performanceMetrics) return false;
-    
+
     const { lcp, fid, cls, fcp } = state.performanceMetrics;
     return lcp < 2500 && fid < 100 && cls < 0.1 && fcp < 1800;
   }, [state.performanceMetrics]);
@@ -370,11 +388,7 @@ export const SEOProvider: React.FC<SEOProviderProps> = ({
     },
   };
 
-  return (
-    <SEOContext.Provider value={contextValue}>
-      {children}
-    </SEOContext.Provider>
-  );
+  return <SEOContext.Provider value={contextValue}>{children}</SEOContext.Provider>;
 };
 
 // 辅助函数
@@ -384,14 +398,13 @@ const addContextToTitle = (
   language: Language
 ): string => {
   let title = baseTitle;
-  
+
   if (context.sliceCount) {
-    const sliceText = language === 'zh-CN' 
-      ? ` (${context.sliceCount}张)` 
-      : ` (${context.sliceCount} pieces)`;
+    const sliceText =
+      language === 'zh-CN' ? ` (${context.sliceCount}张)` : ` (${context.sliceCount} pieces)`;
     title = title.replace(/ - .*$/, sliceText + title.match(/ - .*$/)?.[0] || '');
   }
-  
+
   return title;
 };
 
@@ -401,24 +414,25 @@ const addContextToDescription = (
   language: Language
 ): string => {
   let description = baseDescription;
-  
+
   if (context.sliceCount) {
-    const sliceText = language === 'zh-CN' 
-      ? `，已生成${context.sliceCount}张图片` 
-      : `, generated ${context.sliceCount} images`;
+    const sliceText =
+      language === 'zh-CN'
+        ? `，已生成${context.sliceCount}张图片`
+        : `, generated ${context.sliceCount} images`;
     description = description.replace(/[。.]/, sliceText + '。');
   }
-  
+
   return description;
 };
 
 const generateHreflangMapping = (page: PageType): Record<string, string> => {
   const baseUrl = 'https://screenshot-splitter.com';
   const pagePath = page === 'home' ? '' : `/${page}`;
-  
+
   return {
     'zh-CN': `${baseUrl}${pagePath}`,
-    'en': `${baseUrl}/en${pagePath}`,
+    en: `${baseUrl}/en${pagePath}`,
     'x-default': `${baseUrl}${pagePath}`,
   };
 };
@@ -429,7 +443,7 @@ const optimizeMetadataForDevice = (
 ): SEOMetadata => {
   let optimizedTitle = metadata.title;
   let optimizedDescription = metadata.description;
-  
+
   switch (deviceType) {
     case 'mobile':
       if (optimizedTitle.length > 50) {
@@ -448,7 +462,7 @@ const optimizeMetadataForDevice = (
       }
       break;
   }
-  
+
   return {
     ...metadata,
     title: optimizedTitle,

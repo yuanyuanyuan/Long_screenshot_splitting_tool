@@ -8,10 +8,7 @@ import { useI18nContext } from '../hooks/useI18nContext';
 // 定义所有应该存在的翻译键值
 export const REQUIRED_I18N_KEYS = {
   // 头部信息
-  header: [
-    'header.title',
-    'header.subtitle'
-  ],
+  header: ['header.title', 'header.subtitle'],
 
   // 上传相关
   upload: [
@@ -24,7 +21,7 @@ export const REQUIRED_I18N_KEYS = {
     'upload.fileTypeError',
     'upload.fileSizeError',
     'upload.pageTitle',
-    'upload.pageDescription'
+    'upload.pageDescription',
   ],
 
   // 预览相关
@@ -33,7 +30,7 @@ export const REQUIRED_I18N_KEYS = {
     'preview.selectAll',
     'preview.deselectAll',
     'preview.selected',
-    'preview.noSlices'
+    'preview.noSlices',
   ],
 
   // 导出相关
@@ -55,7 +52,7 @@ export const REQUIRED_I18N_KEYS = {
     'export.validation.noSelection.goSplit',
     'export.validation.goHome',
     'export.pageTitle',
-    'export.pageDescription'
+    'export.pageDescription',
   ],
 
   // 分割相关
@@ -68,15 +65,11 @@ export const REQUIRED_I18N_KEYS = {
     'split.validation.goUpload',
     'split.validation.goHome',
     'split.pageTitle',
-    'split.pageDescription'
+    'split.pageDescription',
   ],
 
   // 语言切换
-  lang: [
-    'lang.current',
-    'lang.switcher.zh-CN',
-    'lang.switcher.en'
-  ],
+  lang: ['lang.current', 'lang.switcher.zh-CN', 'lang.switcher.en'],
 
   // 导航相关
   navigation: [
@@ -130,14 +123,11 @@ export const REQUIRED_I18N_KEYS = {
     'navigation.metrics.totalSteps',
     'navigation.metrics.completedSteps',
     'navigation.metrics.remainingSteps',
-    'navigation.metrics.progressPercentage'
+    'navigation.metrics.progressPercentage',
   ],
 
   // 应用相关
-  app: [
-    'app.loading',
-    'app.i18nLoading'
-  ],
+  app: ['app.loading', 'app.i18nLoading'],
 
   // 调试相关
   debug: [
@@ -177,7 +167,7 @@ export const REQUIRED_I18N_KEYS = {
     'debug.info.yes',
     'debug.info.no',
     'debug.preview.title',
-    'debug.preview.dataTitle'
+    'debug.preview.dataTitle',
   ],
 
   // 控制台消息
@@ -189,13 +179,11 @@ export const REQUIRED_I18N_KEYS = {
     'console.zipProgress',
     'console.zipComplete',
     'console.pdfFailed',
-    'console.zipFailed'
+    'console.zipFailed',
   ],
 
   // 弹窗消息
-  alert: [
-    'alert.debugOutput'
-  ]
+  alert: ['alert.debugOutput'],
 };
 
 // 获取所有键值的扁平化数组
@@ -208,7 +196,7 @@ export const useI18nCoverageTest = () => {
   const { t, currentLanguage } = useI18nContext();
 
   // 测试所有键值是否存在
-  const testAllKeys = (): { missing: string[], total: number, coverage: number } => {
+  const testAllKeys = (): { missing: string[]; total: number; coverage: number } => {
     const allKeys = getAllRequiredKeys();
     const missing: string[] = [];
 
@@ -229,7 +217,7 @@ export const useI18nCoverageTest = () => {
     return {
       missing,
       total: allKeys.length,
-      coverage: Math.round(coverage * 100) / 100
+      coverage: Math.round(coverage * 100) / 100,
     };
   };
 
@@ -253,14 +241,14 @@ export const useI18nCoverageTest = () => {
       category,
       missing,
       total: categoryKeys.length,
-      coverage: ((categoryKeys.length - missing.length) / categoryKeys.length) * 100
+      coverage: ((categoryKeys.length - missing.length) / categoryKeys.length) * 100,
     };
   };
 
   // 生成完整的覆盖率报告
   const generateCoverageReport = () => {
     const overallTest = testAllKeys();
-    const categoryTests = Object.keys(REQUIRED_I18N_KEYS).map(category => 
+    const categoryTests = Object.keys(REQUIRED_I18N_KEYS).map(category =>
       testCategoryKeys(category as keyof typeof REQUIRED_I18N_KEYS)
     );
 
@@ -273,15 +261,15 @@ export const useI18nCoverageTest = () => {
         totalKeys: overallTest.total,
         missingKeys: overallTest.missing.length,
         coveragePercentage: overallTest.coverage,
-        status: overallTest.coverage === 100 ? 'COMPLETE' : 'INCOMPLETE'
-      }
+        status: overallTest.coverage === 100 ? 'COMPLETE' : 'INCOMPLETE',
+      },
     };
 
     console.group(`🌐 I18n Coverage Report - ${currentLanguage.toUpperCase()}`);
     console.log(`📊 Overall Coverage: ${report.overall.coverage}%`);
     console.log(`✅ Found: ${report.overall.total - report.overall.missing.length} keys`);
     console.log(`❌ Missing: ${report.overall.missing.length} keys`);
-    
+
     if (report.overall.missing.length > 0) {
       console.group('❌ Missing Keys:');
       report.overall.missing.forEach(key => console.log(`  - ${key}`));
@@ -291,7 +279,9 @@ export const useI18nCoverageTest = () => {
     console.group('📋 Category Breakdown:');
     categoryTests.forEach(test => {
       const status = test.coverage === 100 ? '✅' : '⚠️';
-      console.log(`${status} ${test.category}: ${test.coverage}% (${test.total - test.missing.length}/${test.total})`);
+      console.log(
+        `${status} ${test.category}: ${test.coverage}% (${test.total - test.missing.length}/${test.total})`
+      );
       if (test.missing.length > 0) {
         test.missing.forEach(key => console.log(`    - Missing: ${key}`));
       }
@@ -306,7 +296,7 @@ export const useI18nCoverageTest = () => {
     testAllKeys,
     testCategoryKeys,
     generateCoverageReport,
-    getAllRequiredKeys
+    getAllRequiredKeys,
   };
 };
 
@@ -319,7 +309,9 @@ export const runI18nCoverageTest = () => {
         // 这里需要在组件内部调用，暂时注释掉
         // const { generateCoverageReport } = useI18nCoverageTest();
         // generateCoverageReport();
-        console.log('🌐 I18n Coverage Test is ready. Call generateCoverageReport() in a component to run the test.');
+        console.log(
+          '🌐 I18n Coverage Test is ready. Call generateCoverageReport() in a component to run the test.'
+        );
       } catch (error) {
         console.error('❌ I18n Coverage Test failed:', error);
       }

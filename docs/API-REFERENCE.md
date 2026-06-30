@@ -17,6 +17,7 @@
 **文件位置**: `src/components/ScreenshotSplitter.tsx`
 
 **Props 接口**:
+
 ```typescript
 interface ScreenshotSplitterProps {
   /** 初始分割高度 */
@@ -41,6 +42,7 @@ interface ImageSegment {
 ```
 
 **使用示例**:
+
 ```typescript
 import { ScreenshotSplitter } from '../components/ScreenshotSplitter';
 
@@ -67,6 +69,7 @@ const App = () => {
 **文件位置**: `src/components/FileUploader.tsx`
 
 **Props 接口**:
+
 ```typescript
 interface FileUploaderProps {
   /** 接受的文件类型 */
@@ -91,6 +94,7 @@ interface FileUploaderProps {
 **文件位置**: `src/components/ImagePreview.tsx`
 
 **Props 接口**:
+
 ```typescript
 interface ImagePreviewProps {
   /** 图片源 */
@@ -115,6 +119,7 @@ interface ImagePreviewProps {
 **文件位置**: `src/components/ExportControls.tsx`
 
 **Props 接口**:
+
 ```typescript
 interface ExportControlsProps {
   /** 图片片段数据 */
@@ -139,6 +144,7 @@ interface ExportControlsProps {
 **文件位置**: `shared-components/components/Button/Button.tsx`
 
 **Props 接口**:
+
 ```typescript
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** 按钮变体 */
@@ -157,11 +163,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 ```
 
 **使用示例**:
+
 ```typescript
 import { Button } from '../../shared-components/components/Button';
 
-<Button 
-  variant="primary" 
+<Button
+  variant="primary"
   size="large"
   loading={isProcessing}
   loadingText="处理中..."
@@ -178,6 +185,7 @@ import { Button } from '../../shared-components/components/Button';
 **文件位置**: `shared-components/components/CopyrightInfo/CopyrightInfo.tsx`
 
 **Props 接口**:
+
 ```typescript
 interface CopyrightInfoProps {
   /** 版权所有者 */
@@ -206,6 +214,7 @@ interface CopyrightInfoProps {
 **文件位置**: `src/hooks/useImageProcessor.ts`
 
 **接口定义**:
+
 ```typescript
 interface UseImageProcessorReturn {
   /** 处理图片 */
@@ -224,6 +233,7 @@ const useImageProcessor = (): UseImageProcessorReturn;
 ```
 
 **使用示例**:
+
 ```typescript
 import { useImageProcessor } from '../hooks/useImageProcessor';
 
@@ -255,6 +265,7 @@ const Component = () => {
 **文件位置**: `src/hooks/useAppState.ts`
 
 **接口定义**:
+
 ```typescript
 interface AppState {
   currentImage: File | null;
@@ -289,6 +300,7 @@ interface UseAppStateReturn {
 **文件位置**: `src/hooks/useI18n.ts`
 
 **接口定义**:
+
 ```typescript
 interface UseI18nReturn {
   /** 当前语言 */
@@ -313,6 +325,7 @@ Web Worker 集成 Hook。
 **文件位置**: `src/hooks/useWorker.ts`
 
 **接口定义**:
+
 ```typescript
 interface UseWorkerReturn<T, R> {
   /** 执行 Worker 任务 */
@@ -323,9 +336,7 @@ interface UseWorkerReturn<T, R> {
   terminate: () => void;
 }
 
-function useWorker<T = any, R = any>(
-  workerScript: string
-): UseWorkerReturn<T, R>;
+function useWorker<T = any, R = any>(workerScript: string): UseWorkerReturn<T, R>;
 ```
 
 ---
@@ -350,16 +361,16 @@ interface TextFormatterOptions {
 export class TextFormatter {
   /** 截断文本 */
   static truncate(text: string, options: TextFormatterOptions): string;
-  
+
   /** 首字母大写 */
   static capitalize(text: string): string;
-  
+
   /** 驼峰转换 */
   static camelCase(text: string): string;
-  
+
   /** 短横线分隔 */
   static kebabCase(text: string): string;
-  
+
   /** 格式化文件大小 */
   static formatFileSize(bytes: number): string;
 }
@@ -382,11 +393,8 @@ interface PDFExportOptions {
 
 export class PDFExporter {
   /** 导出图片片段为 PDF */
-  static exportSegmentsToPDF(
-    segments: ImageSegment[], 
-    options?: PDFExportOptions
-  ): Promise<void>;
-  
+  static exportSegmentsToPDF(segments: ImageSegment[], options?: PDFExportOptions): Promise<void>;
+
   /** 获取 PDF 预览 */
   static generatePreview(segments: ImageSegment[]): Promise<string>;
 }
@@ -407,11 +415,8 @@ interface ZIPExportOptions {
 
 export class ZIPExporter {
   /** 导出图片片段为 ZIP */
-  static exportSegmentsToZIP(
-    segments: ImageSegment[], 
-    options?: ZIPExportOptions
-  ): Promise<void>;
-  
+  static exportSegmentsToZIP(segments: ImageSegment[], options?: ZIPExportOptions): Promise<void>;
+
   /** 估算压缩后大小 */
   static estimateCompressedSize(segments: ImageSegment[]): number;
 }
@@ -427,26 +432,26 @@ export class ZIPExporter {
 
 ```typescript
 interface PerformanceMetrics {
-  lcp: number;        // Largest Contentful Paint
-  fid: number;        // First Input Delay
-  cls: number;        // Cumulative Layout Shift
-  fcp: number;        // First Contentful Paint
-  ttfb: number;       // Time to First Byte
+  lcp: number; // Largest Contentful Paint
+  fid: number; // First Input Delay
+  cls: number; // Cumulative Layout Shift
+  fcp: number; // First Contentful Paint
+  ttfb: number; // Time to First Byte
 }
 
 export class PerformanceMonitor {
   /** 开始监控 */
   static startMonitoring(): void;
-  
+
   /** 停止监控 */
   static stopMonitoring(): void;
-  
+
   /** 获取性能指标 */
   static getMetrics(): Promise<PerformanceMetrics>;
-  
+
   /** 记录自定义指标 */
   static recordCustomMetric(name: string, value: number): void;
-  
+
   /** 获取报告 */
   static generateReport(): Promise<PerformanceReport>;
 }
@@ -567,16 +572,10 @@ export function renderComponent(
 ): RenderResult;
 
 /** 模拟文件上传 */
-export function mockFileUpload(
-  file: File,
-  element: HTMLElement
-): Promise<void>;
+export function mockFileUpload(file: File, element: HTMLElement): Promise<void>;
 
 /** 等待异步操作完成 */
-export function waitForAsync(
-  callback: () => Promise<any>,
-  timeout?: number
-): Promise<any>;
+export function waitForAsync(callback: () => Promise<any>, timeout?: number): Promise<any>;
 ```
 
 ---
@@ -650,6 +649,6 @@ export type ConfigValidator<T> = (config: T) => boolean | string;
 
 ---
 
-*📝 最后更新: 2025-08-26*  
-*📋 API 版本: v1.0.0*  
-*🔄 更新频率: 随项目版本更新*
+_📝 最后更新: 2025-08-26_  
+_📋 API 版本: v1.0.0_  
+_🔄 更新频率: 随项目版本更新_

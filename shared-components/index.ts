@@ -7,7 +7,10 @@
 export * from './interfaces/ComponentInterface';
 
 // 导出管理器
-import { ComponentCommunicationManager, communicationManager } from './managers/ComponentCommunicationManager';
+import {
+  ComponentCommunicationManager,
+  communicationManager,
+} from './managers/ComponentCommunicationManager';
 import { SharedStateManager, sharedStateManager } from './managers/SharedStateManager';
 
 export { ComponentCommunicationManager, communicationManager };
@@ -30,7 +33,7 @@ export type {
   ComponentLifecycle,
   ComponentRegistry,
   SharedState,
-  StateChangeEvent
+  StateChangeEvent,
 } from './interfaces/ComponentInterface';
 
 // 版本信息
@@ -40,5 +43,5 @@ export const VERSION = '1.0.0';
 export default {
   communicationManager,
   sharedStateManager,
-  VERSION
+  VERSION,
 };

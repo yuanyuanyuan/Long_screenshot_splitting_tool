@@ -97,7 +97,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
 
     if (supportsIntersectionObserver) {
       observerRef.current = new IntersectionObserver(
-        (entries) => {
+        entries => {
           const [entry] = entries;
           if (entry.isIntersecting) {
             setState(prev => ({ ...prev, isInView: true }));
@@ -143,31 +143,31 @@ export const LazyImage: React.FC<LazyImageProps> = ({
 
   // 生成加载动画
   const LoadingSpinner = () => (
-    <div 
+    <div
       className="absolute inset-0 flex items-center justify-center bg-gray-100"
       style={{
-        minHeight: viewport.isMobile ? '120px' : '80px'
+        minHeight: viewport.isMobile ? '120px' : '80px',
       }}
     >
-      <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 ${
-        viewport.isMobile ? 'h-8 w-8' : 'h-6 w-6'
-      }`}></div>
+      <div
+        className={`animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 ${
+          viewport.isMobile ? 'h-8 w-8' : 'h-6 w-6'
+        }`}
+      ></div>
     </div>
   );
 
   // 生成错误状态
   const ErrorState = () => (
-    <div 
+    <div
       className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-500"
       style={{
-        minHeight: viewport.isMobile ? '120px' : '80px'
+        minHeight: viewport.isMobile ? '120px' : '80px',
       }}
     >
       <div className="text-center">
         <div className={`${viewport.isMobile ? 'text-2xl mb-2' : 'text-xl mb-1'}`}>📷</div>
-        <div className={`${viewport.isMobile ? 'text-sm' : 'text-xs'}`}>
-          图片加载失败
-        </div>
+        <div className={`${viewport.isMobile ? 'text-sm' : 'text-xs'}`}>图片加载失败</div>
       </div>
     </div>
   );
@@ -189,17 +189,10 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   };
 
   return (
-    <div 
-      className={`lazy-image-container ${className}`}
-      style={containerStyle}
-      ref={imgRef}
-    >
+    <div className={`lazy-image-container ${className}`} style={containerStyle} ref={imgRef}>
       {/* 占位符背景 */}
       {!state.isLoaded && !state.hasError && (
-        <div 
-          className="absolute inset-0"
-          style={getPlaceholderStyle()}
-        />
+        <div className="absolute inset-0" style={getPlaceholderStyle()} />
       )}
 
       {/* 加载状态 */}

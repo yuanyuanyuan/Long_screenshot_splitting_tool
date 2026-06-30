@@ -144,7 +144,7 @@
   "alert.debugOutput": "Debug info output to console\nSlice count: {count}\nShould show preview: {shouldShow}",
   "app.i18nLoading": "Loading language pack...",
   "navigation.accessibility.current": "Current Page",
-  "navigation.accessibility.disabled": "Unavailable", 
+  "navigation.accessibility.disabled": "Unavailable",
   "navigation.accessibility.mainNav": "Main Navigation",
   "navigation.accessibility.navButtons": "Navigation Buttons",
   "navigation.accessibility.shortcuts": "Quick Navigation",

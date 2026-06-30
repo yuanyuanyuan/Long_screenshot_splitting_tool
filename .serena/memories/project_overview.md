@@ -5,6 +5,7 @@
 **核心功能**: SPA多文件构建和组件独立部署
 
 ## 技术栈
+
 - **构建工具**: Vite + TypeScript
 - **包管理**: pnpm workspace
 - **UI框架**: React 18
@@ -13,6 +14,7 @@
 - **部署**: GitHub Actions + GitHub Pages
 
 ## 项目结构
+
 - `packages/`: 组件包目录
   - `screenshot-splitter/`: 长截图分割工具
   - `shared-components/`: 共享组件库
@@ -22,10 +24,12 @@
 - `.github/workflows/`: GitHub Actions
 
 ## 构建模式
+
 - **SPA模式**: 多文件结构，支持代码分割和懒加载
 - **资源配置化**: 支持配置化的资源基础URL，便于CDN部署
 
 ## 组件特性
+
 - 每个组件可独立构建、运行和部署
 - 组件间通过标准化接口通信
 - 共享逻辑抽取到 shared-components

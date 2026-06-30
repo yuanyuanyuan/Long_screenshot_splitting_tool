@@ -1,17 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "./shared-components/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    './shared-components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     // Mobile-first breakpoints (default Tailwind)
     screens: {
-      'sm': '640px',
-      'md': '768px', 
-      'lg': '1024px',
-      'xl': '1280px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
       '2xl': '1536px',
     },
     extend: {
@@ -31,7 +31,7 @@ export default {
       },
       // Mobile-optimized spacing
       spacing: {
-        'touch': '44px', // Minimum touch target
+        touch: '44px', // Minimum touch target
         'touch-lg': '48px', // Optimal touch target
       },
       // Mobile-optimized font sizes
@@ -41,7 +41,7 @@ export default {
         'base-mobile': '1rem',
         'lg-mobile': '1.125rem',
       },
-      // Mobile-optimized animations  
+      // Mobile-optimized animations
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
@@ -68,14 +68,14 @@ export default {
       },
       // Mobile-optimized transitions
       transitionDuration: {
-        '250': '250ms',
-        '400': '400ms',
+        250: '250ms',
+        400: '400ms',
       },
     },
   },
   // Mobile-first utilities
   plugins: [
-    function({ addUtilities, _theme }) {
+    function ({ addUtilities, _theme }) {
       const newUtilities = {
         // Touch-friendly utilities
         '.touch-manipulation': {
@@ -107,6 +107,6 @@ export default {
         },
       };
       addUtilities(newUtilities);
-    }
+    },
   ],
-}
+};

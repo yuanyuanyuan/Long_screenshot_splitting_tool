@@ -6,7 +6,7 @@ const mockEnv = {
   NODE_ENV: 'test',
   VITE_APP_NAME: 'Test App',
   VITE_APP_VERSION: '1.0.0',
-  VITE_API_BASE_URL: 'https://api.test.com'
+  VITE_API_BASE_URL: 'https://api.test.com',
 };
 
 describe('AppConfig', () => {

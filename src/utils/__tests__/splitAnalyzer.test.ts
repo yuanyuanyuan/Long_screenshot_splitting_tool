@@ -216,10 +216,7 @@ describe('chooseSplitPoints', () => {
       { top: 980, bottom: 1020, center: 1000 },
       { top: 1480, bottom: 1520, center: 1500 },
     ];
-    const points = chooseSplitPoints(
-      bands,
-      makeOpts({ searchWindow: 600, mergeThreshold: 600 })
-    );
+    const points = chooseSplitPoints(bands, makeOpts({ searchWindow: 600, mergeThreshold: 600 }));
     expect(points).toEqual([1000]);
   });
 });

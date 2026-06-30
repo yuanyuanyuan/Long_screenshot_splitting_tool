@@ -19,18 +19,18 @@ class CodeSplittingOptimizer {
    */
   async analyzeAll() {
     console.log('🔍 分析代码分割机会...');
-    
+
     const packages = this.getPackages();
     const results = {};
-    
+
     for (const pkg of packages) {
       console.log(`\n📦 分析包: ${pkg}`);
       results[pkg] = await this.analyzePackage(pkg);
     }
-    
+
     this.analysisResults = results;
     await this.generateOptimizationPlan();
-    
+
     return results;
   }
 
@@ -40,11 +40,11 @@ class CodeSplittingOptimizer {
   async analyzePackage(packageName) {
     const packageDir = path.join(this.projectRoot, 'packages', packageName);
     const srcDir = path.join(packageDir, 'src');
-    
+
     if (!fs.existsSync(srcDir)) {
       return { error: 'Source directory not found' };
     }
-    
+
     const analysis = {
       package: packageName,
       components: [],
@@ -52,27 +52,27 @@ class CodeSplittingOptimizer {
       heavyDependencies: [],
       lazyLoadCandidates: [],
       chunkingOpportunities: [],
-      recommendations: []
+      recommendations: [],
     };
-    
+
     // 分析组件
     analysis.components = await this.analyzeComponents(srcDir);
-    
+
     // 分析路由
     analysis.routes = await this.analyzeRoutes(srcDir);
-    
+
     // 分析重型依赖
     analysis.heavyDependencies = await this.analyzeHeavyDependencies(packageDir);
-    
+
     // 识别懒加载候选
     analysis.lazyLoadCandidates = this.identifyLazyLoadCandidates(analysis);
-    
+
     // 识别代码块分割机会
     analysis.chunkingOpportunities = this.identifyChunkingOpportunities(analysis);
-    
+
     // 生成优化建议
     analysis.recommendations = this.generateOptimizationRecommendations(analysis);
-    
+
     return analysis;
   }
 
@@ -81,17 +81,17 @@ class CodeSplittingOptimizer {
    */
   async analyzeComponents(srcDir) {
     const components = [];
-    
+
     const analyzeFile = (filePath, relativePath) => {
       if (!filePath.match(/\.(tsx?|jsx?)$/)) return;
-      
+
       try {
         const content = fs.readFileSync(filePath, 'utf8');
         const ast = parse(content, {
           sourceType: 'module',
-          plugins: ['jsx', 'typescript', 'decorators-legacy']
+          plugins: ['jsx', 'typescript', 'decorators-legacy'],
         });
-        
+
         const component = {
           name: path.basename(filePath, path.extname(filePath)),
           path: relativePath,
@@ -100,21 +100,21 @@ class CodeSplittingOptimizer {
           exports: [],
           dependencies: [],
           complexity: 0,
-          isLazyLoadable: false
+          isLazyLoadable: false,
         };
-        
+
         traverse(ast, {
           ImportDeclaration(path) {
             component.imports.push({
               source: path.node.source.value,
-              specifiers: path.node.specifiers.map(s => s.local.name)
+              specifiers: path.node.specifiers.map(s => s.local.name),
             });
           },
-          
+
           ExportDefaultDeclaration(path) {
             component.exports.push('default');
           },
-          
+
           ExportNamedDeclaration(path) {
             if (path.node.declaration) {
               if (path.node.declaration.id) {
@@ -122,28 +122,27 @@ class CodeSplittingOptimizer {
               }
             }
           },
-          
+
           FunctionDeclaration(path) {
             component.complexity += this.calculateComplexity(path);
           },
-          
+
           ArrowFunctionExpression(path) {
             component.complexity += this.calculateComplexity(path);
-          }
+          },
         });
-        
+
         // 判断是否适合懒加载
         component.isLazyLoadable = this.isLazyLoadable(component);
-        
+
         components.push(component);
-        
       } catch (error) {
         console.warn(`⚠️ 解析文件失败: ${filePath}`, error.message);
       }
     };
-    
+
     this.walkDirectory(srcDir, analyzeFile);
-    
+
     return components.sort((a, b) => b.size - a.size);
   }
 
@@ -153,27 +152,27 @@ class CodeSplittingOptimizer {
   async analyzeRoutes(srcDir) {
     const routes = [];
     const routerFiles = [];
-    
+
     // 查找路由文件
     this.walkDirectory(srcDir, (filePath, relativePath) => {
       if (relativePath.includes('router') || relativePath.includes('route')) {
         routerFiles.push(filePath);
       }
     });
-    
+
     for (const routerFile of routerFiles) {
       try {
         const content = fs.readFileSync(routerFile, 'utf8');
         const ast = parse(content, {
           sourceType: 'module',
-          plugins: ['jsx', 'typescript', 'decorators-legacy']
+          plugins: ['jsx', 'typescript', 'decorators-legacy'],
         });
-        
+
         traverse(ast, {
           ObjectExpression(path) {
             const properties = path.node.properties;
             const route = {};
-            
+
             properties.forEach(prop => {
               if (prop.key && prop.key.name === 'path' && prop.value.type === 'StringLiteral') {
                 route.path = prop.value.value;
@@ -182,19 +181,18 @@ class CodeSplittingOptimizer {
                 route.component = this.extractComponentName(prop.value);
               }
             });
-            
+
             if (route.path && route.component) {
               route.isLazyLoadable = !route.path.includes('*') && route.path !== '/';
               routes.push(route);
             }
-          }
+          },
         });
-        
       } catch (error) {
         console.warn(`⚠️ 解析路由文件失败: ${routerFile}`, error.message);
       }
     }
-    
+
     return routes;
   }
 
@@ -203,26 +201,26 @@ class CodeSplittingOptimizer {
    */
   async analyzeHeavyDependencies(packageDir) {
     const packageJsonPath = path.join(packageDir, 'package.json');
-    
+
     if (!fs.existsSync(packageJsonPath)) {
       return [];
     }
-    
+
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
     const heavyDeps = [];
-    
+
     // 已知的重型依赖
     const knownHeavyDeps = {
-      'lodash': { size: 70000, alternative: 'lodash-es (tree-shakable)' },
-      'moment': { size: 67000, alternative: 'dayjs (2KB)' },
-      'antd': { size: 200000, alternative: '按需导入' },
+      lodash: { size: 70000, alternative: 'lodash-es (tree-shakable)' },
+      moment: { size: 67000, alternative: 'dayjs (2KB)' },
+      antd: { size: 200000, alternative: '按需导入' },
       'material-ui': { size: 300000, alternative: '按需导入' },
       'chart.js': { size: 150000, alternative: '懒加载' },
       'monaco-editor': { size: 500000, alternative: '懒加载' },
-      'three': { size: 400000, alternative: '懒加载' },
-      'echarts': { size: 300000, alternative: '按需导入' }
+      three: { size: 400000, alternative: '懒加载' },
+      echarts: { size: 300000, alternative: '按需导入' },
     };
-    
+
     if (packageJson.dependencies) {
       Object.entries(packageJson.dependencies).forEach(([name, version]) => {
         if (knownHeavyDeps[name]) {
@@ -231,12 +229,12 @@ class CodeSplittingOptimizer {
             version,
             estimatedSize: knownHeavyDeps[name].size,
             alternative: knownHeavyDeps[name].alternative,
-            recommendation: 'consider-optimization'
+            recommendation: 'consider-optimization',
           });
         }
       });
     }
-    
+
     return heavyDeps;
   }
 
@@ -245,12 +243,10 @@ class CodeSplittingOptimizer {
    */
   identifyLazyLoadCandidates(analysis) {
     const candidates = [];
-    
+
     // 大型组件
-    const largeComponents = analysis.components.filter(c => 
-      c.size > 5000 || c.complexity > 10
-    );
-    
+    const largeComponents = analysis.components.filter(c => c.size > 5000 || c.complexity > 10);
+
     largeComponents.forEach(component => {
       candidates.push({
         type: 'component',
@@ -258,10 +254,10 @@ class CodeSplittingOptimizer {
         path: component.path,
         reason: 'Large size or high complexity',
         priority: component.size > 10000 ? 'high' : 'medium',
-        estimatedSavings: Math.round(component.size * 0.8)
+        estimatedSavings: Math.round(component.size * 0.8),
       });
     });
-    
+
     // 路由组件
     analysis.routes.forEach(route => {
       if (route.isLazyLoadable) {
@@ -271,11 +267,11 @@ class CodeSplittingOptimizer {
           path: route.path,
           reason: 'Route-based code splitting opportunity',
           priority: 'high',
-          estimatedSavings: 'TBD'
+          estimatedSavings: 'TBD',
         });
       }
     });
-    
+
     // 重型依赖
     analysis.heavyDependencies.forEach(dep => {
       candidates.push({
@@ -284,10 +280,10 @@ class CodeSplittingOptimizer {
         reason: 'Heavy dependency',
         priority: 'medium',
         estimatedSavings: dep.estimatedSize,
-        alternative: dep.alternative
+        alternative: dep.alternative,
       });
     });
-    
+
     return candidates.sort((a, b) => {
       const priorityOrder = { high: 3, medium: 2, low: 1 };
       return priorityOrder[b.priority] - priorityOrder[a.priority];
@@ -299,7 +295,7 @@ class CodeSplittingOptimizer {
    */
   identifyChunkingOpportunities(analysis) {
     const opportunities = [];
-    
+
     // 共享依赖
     const importCounts = {};
     analysis.components.forEach(component => {
@@ -308,7 +304,7 @@ class CodeSplittingOptimizer {
         importCounts[imp.source] = (importCounts[imp.source] || 0) + 1;
       });
     });
-    
+
     Object.entries(importCounts).forEach(([dep, count]) => {
       if (count >= 3) {
         opportunities.push({
@@ -316,11 +312,11 @@ class CodeSplittingOptimizer {
           dependency: dep,
           usageCount: count,
           reason: 'Shared dependency used in multiple components',
-          recommendation: 'Extract to vendor chunk'
+          recommendation: 'Extract to vendor chunk',
         });
       }
     });
-    
+
     // 功能模块
     const moduleGroups = this.groupComponentsByModule(analysis.components);
     Object.entries(moduleGroups).forEach(([module, components]) => {
@@ -332,11 +328,11 @@ class CodeSplittingOptimizer {
           componentCount: components.length,
           totalSize,
           reason: 'Related components can be grouped',
-          recommendation: 'Create feature-specific chunk'
+          recommendation: 'Create feature-specific chunk',
         });
       }
     });
-    
+
     return opportunities;
   }
 
@@ -345,17 +341,17 @@ class CodeSplittingOptimizer {
    */
   groupComponentsByModule(components) {
     const groups = {};
-    
+
     components.forEach(component => {
       const pathParts = component.path.split('/');
       const module = pathParts.length > 1 ? pathParts[0] : 'root';
-      
+
       if (!groups[module]) {
         groups[module] = [];
       }
       groups[module].push(component);
     });
-    
+
     return groups;
   }
 
@@ -364,7 +360,7 @@ class CodeSplittingOptimizer {
    */
   generateOptimizationRecommendations(analysis) {
     const recommendations = [];
-    
+
     // 懒加载建议
     if (analysis.lazyLoadCandidates.length > 0) {
       const highPriority = analysis.lazyLoadCandidates.filter(c => c.priority === 'high');
@@ -375,11 +371,11 @@ class CodeSplittingOptimizer {
           title: '实施懒加载',
           description: `发现 ${highPriority.length} 个高优先级懒加载机会`,
           items: highPriority.slice(0, 5),
-          estimatedImpact: 'high'
+          estimatedImpact: 'high',
         });
       }
     }
-    
+
     // 代码分割建议
     if (analysis.chunkingOpportunities.length > 0) {
       recommendations.push({
@@ -388,10 +384,10 @@ class CodeSplittingOptimizer {
         title: '优化代码分割',
         description: `发现 ${analysis.chunkingOpportunities.length} 个代码分割机会`,
         items: analysis.chunkingOpportunities.slice(0, 3),
-        estimatedImpact: 'medium'
+        estimatedImpact: 'medium',
       });
     }
-    
+
     // 依赖优化建议
     if (analysis.heavyDependencies.length > 0) {
       recommendations.push({
@@ -400,10 +396,10 @@ class CodeSplittingOptimizer {
         title: '优化重型依赖',
         description: `发现 ${analysis.heavyDependencies.length} 个重型依赖`,
         items: analysis.heavyDependencies,
-        estimatedImpact: 'high'
+        estimatedImpact: 'high',
       });
     }
-    
+
     return recommendations.sort((a, b) => {
       const priorityOrder = { high: 3, medium: 2, low: 1 };
       return priorityOrder[b.priority] - priorityOrder[a.priority];
@@ -416,26 +412,26 @@ class CodeSplittingOptimizer {
   async generateOptimizationPlan() {
     const planPath = path.join(this.projectRoot, 'code-splitting-plan.json');
     const htmlPlanPath = path.join(this.projectRoot, 'code-splitting-plan.html');
-    
+
     const plan = {
       timestamp: new Date().toISOString(),
       summary: this.generateSummary(),
       packages: this.analysisResults,
       globalRecommendations: this.generateGlobalRecommendations(),
-      implementationSteps: this.generateImplementationSteps()
+      implementationSteps: this.generateImplementationSteps(),
     };
-    
+
     // 生成JSON计划
     fs.writeFileSync(planPath, JSON.stringify(plan, null, 2));
-    
+
     // 生成HTML计划
     const htmlPlan = this.generateHtmlPlan(plan);
     fs.writeFileSync(htmlPlanPath, htmlPlan);
-    
+
     console.log(`\n📋 优化计划已生成:`);
     console.log(`  JSON: ${planPath}`);
     console.log(`  HTML: ${htmlPlanPath}`);
-    
+
     this.printOptimizationSummary(plan);
   }
 
@@ -448,16 +444,16 @@ class CodeSplittingOptimizer {
       totalLazyLoadCandidates: 0,
       totalChunkingOpportunities: 0,
       totalHeavyDependencies: 0,
-      estimatedSavings: 0
+      estimatedSavings: 0,
     };
-    
+
     Object.values(this.analysisResults).forEach(analysis => {
       if (analysis.error) return;
-      
+
       summary.totalLazyLoadCandidates += analysis.lazyLoadCandidates?.length || 0;
       summary.totalChunkingOpportunities += analysis.chunkingOpportunities?.length || 0;
       summary.totalHeavyDependencies += analysis.heavyDependencies?.length || 0;
-      
+
       // 估算节省的大小
       analysis.lazyLoadCandidates?.forEach(candidate => {
         if (typeof candidate.estimatedSavings === 'number') {
@@ -465,7 +461,7 @@ class CodeSplittingOptimizer {
         }
       });
     });
-    
+
     return summary;
   }
 
@@ -474,7 +470,7 @@ class CodeSplittingOptimizer {
    */
   generateGlobalRecommendations() {
     const recommendations = [];
-    
+
     // Vite配置优化
     recommendations.push({
       type: 'vite-config',
@@ -494,9 +490,9 @@ export default {
     }
   }
 }`,
-      priority: 'high'
+      priority: 'high',
     });
-    
+
     // React懒加载
     recommendations.push({
       type: 'react-lazy',
@@ -510,9 +506,9 @@ const LazyComponent = React.lazy(() => import('./LazyComponent'));
 <Suspense fallback={<div>Loading...</div>}>
   <LazyComponent />
 </Suspense>`,
-      priority: 'high'
+      priority: 'high',
     });
-    
+
     // 路由懒加载
     recommendations.push({
       type: 'route-lazy',
@@ -530,9 +526,9 @@ const routes = [
     component: React.lazy(() => import('./pages/Settings'))
   }
 ];`,
-      priority: 'medium'
+      priority: 'medium',
     });
-    
+
     return recommendations;
   }
 
@@ -546,35 +542,35 @@ const routes = [
         title: '分析当前状态',
         description: '运行构建产物分析，了解当前包大小',
         command: 'node tools/build-scripts/bundle-analyzer.js',
-        estimatedTime: '10分钟'
+        estimatedTime: '10分钟',
       },
       {
         step: 2,
         title: '配置代码分割',
         description: '更新Vite配置，启用手动代码分割',
         files: ['vite.config.ts'],
-        estimatedTime: '30分钟'
+        estimatedTime: '30分钟',
       },
       {
         step: 3,
         title: '实施路由懒加载',
         description: '将路由组件改为懒加载',
         files: ['src/router/index.ts'],
-        estimatedTime: '1小时'
+        estimatedTime: '1小时',
       },
       {
         step: 4,
         title: '优化重型依赖',
         description: '替换或懒加载重型依赖',
-        estimatedTime: '2小时'
+        estimatedTime: '2小时',
       },
       {
         step: 5,
         title: '测试和验证',
         description: '构建并测试优化效果',
         command: 'pnpm run build && node tools/build-scripts/bundle-analyzer.js',
-        estimatedTime: '30分钟'
-      }
+        estimatedTime: '30分钟',
+      },
     ];
   }
 
@@ -641,18 +637,24 @@ const routes = [
             
             <div class="section">
                 <h2>💡 全局建议</h2>
-                ${plan.globalRecommendations.map(rec => `
+                ${plan.globalRecommendations
+                  .map(
+                    rec => `
                     <div class="recommendation rec-${rec.priority}">
                         <h3>${rec.title}</h3>
                         <p>${rec.description}</p>
                         <div class="code-block">${rec.code}</div>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
             
             <div class="section">
                 <h2>📋 实施步骤</h2>
-                ${plan.implementationSteps.map(step => `
+                ${plan.implementationSteps
+                  .map(
+                    step => `
                     <div class="step">
                         <div style="display: flex; align-items: center;">
                             <div class="step-number">${step.step}</div>
@@ -664,7 +666,9 @@ const routes = [
                             </div>
                         </div>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         </div>
     </div>
@@ -681,7 +685,7 @@ const routes = [
     console.log(`  代码分割机会: ${plan.summary.totalChunkingOpportunities}`);
     console.log(`  重型依赖: ${plan.summary.totalHeavyDependencies}`);
     console.log(`  预估节省: ${this.formatSize(plan.summary.estimatedSavings)}`);
-    
+
     console.log('\n📋 下一步行动:');
     plan.implementationSteps.slice(0, 3).forEach(step => {
       console.log(`  ${step.step}. ${step.title} (${step.estimatedTime})`);
@@ -694,7 +698,7 @@ const routes = [
   getPackages() {
     const packagesDir = path.join(this.projectRoot, 'packages');
     if (!fs.existsSync(packagesDir)) return [];
-    
+
     return fs.readdirSync(packagesDir).filter(item => {
       const itemPath = path.join(packagesDir, item);
       return fs.statSync(itemPath).isDirectory();
@@ -703,12 +707,12 @@ const routes = [
 
   walkDirectory(dir, callback) {
     if (!fs.existsSync(dir)) return;
-    
+
     const items = fs.readdirSync(dir);
     items.forEach(item => {
       const itemPath = path.join(dir, item);
       const stats = fs.statSync(itemPath);
-      
+
       if (stats.isDirectory()) {
         this.walkDirectory(itemPath, callback);
       } else {
@@ -721,27 +725,29 @@ const routes = [
   calculateComplexity(path) {
     // 简单的复杂度计算
     let complexity = 1;
-    
+
     path.traverse({
       IfStatement: () => complexity++,
       ForStatement: () => complexity++,
       WhileStatement: () => complexity++,
       SwitchStatement: () => complexity++,
-      ConditionalExpression: () => complexity++
+      ConditionalExpression: () => complexity++,
     });
-    
+
     return complexity;
   }
 
   isLazyLoadable(component) {
     // 判断组件是否适合懒加载
-    return component.size > 3000 || 
-           component.complexity > 5 ||
-           component.imports.some(imp => 
-             ['chart', 'editor', 'calendar', 'table'].some(keyword => 
-               imp.source.toLowerCase().includes(keyword)
-             )
-           );
+    return (
+      component.size > 3000 ||
+      component.complexity > 5 ||
+      component.imports.some(imp =>
+        ['chart', 'editor', 'calendar', 'table'].some(keyword =>
+          imp.source.toLowerCase().includes(keyword)
+        )
+      )
+    );
   }
 
   extractComponentName(node) {
@@ -756,11 +762,11 @@ const routes = [
 
   formatSize(bytes) {
     if (bytes === 0) return '0 B';
-    
+
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 }
@@ -768,8 +774,9 @@ const routes = [
 // 命令行接口
 if (require.main === module) {
   const optimizer = new CodeSplittingOptimizer();
-  
-  optimizer.analyzeAll()
+
+  optimizer
+    .analyzeAll()
     .then(() => {
       console.log('\n✅ 代码分割分析完成!');
       process.exit(0);

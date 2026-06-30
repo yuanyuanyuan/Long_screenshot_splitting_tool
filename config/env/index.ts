@@ -137,14 +137,14 @@ export function getLogLevel(): string {
  */
 export function validateEnvironmentConfig(config: EnvironmentConfig): boolean {
   const requiredKeys = ['app', 'api', 'features', 'build', 'server', 'storage', 'logging'];
-  
+
   for (const key of requiredKeys) {
     if (!(key in config)) {
       console.error(`Missing required config key: ${key}`);
       return false;
     }
   }
-  
+
   return true;
 }
 

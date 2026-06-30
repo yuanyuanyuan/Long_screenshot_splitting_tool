@@ -1,7 +1,7 @@
 /**
  * SEO Configuration Loader
  * Provides robust configuration loading with caching, error handling, and performance optimization
- * 
+ *
  * Features:
  * - Automatic configuration loading and initialization
  * - Hot-reload capability for development
@@ -10,12 +10,12 @@
  */
 
 import { seoConfigManager } from '../../utils/seo/SEOConfigManager';
-import type { 
-  SEOConfig, 
-  SEOConfigValidationResult, 
+import type {
+  SEOConfig,
+  SEOConfigValidationResult,
   SEOConfigLoadOptions,
   ConfigLoaderOptions,
-  ConfigLoaderMetrics
+  ConfigLoaderMetrics,
 } from '../../types/seo.types';
 
 /**
@@ -32,7 +32,7 @@ export class ConfigLoader {
     errorCount: 0,
     avgLoadTime: 0,
     lastLoadTime: 0,
-    totalLoadTime: 0
+    totalLoadTime: 0,
   };
   private retryTimeout: NodeJS.Timeout | null = null;
   private reloadInterval: NodeJS.Timeout | null = null;
@@ -59,7 +59,7 @@ export class ConfigLoader {
       enableHotReload = process.env.NODE_ENV === 'development',
       // _validateOnLoad = true,
       retryOnFailure = true,
-      maxRetries = 3
+      maxRetries = 3,
     } = options;
 
     if (this.initialized && !options.force) {
@@ -69,12 +69,12 @@ export class ConfigLoader {
         config: seoConfigManager.getConfig(),
         errors: [],
         warnings: [],
-        loadTime: 0
+        loadTime: 0,
       };
     }
 
     console.info('[ConfigLoader] Initializing SEO configuration loader...');
-    
+
     try {
       this.loading = true;
       const startTime = Date.now();
@@ -83,7 +83,7 @@ export class ConfigLoader {
       const result = await this.loadConfiguration({
         force: true,
         validateOnly: false,
-        ...options
+        ...options,
       });
 
       // Update metrics
@@ -102,27 +102,25 @@ export class ConfigLoader {
         if (enableHotReload) {
           this.setupHotReload();
         }
-
       } else {
         console.error('[ConfigLoader] Failed to load configuration:', result.errors);
-        
+
         if (retryOnFailure) {
           this.scheduleRetry(maxRetries);
         }
       }
 
       return result;
-
     } catch (error) {
       console.error('[ConfigLoader] Initialization error:', error);
       this.updateMetrics(0, false);
-      
+
       return {
         success: false,
         config: seoConfigManager.getConfig(), // This will return fallback config
         errors: [error instanceof Error ? error.message : 'Unknown initialization error'],
         warnings: [],
-        loadTime: 0
+        loadTime: 0,
       };
     } finally {
       this.loading = false;
@@ -132,7 +130,9 @@ export class ConfigLoader {
   /**
    * Load configuration with full error handling and metrics
    */
-  public async loadConfiguration(options: SEOConfigLoadOptions = {}): Promise<SEOConfigValidationResult> {
+  public async loadConfiguration(
+    options: SEOConfigLoadOptions = {}
+  ): Promise<SEOConfigValidationResult> {
     if (this.loading) {
       console.warn('[ConfigLoader] Configuration already loading, please wait...');
       return this.waitForLoad();
@@ -152,27 +152,26 @@ export class ConfigLoader {
       if (result.success) {
         console.info('[ConfigLoader] Configuration loaded successfully', {
           loadTime: result.loadTime,
-          warnings: result.warnings?.length || 0
+          warnings: result.warnings?.length || 0,
         });
       } else {
         console.error('[ConfigLoader] Configuration load failed', {
           errors: result.errors,
-          warnings: result.warnings
+          warnings: result.warnings,
         });
       }
 
       return result;
-
     } catch (error) {
       console.error('[ConfigLoader] Load configuration error:', error);
       this.updateMetrics(0, false);
-      
+
       return {
         success: false,
         config: seoConfigManager.getConfig(),
         errors: [error instanceof Error ? error.message : 'Unknown load error'],
         warnings: [],
-        loadTime: 0
+        loadTime: 0,
       };
     } finally {
       this.loading = false;
@@ -199,7 +198,7 @@ export class ConfigLoader {
         config: undefined,
         errors: [error instanceof Error ? error.message : 'Validation error'],
         warnings: [],
-        loadTime: 0
+        loadTime: 0,
       };
     }
   }
@@ -228,12 +227,12 @@ export class ConfigLoader {
   /**
    * Get loader metrics
    */
-  public getMetrics(): ConfigLoaderMetrics & { 
-    seoManagerStats: ReturnType<typeof seoConfigManager.getStats> 
+  public getMetrics(): ConfigLoaderMetrics & {
+    seoManagerStats: ReturnType<typeof seoConfigManager.getStats>;
   } {
     return {
       ...this.metrics,
-      seoManagerStats: seoConfigManager.getStats()
+      seoManagerStats: seoConfigManager.getStats(),
     };
   }
 
@@ -247,7 +246,7 @@ export class ConfigLoader {
       errorCount: 0,
       avgLoadTime: 0,
       lastLoadTime: 0,
-      totalLoadTime: 0
+      totalLoadTime: 0,
     };
   }
 
@@ -273,7 +272,7 @@ export class ConfigLoader {
 
   private async waitForLoad(): Promise<SEOConfigValidationResult> {
     // Simple polling mechanism to wait for load completion
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const checkLoading = () => {
         if (!this.loading) {
           resolve({
@@ -281,7 +280,7 @@ export class ConfigLoader {
             config: seoConfigManager.getConfig(),
             errors: [],
             warnings: ['Waited for concurrent load to complete'],
-            loadTime: 0
+            loadTime: 0,
           });
         } else {
           setTimeout(checkLoading, 100);
@@ -294,7 +293,7 @@ export class ConfigLoader {
   private updateMetrics(loadTime: number, success: boolean): void {
     this.metrics.loadCount++;
     this.metrics.lastLoadTime = Date.now();
-    
+
     if (success) {
       this.metrics.successCount++;
       this.metrics.totalLoadTime += loadTime;
@@ -311,7 +310,9 @@ export class ConfigLoader {
     }
 
     const retryDelay = Math.min(1000 * Math.pow(2, currentRetry - 1), 30000); // Exponential backoff, max 30s
-    console.warn(`[ConfigLoader] Scheduling retry ${currentRetry}/${maxRetries} in ${retryDelay}ms`);
+    console.warn(
+      `[ConfigLoader] Scheduling retry ${currentRetry}/${maxRetries} in ${retryDelay}ms`
+    );
 
     this.retryTimeout = setTimeout(async () => {
       try {
@@ -331,7 +332,7 @@ export class ConfigLoader {
 
   private setupAutoReload(interval: number): void {
     console.info(`[ConfigLoader] Setting up auto-reload every ${interval}ms`);
-    
+
     this.reloadInterval = setInterval(async () => {
       try {
         console.info('[ConfigLoader] Auto-reloading configuration...');
@@ -346,7 +347,7 @@ export class ConfigLoader {
     // In a real implementation, this would watch for file changes
     // For now, we'll just log that hot-reload is enabled
     console.info('[ConfigLoader] Hot-reload enabled for development');
-    
+
     // Example: Watch for configuration file changes
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
       // In browser environment, could use WebSocket or polling
@@ -359,7 +360,9 @@ export class ConfigLoader {
 /**
  * Convenience function to initialize configuration
  */
-export async function initializeSEOConfig(options?: ConfigLoaderOptions): Promise<SEOConfigValidationResult> {
+export async function initializeSEOConfig(
+  options?: ConfigLoaderOptions
+): Promise<SEOConfigValidationResult> {
   const loader = ConfigLoader.getInstance();
   return loader.initialize(options);
 }

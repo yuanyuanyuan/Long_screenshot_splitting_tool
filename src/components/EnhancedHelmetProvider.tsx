@@ -47,9 +47,9 @@ export const EnhancedHelmetProvider: React.FC<EnhancedHelmetProviderProps> = ({
 
   useEffect(() => {
     if (initializationRef.current) return;
-    
+
     initializationRef.current = true;
-    
+
     // 初始化增强功能
     if (typeof window !== 'undefined') {
       // 性能优化：延迟初始化
@@ -77,25 +77,25 @@ export const EnhancedHelmetProvider: React.FC<EnhancedHelmetProviderProps> = ({
         realTimeUpdater.updateMetadata(metadata);
       }
     },
-    
+
     updateTitle: (title: string) => {
       if (enableRealTimeUpdates) {
         realTimeUpdater.updateTitle(title);
       }
     },
-    
+
     updateDescription: (description: string) => {
       if (enableRealTimeUpdates) {
         realTimeUpdater.updateDescription(description);
       }
     },
-    
+
     updateKeywords: (keywords: string[]) => {
       if (enableRealTimeUpdates) {
         realTimeUpdater.updateKeywords(keywords);
       }
     },
-    
+
     injectCustomMeta: (name: string, content: string) => {
       if (typeof window !== 'undefined') {
         const meta = document.createElement('meta');
@@ -105,7 +105,7 @@ export const EnhancedHelmetProvider: React.FC<EnhancedHelmetProviderProps> = ({
         document.head.appendChild(meta);
       }
     },
-    
+
     isInitialized,
   };
 
@@ -127,8 +127,8 @@ export const EnhancedHelmet: React.FC<{
   defer?: boolean;
   encodeSpecialCharacters?: boolean;
   prioritizeSEOTags?: boolean;
-}> = ({ 
-  children, 
+}> = ({
+  children,
   defer = false,
   encodeSpecialCharacters: _encodeSpecialCharacters = true,
   prioritizeSEOTags: _prioritizeSEOTags = true,
@@ -152,7 +152,7 @@ export const SEOPriorityWrapper: React.FC<{
   priority?: 'high' | 'normal' | 'low';
 }> = ({ children, priority = 'normal' }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (priority === 'high' && wrapperRef.current) {
       // 对高优先级内容应用特殊处理
@@ -186,11 +186,7 @@ export const AsyncHelmetLoader: React.FC<{
   children: ReactNode;
   loadingComponent?: ReactNode;
   errorComponent?: ReactNode;
-}> = ({ 
-  children, 
-  loadingComponent = null,
-  errorComponent = null,
-}) => {
+}> = ({ children, loadingComponent = null, errorComponent = null }) => {
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
 

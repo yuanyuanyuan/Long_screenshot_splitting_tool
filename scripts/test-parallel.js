@@ -16,13 +16,13 @@ const testConfigs = {
       'src/components/__tests__/SEO*.test.tsx',
       'src/hooks/__tests__/*SEO*.test.ts',
       'src/config/__tests__/seo*.test.ts',
-      'src/types/__tests__/seo*.test.ts'
+      'src/types/__tests__/seo*.test.ts',
     ],
     env: {
       VITE_ENABLE_SEO_DEV: 'true',
       VITE_ENABLE_MOBILE_DEV: 'false',
-      VITE_FEATURE_FOCUS: 'seo'
-    }
+      VITE_FEATURE_FOCUS: 'seo',
+    },
   },
   mobile: {
     name: 'Mobile Responsive Tests',
@@ -31,13 +31,13 @@ const testConfigs = {
       'src/hooks/__tests__/*Viewport*.test.ts',
       'src/hooks/__tests__/*viewport*.test.ts',
       'src/utils/__tests__/*responsive*.test.ts',
-      'src/components/__tests__/*Responsive*.test.tsx'
+      'src/components/__tests__/*Responsive*.test.tsx',
     ],
     env: {
       VITE_ENABLE_SEO_DEV: 'false',
       VITE_ENABLE_MOBILE_DEV: 'true',
-      VITE_FEATURE_FOCUS: 'mobile'
-    }
+      VITE_FEATURE_FOCUS: 'mobile',
+    },
   },
   integration: {
     name: 'Integration Tests',
@@ -47,14 +47,14 @@ const testConfigs = {
       'tests/integration/**/*.test.ts',
       'tests/integration/**/*.test.tsx',
       'src/components/__tests__/*.test.tsx',
-      'shared-components/**/*.test.ts'
+      'shared-components/**/*.test.ts',
     ],
     env: {
       VITE_ENABLE_SEO_DEV: 'true',
       VITE_ENABLE_MOBILE_DEV: 'true',
-      VITE_FEATURE_FOCUS: 'integration'
-    }
-  }
+      VITE_FEATURE_FOCUS: 'integration',
+    },
+  },
 };
 
 function runTests(feature, options = {}) {
@@ -65,15 +65,15 @@ function runTests(feature, options = {}) {
   }
 
   console.log(`\n🧪 Running ${config.name}...`);
-  
+
   const args = [
     'run',
     options.coverage ? 'test:coverage' : 'test',
     '--',
     '--reporter=verbose',
-    '--run'
+    '--run',
   ];
-  
+
   // Add test name pattern filter for the feature
   if (feature === 'seo') {
     args.push('--testNamePattern', '(seo|SEO)');
@@ -98,15 +98,15 @@ function runTests(feature, options = {}) {
       ...process.env,
       ...config.env,
       NODE_ENV: 'test',
-      VITE_DEV_MODE: 'parallel'
+      VITE_DEV_MODE: 'parallel',
     },
-    stdio: 'inherit'
+    stdio: 'inherit',
   });
 
-  testProcess.on('close', (code) => {
+  testProcess.on('close', code => {
     const status = code === 0 ? '✅' : '❌';
     console.log(`\n${status} ${config.name} completed with code ${code}`);
-    
+
     if (options.exitOnFailure && code !== 0) {
       process.exit(code);
     }
@@ -117,18 +117,18 @@ function runTests(feature, options = {}) {
 
 function runAllParallel(options = {}) {
   console.log('🚀 Running all tests in parallel...\n');
-  
+
   const features = Object.keys(testConfigs);
   const processes = features.map(feature => runTests(feature, options));
-  
+
   let completed = 0;
   let hasFailures = false;
 
   processes.forEach((process, index) => {
-    process.on('close', (code) => {
+    process.on('close', code => {
       completed++;
       if (code !== 0) hasFailures = true;
-      
+
       if (completed === processes.length) {
         const status = hasFailures ? '❌' : '✅';
         console.log(`\n${status} All parallel tests completed`);
@@ -144,7 +144,7 @@ const feature = args[0];
 const options = {
   coverage: args.includes('--coverage'),
   watch: args.includes('--watch'),
-  exitOnFailure: args.includes('--exit-on-failure')
+  exitOnFailure: args.includes('--exit-on-failure'),
 };
 
 if (!feature || feature === 'all') {

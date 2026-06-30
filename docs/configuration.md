@@ -20,34 +20,34 @@
 
 ### 资源URL配置
 
-| 环境变量 | 说明 | 示例值 |
-|---------|------|--------|
-| `VITE_USE_ABSOLUTE_URLS` | 是否使用绝对URL | `true` / `false` |
-| `VITE_ASSETS_BASE_URL` | 资源基础URL | `https://cdn.example.com/project` |
-| `VITE_DEPLOY_ENV` | 部署环境 | `development` / `test` / `production` |
+| 环境变量                 | 说明            | 示例值                                |
+| ------------------------ | --------------- | ------------------------------------- |
+| `VITE_USE_ABSOLUTE_URLS` | 是否使用绝对URL | `true` / `false`                      |
+| `VITE_ASSETS_BASE_URL`   | 资源基础URL     | `https://cdn.example.com/project`     |
+| `VITE_DEPLOY_ENV`        | 部署环境        | `development` / `test` / `production` |
 
 ### 资源服务器配置
 
-| 环境变量 | 说明 | 示例值 |
-|---------|------|--------|
-| `VITE_ASSETS_DOMAIN` | 资源服务器域名 | `cdn.example.com` |
-| `VITE_ASSETS_PATH_PREFIX` | 资源路径前缀 | `/project-name` |
-| `VITE_ASSETS_HTTPS` | 是否使用HTTPS | `true` / `false` |
+| 环境变量                  | 说明           | 示例值            |
+| ------------------------- | -------------- | ----------------- |
+| `VITE_ASSETS_DOMAIN`      | 资源服务器域名 | `cdn.example.com` |
+| `VITE_ASSETS_PATH_PREFIX` | 资源路径前缀   | `/project-name`   |
+| `VITE_ASSETS_HTTPS`       | 是否使用HTTPS  | `true` / `false`  |
 
 ### CDN配置
 
-| 环境变量 | 说明 | 示例值 |
-|---------|------|--------|
+| 环境变量            | 说明       | 示例值                    |
+| ------------------- | ---------- | ------------------------- |
 | `VITE_CDN_BASE_URL` | CDN基础URL | `https://cdn.example.com` |
 
 ### GitHub Pages配置
 
-| 环境变量 | 说明 | 示例值 |
-|---------|------|--------|
-| `VITE_GITHUB_PAGES` | 是否启用GitHub Pages | `true` / `false` |
-| `VITE_GITHUB_REPOSITORY` | GitHub仓库 | `username/repository` |
-| `VITE_GITHUB_USER` | GitHub用户名 | `username` |
-| `VITE_BASE_PATH` | 应用基础路径 | `/` 或 `/repository/` |
+| 环境变量                 | 说明                 | 示例值                |
+| ------------------------ | -------------------- | --------------------- |
+| `VITE_GITHUB_PAGES`      | 是否启用GitHub Pages | `true` / `false`      |
+| `VITE_GITHUB_REPOSITORY` | GitHub仓库           | `username/repository` |
+| `VITE_GITHUB_USER`       | GitHub用户名         | `username`            |
+| `VITE_BASE_PATH`         | 应用基础路径         | `/` 或 `/repository/` |
 
 ## 使用场景
 
@@ -131,6 +131,7 @@ VITE_USE_ABSOLUTE_URLS=true VITE_ASSETS_BASE_URL=https://custom-cdn.com npm run 
 ### 资源路径仍然是相对路径
 
 检查以下配置：
+
 - `VITE_USE_ABSOLUTE_URLS` 是否设置为 `true`
 - `VITE_ASSETS_BASE_URL` 是否正确设置
 - 环境变量是否正确加载
@@ -138,6 +139,7 @@ VITE_USE_ABSOLUTE_URLS=true VITE_ASSETS_BASE_URL=https://custom-cdn.com npm run 
 ### GitHub Pages部署失败
 
 检查以下配置：
+
 - `VITE_GITHUB_PAGES` 设置为 `true`
 - `VITE_GITHUB_REPOSITORY` 格式正确（`username/repository`）
 - `VITE_BASE_PATH` 包含仓库名称（`/repository/`）

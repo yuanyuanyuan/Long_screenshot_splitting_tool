@@ -160,6 +160,7 @@ npm run standalone
 ### 常见问题
 
 #### 构建失败
+
 ```bash
 # 清理构建缓存
 npm run clean
@@ -170,6 +171,7 @@ npm install
 ```
 
 #### 内存不足
+
 ```bash
 # 使用轻量级测试模式
 npm run test:light
@@ -179,6 +181,7 @@ npm run test:low-memory
 ```
 
 #### 测试问题
+
 ```bash
 # 运行智能测试
 npm run test:smart
@@ -208,6 +211,7 @@ npm run test:monitor
 ## 📝 更新日志
 
 ### v1.0.0
+
 - ✨ 完成架构迁移到扁平化单仓库结构
 - 🏗️ 优化构建配置和依赖管理
 - 🧪 完善测试覆盖和错误处理

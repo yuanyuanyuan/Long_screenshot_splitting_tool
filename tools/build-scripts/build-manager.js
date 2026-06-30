@@ -18,7 +18,7 @@ const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   magenta: '\x1b[35m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 function log(message, color = 'reset') {
@@ -44,16 +44,16 @@ function logWarning(message) {
 // 执行命令的工具函数
 function runCommand(command, options = {}) {
   const { cwd = rootDir, silent = false } = options;
-  
+
   if (!silent) {
-    log(`执行命令: ${command }`, 'blue');
+    log(`执行命令: ${command}`, 'blue');
   }
-  
+
   try {
     const result = execSync(command, {
       cwd,
       encoding: 'utf8',
-      stdio: silent ? 'pipe' : 'inherit'
+      stdio: silent ? 'pipe' : 'inherit',
     });
     return { success: true, output: result };
   } catch (error) {
@@ -64,12 +64,9 @@ function runCommand(command, options = {}) {
 // 清理构建目录
 function cleanBuildDirs() {
   logStep('CLEAN', '清理构建目录...');
-  
-  const dirsToClean = [
-    'dist',
-    'packages/screenshot-splitter/dist'
-  ];
-  
+
+  const dirsToClean = ['dist', 'packages/screenshot-splitter/dist'];
+
   dirsToClean.forEach(dir => {
     const fullPath = join(rootDir, dir);
     if (existsSync(fullPath)) {
@@ -77,20 +74,20 @@ function cleanBuildDirs() {
       log(`已清理: ${dir}`, 'yellow');
     }
   });
-  
+
   logSuccess('构建目录清理完成');
 }
 
 // 类型检查
 function typeCheck() {
   logStep('TYPE-CHECK', '执行TypeScript类型检查...');
-  
+
   const result = runCommand('pnpm run type-check');
   if (!result.success) {
     logError('TypeScript类型检查失败');
     return false;
   }
-  
+
   logSuccess('TypeScript类型检查通过');
   return true;
 }
@@ -98,12 +95,12 @@ function typeCheck() {
 // 代码检查
 function lintCheck() {
   logStep('LINT', '执行ESLint代码检查...');
-  
+
   const result = runCommand('pnpm run lint');
   if (!result.success) {
     logWarning('ESLint检查发现问题，但继续构建...');
     // 不阻止构建，只是警告
- } else {
+  } else {
     logSuccess('ESLint检查通过');
   }
   return true;
@@ -112,39 +109,39 @@ function lintCheck() {
 // 构建单个组件
 function buildComponent(componentName) {
   logStep('BUILD', `构建组件: ${componentName}`);
-  
+
   const result = runCommand(`pnpm run build:${componentName}`);
-  
+
   if (result.success) {
     logSuccess(`${componentName} 构建成功`);
   } else {
     logError(`${componentName} 构建失败`);
   }
-  
+
   return { success: result.success };
 }
 
 // 构建所有组件
 function buildAll() {
   logStep('BUILD-ALL', '构建所有组件...');
-  
+
   const components = ['screenshot-splitter'];
   const results = {};
-  
+
   for (const component of components) {
     results[component] = buildComponent(component);
   }
-  
+
   return results;
 }
 
 // 生成构建报告
-function generateBuildReport(results ) {
+function generateBuildReport(results) {
   logStep('REPORT', '生成构建报告...');
-  
+
   log('\n📊 构建报告', 'bright');
   log('=' * 50, 'blue');
-  
+
   Object.entries(results).forEach(([component, modes]) => {
     log(`\n${component}:`, 'cyan');
     Object.entries(modes).forEach(([mode, success]) => {
@@ -152,7 +149,7 @@ function generateBuildReport(results ) {
       log(`  ${mode}: ${status}`);
     });
   });
-  
+
   log('\n' + '=' * 50, 'blue');
 }
 
@@ -160,24 +157,24 @@ function generateBuildReport(results ) {
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0] || 'build';
-  
+
   log('🚀 构建管理器启动', 'bright');
   log(`命令: ${command}`, 'blue');
-  
+
   try {
     switch (command) {
       case 'clean':
         cleanBuildDirs();
         break;
-        
+
       case 'check':
         if (!typeCheck()) process.exit(1);
         lintCheck();
         break;
-        
+
       case 'build':
         const component = args[1];
-        
+
         if (component) {
           // 构建特定组件
           const results = buildComponent(component);
@@ -186,13 +183,13 @@ async function main() {
           // 构建所有组件
           const results = buildAll();
           generateBuildReport(results);
-          
+
           // 检查是否有构建失败
           const hasFailure = Object.values(results).some(result => !result.success);
           if (hasFailure) process.exit(1);
         }
         break;
-        
+
       case 'full':
         // 完整构建流程
         cleanBuildDirs();
@@ -200,13 +197,13 @@ async function main() {
         lintCheck();
         const fullResults = buildAll();
         generateBuildReport(fullResults);
-        
+
         const hasFullFailure = Object.values(fullResults).some(result => !result.success);
         if (hasFullFailure) process.exit(1);
-        
+
         logSuccess('🎉 完整构建流程完成！');
         break;
-        
+
       default:
         log('使用方法:', 'yellow');
         log('  node build-manager.js clean          # 清理构建目录');

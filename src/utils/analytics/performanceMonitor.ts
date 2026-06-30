@@ -255,7 +255,7 @@ export class PerformanceMonitor {
             delta: inp,
             id: `inp-${Date.now()}`,
             entries: [],
-            navigationType: 'navigate'
+            navigationType: 'navigate',
           } as Metric);
 
           // 重置数组，保持最近的测量
@@ -440,7 +440,7 @@ export class PerformanceMonitor {
         FCP: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
         INP: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
         LCP: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
-        TTFB: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 }
+        TTFB: { count: 0, average: 0, min: 0, max: 0, good: 0, needsImprovement: 0, poor: 0 },
       },
       overallScore: 0,
       lastUpdated: Date.now(),
@@ -528,11 +528,7 @@ export class PerformanceMonitor {
       (navigator as any).connection ||
       (navigator as any).mozConnection ||
       (navigator as any).webkitConnection;
-    return connection
-      ? connection.effectiveType ||
-          connection.type ||
-          'unknown'
-      : 'unknown';
+    return connection ? connection.effectiveType || connection.type || 'unknown' : 'unknown';
   }
 
   /**

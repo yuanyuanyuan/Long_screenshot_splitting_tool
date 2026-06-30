@@ -3,14 +3,14 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { generatePageMetadata } from '../utils/seo/metadataGenerator';
 import { SEO_CONFIG, getCurrentSEOConfig } from '../config/seo.config';
 import { seoConfigManager } from '../utils/seo/SEOConfigManager';
-import type { 
-  SEOManagerProps, 
-  SEOMetadata, 
-  SEOConfig, 
-  Language, 
+import type {
+  SEOManagerProps,
+  SEOMetadata,
+  SEOConfig,
+  Language,
   PageType,
   ViewportInfo,
-  PerformanceMetrics
+  PerformanceMetrics,
 } from '../types/seo.types';
 
 /**
@@ -25,11 +25,15 @@ const useSEOPerformance = () => {
     // 创建性能观察器
     if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       try {
-        observerRef.current = new PerformanceObserver((list) => {
+        observerRef.current = new PerformanceObserver(list => {
           const entries = list.getEntries();
-          let fcp = 0, lcp = 0, fid = 0, cls = 0, ttfb = 0;
+          let fcp = 0,
+            lcp = 0,
+            fid = 0,
+            cls = 0,
+            ttfb = 0;
 
-          entries.forEach((entry) => {
+          entries.forEach(entry => {
             if (entry.name === 'first-contentful-paint') {
               fcp = entry.startTime;
             } else if (entry.entryType === 'largest-contentful-paint') {
@@ -47,7 +51,15 @@ const useSEOPerformance = () => {
         });
 
         // 观察多种性能指标
-        observerRef.current.observe({ entryTypes: ['paint', 'largest-contentful-paint', 'first-input', 'layout-shift', 'navigation'] });
+        observerRef.current.observe({
+          entryTypes: [
+            'paint',
+            'largest-contentful-paint',
+            'first-input',
+            'layout-shift',
+            'navigation',
+          ],
+        });
       } catch (error) {
         console.warn('Performance observation not supported:', error);
       }
@@ -75,7 +87,7 @@ const useViewportDetection = (): ViewportInfo => {
     isMobile: false,
     isTablet: false,
     isDesktop: true,
-    orientation: 'landscape'
+    orientation: 'landscape',
   });
 
   useEffect(() => {
@@ -85,7 +97,7 @@ const useViewportDetection = (): ViewportInfo => {
       const isMobile = width < 768;
       const isTablet = width >= 768 && width < 1024;
       const isDesktop = width >= 1024;
-      
+
       setViewportInfo({
         width,
         height,
@@ -93,7 +105,7 @@ const useViewportDetection = (): ViewportInfo => {
         isMobile,
         isTablet,
         isDesktop,
-        orientation: width > height ? 'landscape' : 'portrait'
+        orientation: width > height ? 'landscape' : 'portrait',
       });
     };
 
@@ -101,7 +113,7 @@ const useViewportDetection = (): ViewportInfo => {
       updateViewport();
       window.addEventListener('resize', updateViewport);
       window.addEventListener('orientationchange', updateViewport);
-      
+
       return () => {
         window.removeEventListener('resize', updateViewport);
         window.removeEventListener('orientationchange', updateViewport);
@@ -151,8 +163,14 @@ const useDynamicMetadata = (
   useEffect(() => {
     if (!config) return;
 
-    const contextKey = JSON.stringify({ page, language, context, customMetadata, viewport: viewportInfo.deviceType });
-    
+    const contextKey = JSON.stringify({
+      page,
+      language,
+      context,
+      customMetadata,
+      viewport: viewportInfo.deviceType,
+    });
+
     // 避免不必要的重新计算
     if (previousContext.current === contextKey) return;
     previousContext.current = contextKey;
@@ -160,54 +178,63 @@ const useDynamicMetadata = (
     try {
       // 使用新配置管理器或回退到传统方法
       let metadata: SEOMetadata;
-      
+
       if (seoConfigManager.getStats().loaded) {
         // 使用新配置系统
         const pageConfig = seoConfigManager.getPageConfig(page, language);
         seoConfigManager.getStructuredData(page, language);
-        
+
         // 生成基础元数据
         const baseTitle = pageConfig.title;
         const baseDescription = pageConfig.description;
-        
+
         // 添加上下文信息
         const dynamicTitle = addContextToTitle(baseTitle, context, language);
         const dynamicDescription = addContextToDescription(baseDescription, context, language);
-        
+
         // 设备优化
-        const deviceOptimized = optimizeForDevice({ title: dynamicTitle, description: dynamicDescription }, viewportInfo.deviceType);
-        
+        const deviceOptimized = optimizeForDevice(
+          { title: dynamicTitle, description: dynamicDescription },
+          viewportInfo.deviceType
+        );
+
         metadata = {
           title: deviceOptimized.title,
           description: deviceOptimized.description,
           keywords: pageConfig.keywords,
           ogTitle: deviceOptimized.title,
           ogDescription: deviceOptimized.description,
-          ogImage: config.defaultImages?.ogImage || `${config.site?.url || SEO_CONFIG.siteUrl}/og-image.png`,
+          ogImage:
+            config.defaultImages?.ogImage ||
+            `${config.site?.url || SEO_CONFIG.siteUrl}/og-image.png`,
           ogType: 'website' as const,
           ogUrl: `${config.site?.url || SEO_CONFIG.siteUrl}${getPagePath(page, language)}`,
           twitterCard: 'summary_large_image' as const,
           twitterTitle: deviceOptimized.title,
           twitterDescription: deviceOptimized.description,
-          twitterImage: config.defaultImages?.twitterImage || `${config.site?.url || SEO_CONFIG.siteUrl}/twitter-card.png`,
+          twitterImage:
+            config.defaultImages?.twitterImage ||
+            `${config.site?.url || SEO_CONFIG.siteUrl}/twitter-card.png`,
           canonicalUrl: `${config.site?.url || SEO_CONFIG.siteUrl}${getPagePath(page, language)}`,
           hreflang: generateHreflangForPage(page, config.site?.url || SEO_CONFIG.siteUrl),
           robots: 'index,follow',
-          author: config.structuredData?.organization?.name || SEO_CONFIG.structuredData.organization.name,
+          author:
+            config.structuredData?.organization?.name ||
+            SEO_CONFIG.structuredData.organization.name,
           publishedTime: customMetadata.publishedTime,
           modifiedTime: customMetadata.modifiedTime || new Date().toISOString(),
-          ...customMetadata
+          ...customMetadata,
         };
       } else {
         // 回退到传统方法
         metadata = generatePageMetadata(page, context, language, customMetadata);
-        
+
         // 应用设备优化
         const deviceOptimized = optimizeForDevice(
-          { title: metadata.title, description: metadata.description }, 
+          { title: metadata.title, description: metadata.description },
           viewportInfo.deviceType
         );
-        
+
         metadata.title = deviceOptimized.title;
         metadata.description = deviceOptimized.description;
         metadata.ogTitle = deviceOptimized.title;
@@ -215,7 +242,7 @@ const useDynamicMetadata = (
         metadata.twitterTitle = deviceOptimized.title;
         metadata.twitterDescription = deviceOptimized.description;
       }
-      
+
       setDynamicMetadata(metadata);
     } catch (error) {
       console.error('Failed to generate dynamic metadata:', error);
@@ -228,52 +255,62 @@ const useDynamicMetadata = (
 };
 
 // 辅助函数
-const addContextToTitle = (baseTitle: string, context: Record<string, any>, language: Language): string => {
+const addContextToTitle = (
+  baseTitle: string,
+  context: Record<string, any>,
+  language: Language
+): string => {
   let title = baseTitle;
-  
+
   if (context.sliceCount) {
-    const sliceText = language === 'zh-CN' 
-      ? ` (${context.sliceCount}张)` 
-      : ` (${context.sliceCount} pieces)`;
+    const sliceText =
+      language === 'zh-CN' ? ` (${context.sliceCount}张)` : ` (${context.sliceCount} pieces)`;
     title = title.replace(/ - .*$/, sliceText + title.match(/ - .*$/)?.[0] || '');
   }
-  
+
   if (context.selectedCount) {
-    const selectedText = language === 'zh-CN' 
-      ? ` (已选${context.selectedCount}张)` 
-      : ` (${context.selectedCount} selected)`;
+    const selectedText =
+      language === 'zh-CN'
+        ? ` (已选${context.selectedCount}张)`
+        : ` (${context.selectedCount} selected)`;
     title = title.replace(/ - .*$/, selectedText + title.match(/ - .*$/)?.[0] || '');
   }
-  
+
   return title;
 };
 
-const addContextToDescription = (baseDescription: string, context: Record<string, any>, language: Language): string => {
+const addContextToDescription = (
+  baseDescription: string,
+  context: Record<string, any>,
+  language: Language
+): string => {
   let description = baseDescription;
-  
+
   if (context.sliceCount) {
-    const sliceText = language === 'zh-CN' 
-      ? `，已生成${context.sliceCount}张图片` 
-      : `, generated ${context.sliceCount} images`;
+    const sliceText =
+      language === 'zh-CN'
+        ? `，已生成${context.sliceCount}张图片`
+        : `, generated ${context.sliceCount} images`;
     description = description.replace(/[。.]/, sliceText + '。');
   }
-  
+
   if (context.selectedCount) {
-    const selectedText = language === 'zh-CN' 
-      ? `，已选择${context.selectedCount}张图片` 
-      : `, ${context.selectedCount} images selected`;
+    const selectedText =
+      language === 'zh-CN'
+        ? `，已选择${context.selectedCount}张图片`
+        : `, ${context.selectedCount} images selected`;
     description = description.replace(/[。.]/, selectedText + '。');
   }
-  
+
   return description;
 };
 
 const optimizeForDevice = (
-  metadata: { title: string; description: string }, 
+  metadata: { title: string; description: string },
   deviceType: 'mobile' | 'tablet' | 'desktop'
 ): { title: string; description: string } => {
   let { title, description } = metadata;
-  
+
   switch (deviceType) {
     case 'mobile':
       // 移动端标题限制50字符
@@ -300,7 +337,7 @@ const optimizeForDevice = (
       // 桌面端保持原长度
       break;
   }
-  
+
   return { title, description };
 };
 
@@ -314,7 +351,7 @@ const generateHreflangForPage = (page: PageType, baseUrl: string): Record<string
   const pagePath = page === 'home' ? '' : `/${page}`;
   return {
     'zh-CN': `${baseUrl}${pagePath}`,
-    'en': `${baseUrl}/en${pagePath}`,
+    en: `${baseUrl}/en${pagePath}`,
     'x-default': `${baseUrl}${pagePath}`,
   };
 };
@@ -337,21 +374,21 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 性能监控
   const performanceMetrics = useSEOPerformance();
   const viewportInfo = useViewportDetection();
-  
+
   // 动态元数据生成
   const dynamicMetadata = useDynamicMetadata(page, language, context, customMetadata);
-  
+
   // 回退到传统元数据生成
   const fallbackMetadata: SEOMetadata = useMemo(() => {
     try {
       const baseMetadata = generatePageMetadata(page, context, language);
-      
+
       // 应用设备优化
       const deviceOptimized = optimizeForDevice(
         { title: baseMetadata.title, description: baseMetadata.description },
         viewportInfo.deviceType
       );
-      
+
       return {
         ...baseMetadata,
         ...customMetadata,
@@ -366,27 +403,33 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     } catch (error) {
       console.error('SEO metadata generation failed:', error);
       // 返回设备优化的默认元数据
-      const siteName = (typeof SEO_CONFIG.siteName === 'string' 
-        ? SEO_CONFIG.siteName 
-        : (SEO_CONFIG.siteName as any)[language]) || 'Long Screenshot Splitter';
-      
-      const defaultTitle = language === 'zh-CN' 
-        ? `${siteName} - 长截图分割工具` 
-        : `${siteName} - Long Screenshot Splitter`;
-      
-      const defaultDescription = language === 'zh-CN' 
-        ? '长截图分割工具 - 快速、免费、在线处理' 
-        : 'Free online long screenshot splitter tool';
-      
+      const siteName =
+        (typeof SEO_CONFIG.siteName === 'string'
+          ? SEO_CONFIG.siteName
+          : (SEO_CONFIG.siteName as any)[language]) || 'Long Screenshot Splitter';
+
+      const defaultTitle =
+        language === 'zh-CN'
+          ? `${siteName} - 长截图分割工具`
+          : `${siteName} - Long Screenshot Splitter`;
+
+      const defaultDescription =
+        language === 'zh-CN'
+          ? '长截图分割工具 - 快速、免费、在线处理'
+          : 'Free online long screenshot splitter tool';
+
       const deviceOptimized = optimizeForDevice(
         { title: defaultTitle, description: defaultDescription },
         viewportInfo.deviceType
       );
-      
+
       return {
         title: deviceOptimized.title,
         description: deviceOptimized.description,
-        keywords: language === 'zh-CN' ? ['截图分割', '长截图', '图片处理'] : ['screenshot', 'splitter', 'image'],
+        keywords:
+          language === 'zh-CN'
+            ? ['截图分割', '长截图', '图片处理']
+            : ['screenshot', 'splitter', 'image'],
         ogTitle: deviceOptimized.title,
         ogDescription: deviceOptimized.description,
         ogImage: `${SEO_CONFIG.siteUrl}/images/og-image.jpg`,
@@ -403,7 +446,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       };
     }
   }, [page, context, language, customMetadata, viewportInfo.deviceType]);
-  
+
   // 使用动态元数据或回退方案
   const metadata = dynamicMetadata || fallbackMetadata;
 
@@ -415,7 +458,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       // 尝试使用新配置管理器
       if (seoConfigManager.getStats().loaded) {
         const configStructuredData = seoConfigManager.getStructuredData(page, language);
-        
+
         // 添加性能指标到结构化数据（开发环境）
         if (process.env.NODE_ENV === 'development' && performanceMetrics) {
           return {
@@ -425,10 +468,10 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
               fcp: performanceMetrics.fcp,
               lcp: performanceMetrics.lcp,
               cls: performanceMetrics.cls,
-            }
+            },
           };
         }
-        
+
         return configStructuredData;
       }
     } catch (error) {
@@ -436,10 +479,11 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     }
 
     // 回退到传统结构化数据
-    const siteName = (typeof SEO_CONFIG.siteName === 'string' 
-      ? SEO_CONFIG.siteName 
-      : (SEO_CONFIG.siteName as any)[language]) || 'Long Screenshot Splitter';
-    
+    const siteName =
+      (typeof SEO_CONFIG.siteName === 'string'
+        ? SEO_CONFIG.siteName
+        : (SEO_CONFIG.siteName as any)[language]) || 'Long Screenshot Splitter';
+
     const baseStructuredData = {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
@@ -472,10 +516,17 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
 
     // 根据页面添加特定的结构化数据
     if (page === 'home') {
-      const featureList = language === 'zh-CN' 
-        ? ['长截图自动分割', '多格式支持', '批量导出', '在线处理', '免费使用']
-        : ['Auto long screenshot splitting', 'Multi-format support', 'Batch export', 'Online processing', 'Free to use'];
-        
+      const featureList =
+        language === 'zh-CN'
+          ? ['长截图自动分割', '多格式支持', '批量导出', '在线处理', '免费使用']
+          : [
+              'Auto long screenshot splitting',
+              'Multi-format support',
+              'Batch export',
+              'Online processing',
+              'Free to use',
+            ];
+
       return {
         ...baseStructuredData,
         '@type': 'SoftwareApplication',
@@ -484,11 +535,18 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     }
 
     return baseStructuredData;
-  }, [page, language, metadata.description, enableStructuredData, viewportInfo, performanceMetrics]);
+  }, [
+    page,
+    language,
+    metadata.description,
+    enableStructuredData,
+    viewportInfo,
+    performanceMetrics,
+  ]);
 
   // 性能监控和调试信息（开发环境）
   const debugInfoRef = useRef<any>(null);
-  
+
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       const debugInfo = {
@@ -500,13 +558,13 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
         viewportInfo,
         performanceMetrics,
         configLoaded: seoConfigManager.getStats().loaded,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       // 避免重复日志
       if (JSON.stringify(debugInfo) !== JSON.stringify(debugInfoRef.current)) {
         debugInfoRef.current = debugInfo;
-        
+
         console.group('🚀 Enhanced SEO Manager Debug Info');
         console.log('📄 Page:', page);
         console.log('🌐 Language:', language);
@@ -520,7 +578,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       }
     }
   }, [page, language, context, metadata, structuredData, viewportInfo, performanceMetrics]);
-  
+
   // 预加载关键资源的优化钩子
   const preloadResources = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -532,15 +590,15 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
         link.href = metadata.ogImage;
         document.head.appendChild(link);
       }
-      
+
       // 预连接到外部域名
       const preconnectDomains = [
         'https://fonts.googleapis.com',
         'https://fonts.gstatic.com',
         'https://www.google-analytics.com',
-        'https://www.googletagmanager.com'
+        'https://www.googletagmanager.com',
       ];
-      
+
       preconnectDomains.forEach(domain => {
         if (!document.querySelector(`link[href="${domain}"]`)) {
           const link = document.createElement('link');
@@ -554,7 +612,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       });
     }
   }, [metadata.ogImage]);
-  
+
   useEffect(() => {
     preloadResources();
   }, [preloadResources]);
@@ -565,26 +623,36 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       <title>{metadata.title}</title>
       <meta name="description" content={metadata.description} />
       <meta name="keywords" content={metadata.keywords.join(', ')} />
-      <meta name="author" content={metadata.author || SEO_CONFIG.structuredData.organization.name} />
+      <meta
+        name="author"
+        content={metadata.author || SEO_CONFIG.structuredData.organization.name}
+      />
       <meta name="robots" content={metadata.robots || 'index,follow'} />
       <meta name="language" content={language} />
-      
+
       {/* 增强的元数据 */}
       <meta name="generator" content="Long Screenshot Splitter" />
       <meta name="referrer" content="origin-when-cross-origin" />
       <meta name="format-detection" content="telephone=no" />
       <meta name="theme-color" content="#1976d2" />
-      {metadata.publishedTime && <meta property="article:published_time" content={metadata.publishedTime} />}
-      {metadata.modifiedTime && <meta property="article:modified_time" content={metadata.modifiedTime} />}
+      {metadata.publishedTime && (
+        <meta property="article:published_time" content={metadata.publishedTime} />
+      )}
+      {metadata.modifiedTime && (
+        <meta property="article:modified_time" content={metadata.modifiedTime} />
+      )}
 
       {/* 视口和移动端优化 */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+      />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content={metadata.title} />
       <meta name="application-name" content={metadata.title} />
-      
+
       {/* PWA 支持 */}
       <link rel="manifest" href="/manifest.json" />
       <meta name="msapplication-TileColor" content="#1976d2" />
@@ -605,15 +673,28 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       {enableOpenGraph && (
         <>
           <meta property="og:title" content={metadata.ogTitle || metadata.title} />
-          <meta property="og:description" content={metadata.ogDescription || metadata.description} />
+          <meta
+            property="og:description"
+            content={metadata.ogDescription || metadata.description}
+          />
           <meta property="og:type" content={metadata.ogType || 'website'} />
-          <meta property="og:url" content={metadata.ogUrl || metadata.canonicalUrl || SEO_CONFIG.siteUrl} />
-          <meta property="og:site_name" content={(typeof SEO_CONFIG.siteName === 'string' ? SEO_CONFIG.siteName : (SEO_CONFIG.siteName as any)[language]) || 'Long Screenshot Splitter'} />
+          <meta
+            property="og:url"
+            content={metadata.ogUrl || metadata.canonicalUrl || SEO_CONFIG.siteUrl}
+          />
+          <meta
+            property="og:site_name"
+            content={
+              (typeof SEO_CONFIG.siteName === 'string'
+                ? SEO_CONFIG.siteName
+                : (SEO_CONFIG.siteName as any)[language]) || 'Long Screenshot Splitter'
+            }
+          />
           <meta property="og:locale" content={language === 'zh-CN' ? 'zh_CN' : 'en_US'} />
           {/* 备用语言 */}
           {language === 'zh-CN' && <meta property="og:locale:alternate" content="en_US" />}
           {language === 'en' && <meta property="og:locale:alternate" content="zh_CN" />}
-          
+
           {/* 图片信息 */}
           {metadata.ogImage && (
             <>
@@ -624,14 +705,18 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
               <meta property="og:image:type" content="image/png" />
             </>
           )}
-          
+
           {/* 应用程序特定信息 */}
           <meta property="og:app_id" content="long-screenshot-splitter" />
           <meta property="fb:app_id" content="" />
-          
+
           {/* 文章/内容特定信息 */}
-          {metadata.publishedTime && <meta property="article:published_time" content={metadata.publishedTime} />}
-          {metadata.modifiedTime && <meta property="article:modified_time" content={metadata.modifiedTime} />}
+          {metadata.publishedTime && (
+            <meta property="article:published_time" content={metadata.publishedTime} />
+          )}
+          {metadata.modifiedTime && (
+            <meta property="article:modified_time" content={metadata.modifiedTime} />
+          )}
         </>
       )}
 
@@ -640,12 +725,19 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
         <>
           <meta name="twitter:card" content={metadata.twitterCard || 'summary_large_image'} />
           <meta name="twitter:title" content={metadata.twitterTitle || metadata.title} />
-          <meta name="twitter:description" content={metadata.twitterDescription || metadata.description} />
-          
+          <meta
+            name="twitter:description"
+            content={metadata.twitterDescription || metadata.description}
+          />
+
           {/* 社交媒体账号 */}
-          {SEO_CONFIG.socialMedia?.twitter && <meta name="twitter:site" content={SEO_CONFIG.socialMedia.twitter} />}
-          {SEO_CONFIG.socialMedia?.twitter && <meta name="twitter:creator" content={SEO_CONFIG.socialMedia.twitter} />}
-          
+          {SEO_CONFIG.socialMedia?.twitter && (
+            <meta name="twitter:site" content={SEO_CONFIG.socialMedia.twitter} />
+          )}
+          {SEO_CONFIG.socialMedia?.twitter && (
+            <meta name="twitter:creator" content={SEO_CONFIG.socialMedia.twitter} />
+          )}
+
           {/* 图片信息 */}
           {metadata.twitterImage && (
             <>
@@ -655,7 +747,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
               <meta name="twitter:image:height" content="600" />
             </>
           )}
-          
+
           {/* 应用信息 */}
           <meta name="twitter:app:name:iphone" content={metadata.title} />
           <meta name="twitter:app:name:googleplay" content={metadata.title} />
@@ -670,29 +762,33 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       {/* 性能优化 - 预加载和DNS预解析 */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      
+
       {/* DNS预解析 */}
       <link rel="dns-prefetch" href="//www.google-analytics.com" />
       <link rel="dns-prefetch" href="//www.googletagmanager.com" />
       <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       <link rel="dns-prefetch" href="//fonts.gstatic.com" />
-      
+
       {/* 预加载关键资源 */}
       {metadata.ogImage && <link rel="preload" href={metadata.ogImage} as="image" />}
-      <link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-      
+      <link
+        rel="preload"
+        href="/fonts/main.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+
       {/* 资源提示 */}
       <link rel="prefetch" href="/api/health" />
-      
+
       {/* Favicon 和图标 */}
       <link rel="icon" href="/favicon.ico" sizes="any" />
       <link rel="icon" href="/icon.svg" type="image/svg+xml" />
       <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-      
+
       {/* Service Worker 注册提示 */}
-      {process.env.NODE_ENV === 'production' && (
-        <link rel="preload" href="/sw.js" as="script" />
-      )}
+      {process.env.NODE_ENV === 'production' && <link rel="preload" href="/sw.js" as="script" />}
     </Helmet>
   );
 };
@@ -702,11 +798,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
  * 为整个应用提供SEO上下文，集成增强的Helmet功能
  */
 export const SEOProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <HelmetProvider>
-      {children}
-    </HelmetProvider>
-  );
+  return <HelmetProvider>{children}</HelmetProvider>;
 };
 
 export default SEOManager;

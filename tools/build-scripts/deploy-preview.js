@@ -25,7 +25,7 @@ const mimeTypes = {
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
-  '.eot': 'application/vnd.ms-fontobject'
+  '.eot': 'application/vnd.ms-fontobject',
 };
 
 function getMimeType(filePath) {
@@ -55,12 +55,12 @@ function generateDirectoryListing(dirPath, urlPath) {
     const itemPath = join(dirPath, item);
     const isDir = statSync(itemPath).isDirectory();
     const href = urlPath === '/' ? `/${item}` : `${urlPath}/${item}`;
-    
+
     return {
       name: item,
       href,
       isDir,
-      size: isDir ? '-' : statSync(itemPath).size
+      size: isDir ? '-' : statSync(itemPath).size,
     };
   });
 
@@ -71,11 +71,13 @@ function generateDirectoryListing(dirPath, urlPath) {
     return a.name.localeCompare(b.name);
   });
 
-  const listItems = items.map(item => {
-    const icon = item.isDir ? '📁' : '📄';
-    const size = item.isDir ? '' : ` (${item.size} bytes)`;
-    return `<li><a href="${item.href}">${icon} ${item.name}${size}</a></li>`;
-  }).join('\n');
+  const listItems = items
+    .map(item => {
+      const icon = item.isDir ? '📁' : '📄';
+      const size = item.isDir ? '' : ` (${item.size} bytes)`;
+      return `<li><a href="${item.href}">${icon} ${item.name}${size}</a></li>`;
+    })
+    .join('\n');
 
   return `
 <!DOCTYPE html>
@@ -118,22 +120,22 @@ function generateDirectoryListing(dirPath, urlPath) {
 function createPreviewServer(distDir, port = 8080) {
   const server = createServer((req, res) => {
     let urlPath = decodeURIComponent(req.url);
-    
+
     // 移除查询参数
     const queryIndex = urlPath.indexOf('?');
     if (queryIndex !== -1) {
       urlPath = urlPath.substring(0, queryIndex);
     }
-    
+
     // 安全检查：防止路径遍历攻击
     if (urlPath.includes('..')) {
       res.writeHead(403, { 'Content-Type': 'text/plain' });
       res.end('Forbidden');
       return;
     }
-    
+
     const filePath = join(distDir, urlPath === '/' ? 'index.html' : urlPath.substring(1));
-    
+
     // 检查文件是否存在
     if (!existsSync(filePath)) {
       // 如果是SPA模式，尝试返回index.html
@@ -144,14 +146,14 @@ function createPreviewServer(distDir, port = 8080) {
         res.end(content);
         return;
       }
-      
+
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not Found');
       return;
     }
-    
+
     const stat = statSync(filePath);
-    
+
     // 如果是目录，显示目录列表或查找index.html
     if (stat.isDirectory()) {
       const indexPath = join(filePath, 'index.html');
@@ -166,15 +168,15 @@ function createPreviewServer(distDir, port = 8080) {
       }
       return;
     }
-    
+
     // 返回文件内容
     try {
       const content = readFileSync(filePath);
       const mimeType = getMimeType(filePath);
-      
-      res.writeHead(200, { 
+
+      res.writeHead(200, {
         'Content-Type': mimeType,
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache',
       });
       res.end(content);
     } catch (error) {
@@ -182,7 +184,7 @@ function createPreviewServer(distDir, port = 8080) {
       res.end('Internal Server Error');
     }
   });
-  
+
   return server;
 }
 
@@ -191,10 +193,10 @@ async function main() {
   const args = process.argv.slice(2);
   const component = args[0] || 'screenshot-splitter';
   const port = parseInt(args[1]) || 8080;
-  
+
   // 确定构建目录
   const distDir = join(rootDir, `packages/${component}/dist`);
-  
+
   // 检查构建目录是否存在
   if (!existsSync(distDir)) {
     logError(`构建目录不存在: ${distDir}`);
@@ -202,10 +204,10 @@ async function main() {
     logInfo(`  pnpm run build:${component}`);
     process.exit(1);
   }
-  
+
   // 创建并启动服务器
   const server = createPreviewServer(distDir, port);
-  
+
   server.listen(port, () => {
     logSuccess(`部署预览服务器已启动！`);
     logInfo(`组件: ${component}`);
@@ -213,17 +215,21 @@ async function main() {
     logInfo(`地址: http://localhost:${port}`);
     logInfo('');
     logInfo('按 Ctrl+C 停止服务器');
-    
+
     // 尝试自动打开浏览器
     try {
-      const command = process.platform === 'darwin' ? 'open' : 
-                     process.platform === 'win32' ? 'start' : 'xdg-open';
+      const command =
+        process.platform === 'darwin'
+          ? 'open'
+          : process.platform === 'win32'
+            ? 'start'
+            : 'xdg-open';
       execSync(`${command} http://localhost:${port}`, { stdio: 'ignore' });
     } catch (error) {
       // 忽略打开浏览器的错误
     }
   });
-  
+
   // 优雅关闭
   process.on('SIGINT', () => {
     logInfo('\n正在关闭服务器...');

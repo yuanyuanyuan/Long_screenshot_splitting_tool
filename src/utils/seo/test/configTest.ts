@@ -28,17 +28,17 @@ export async function testSEOConfig(): Promise<{
     keywords: false,
     structuredData: false,
   };
-  
+
   const errors: string[] = [];
   const warnings: string[] = [];
 
   try {
     console.log('🔧 Testing SEO Configuration System...');
-    
+
     // Test 1: Configuration Loading
     console.log('📥 Testing configuration loading...');
     const loadResult = await seoConfigManager.loadConfig({ force: true });
-    
+
     if (loadResult.success && loadResult.config) {
       results.loading = true;
       console.log('✅ Configuration loaded successfully');
@@ -52,7 +52,7 @@ export async function testSEOConfig(): Promise<{
     // Test 2: Validation
     console.log('🔍 Testing configuration validation...');
     const validationResult = await SEOConfigValidator.validateFullConfig(loadResult.config);
-    
+
     if (validationResult.valid) {
       results.validation = true;
       console.log('✅ Configuration validation passed');
@@ -67,8 +67,13 @@ export async function testSEOConfig(): Promise<{
     try {
       const homeConfig = seoConfigManager.getPageConfig('home', 'zh-CN');
       const homeConfigEn = seoConfigManager.getPageConfig('home', 'en');
-      
-      if (homeConfig.title && homeConfig.description && homeConfigEn.title && homeConfigEn.description) {
+
+      if (
+        homeConfig.title &&
+        homeConfig.description &&
+        homeConfigEn.title &&
+        homeConfigEn.description
+      ) {
         results.pageConfig = true;
         console.log('✅ Page configuration access works');
         console.log(`   - Home title (zh-CN): ${homeConfig.title.substring(0, 50)}...`);
@@ -87,7 +92,7 @@ export async function testSEOConfig(): Promise<{
     try {
       const keywordsZh = seoConfigManager.getKeywords('home', 'zh-CN', true);
       const keywordsEn = seoConfigManager.getKeywords('home', 'en', true);
-      
+
       if (keywordsZh.length > 0 && keywordsEn.length > 0) {
         results.keywords = true;
         console.log('✅ Keywords access works');
@@ -107,7 +112,7 @@ export async function testSEOConfig(): Promise<{
     try {
       const structuredDataZh = seoConfigManager.getStructuredData('home', 'zh-CN');
       const structuredDataEn = seoConfigManager.getStructuredData('home', 'en');
-      
+
       if (structuredDataZh?.['@type'] && structuredDataEn?.['@type']) {
         results.structuredData = true;
         console.log('✅ Structured data access works');
@@ -120,12 +125,14 @@ export async function testSEOConfig(): Promise<{
       }
     } catch (error) {
       console.log('❌ Structured data access failed');
-      errors.push(`Structured data error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      errors.push(
+        `Structured data error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
 
     // Overall success check
     const allTestsPassed = Object.values(results).every(result => result === true);
-    
+
     if (allTestsPassed) {
       console.log('🎉 All SEO configuration tests passed!');
     } else {
@@ -144,18 +151,17 @@ export async function testSEOConfig(): Promise<{
       success: allTestsPassed && errors.length === 0,
       results,
       errors,
-      warnings
+      warnings,
     };
-
   } catch (error) {
     console.log('💥 Test suite failed with error:', error);
     errors.push(`Test suite error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    
+
     return {
       success: false,
       results,
       errors,
-      warnings
+      warnings,
     };
   }
 }
@@ -165,13 +171,13 @@ export async function testSEOConfig(): Promise<{
  */
 export async function quickTest(): Promise<void> {
   const result = await testSEOConfig();
-  
+
   if (result.success) {
     console.log('✅ SEO Configuration system is working correctly');
   } else {
     console.log('❌ SEO Configuration system has issues:');
     result.errors.forEach(error => console.log(`   - ${error}`));
-    
+
     if (result.warnings.length > 0) {
       console.log('⚠️  Warnings:');
       result.warnings.forEach(warning => console.log(`   - ${warning}`));
@@ -184,34 +190,34 @@ export async function quickTest(): Promise<void> {
  */
 export function testHeadingValidation(): void {
   console.log('📝 Testing heading hierarchy validation...');
-  
+
   const testStructures = [
     {
       name: 'Valid structure',
       structure: {
-        h1: { 'zh-CN': '主标题', 'en': 'Main Title' },
-        h2: { 'zh-CN': ['子标题1', '子标题2'], 'en': ['Subtitle 1', 'Subtitle 2'] },
-        h3: { 'zh-CN': ['详细内容1', '详细内容2'], 'en': ['Detail 1', 'Detail 2'] }
-      }
+        h1: { 'zh-CN': '主标题', en: 'Main Title' },
+        h2: { 'zh-CN': ['子标题1', '子标题2'], en: ['Subtitle 1', 'Subtitle 2'] },
+        h3: { 'zh-CN': ['详细内容1', '详细内容2'], en: ['Detail 1', 'Detail 2'] },
+      },
     },
     {
       name: 'Invalid structure (no H1)',
       structure: {
-        h2: { 'zh-CN': ['直接的H2'], 'en': ['Direct H2'] }
-      }
+        h2: { 'zh-CN': ['直接的H2'], en: ['Direct H2'] },
+      },
     },
     {
       name: 'Invalid structure (multiple H1)',
       structure: {
-        h1: { 'zh-CN': ['标题1', '标题2'], 'en': ['Title 1', 'Title 2'] }
-      }
-    }
+        h1: { 'zh-CN': ['标题1', '标题2'], en: ['Title 1', 'Title 2'] },
+      },
+    },
   ];
 
   testStructures.forEach(({ name, structure }) => {
     console.log(`\n🧪 Testing: ${name}`);
     const validation = SEOConfigValidator.validateHeadingHierarchy(structure);
-    
+
     console.log(`   Valid: ${validation.isValid}`);
     if (validation.errors.length > 0) {
       console.log(`   Errors: ${validation.errors.join(', ')}`);

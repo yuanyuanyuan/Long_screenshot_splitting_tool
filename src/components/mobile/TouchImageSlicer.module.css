@@ -32,7 +32,7 @@
 /* 切片覆盖层 */
 .sliceOverlay {
   position: absolute;
-  border: 2px solid #007AFF;
+  border: 2px solid #007aff;
   background: rgba(0, 122, 255, 0.1);
   pointer-events: none;
   z-index: 10;
@@ -40,13 +40,13 @@
 }
 
 .sliceOverlay.active {
-  border-color: #34C759;
+  border-color: #34c759;
   background: rgba(52, 199, 89, 0.15);
   animation: pulseGreen 1s ease-in-out infinite;
 }
 
 .sliceOverlay.selected {
-  border-color: #FF3B30;
+  border-color: #ff3b30;
   background: rgba(255, 59, 48, 0.1);
   border-width: 3px;
   box-shadow: 0 0 20px rgba(255, 59, 48, 0.3);
@@ -65,7 +65,7 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: #FF3B30;
+  background: #ff3b30;
   color: white;
   font-size: 18px;
   font-weight: bold;
@@ -81,7 +81,7 @@
 
 .deleteButton:active {
   transform: scale(0.9);
-  background: #D70015;
+  background: #d70015;
 }
 
 /* 切片信息显示 */
@@ -184,12 +184,13 @@
 
 /* 动画效果 */
 @keyframes pulseGreen {
-  0%, 100% {
-    border-color: #34C759;
+  0%,
+  100% {
+    border-color: #34c759;
     box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4);
   }
   50% {
-    border-color: #30D158;
+    border-color: #30d158;
     box-shadow: 0 0 0 8px rgba(52, 199, 89, 0);
   }
 }
@@ -212,39 +213,39 @@
     padding: 8px 12px;
     gap: 8px;
   }
-  
+
   .toolButton {
     min-width: 40px;
     min-height: 40px;
     font-size: 16px;
   }
-  
+
   .sliceCounter {
     font-size: 12px;
     padding: 0 4px;
   }
-  
+
   .deleteButton {
     width: 28px;
     height: 28px;
     font-size: 16px;
   }
-  
+
   .sliceInfo {
     font-size: 11px;
     padding: 2px 6px;
     bottom: -22px;
   }
-  
+
   .helpText {
     font-size: 12px;
     padding: 0 20px;
   }
-  
+
   .sliceOverlay {
     border-width: 2px;
   }
-  
+
   .sliceOverlay.selected {
     border-width: 3px;
   }
@@ -256,7 +257,7 @@
     bottom: 24px;
     padding: 14px 18px;
   }
-  
+
   .toolButton {
     min-width: 48px;
     min-height: 48px;
@@ -270,13 +271,13 @@
     bottom: 8px;
     padding: 6px 10px;
   }
-  
+
   .toolButton {
     min-width: 36px;
     min-height: 36px;
     font-size: 14px;
   }
-  
+
   .helpText {
     font-size: 11px;
   }
@@ -287,16 +288,16 @@
   .touchImageSlicer {
     background: #1c1c1e;
   }
-  
+
   .toolbar {
     background: rgba(44, 44, 46, 0.95);
     color: white;
   }
-  
+
   .sliceCounter {
     color: #8e8e93;
   }
-  
+
   .helpText {
     color: #8e8e93;
   }
@@ -307,11 +308,11 @@
   .sliceOverlay {
     border-width: 3px;
   }
-  
+
   .sliceOverlay.selected {
     border-width: 4px;
   }
-  
+
   .deleteButton {
     border: 2px solid white;
   }
@@ -326,7 +327,7 @@
     transition: none;
     animation: none;
   }
-  
+
   .touchFeedback {
     display: none;
   }

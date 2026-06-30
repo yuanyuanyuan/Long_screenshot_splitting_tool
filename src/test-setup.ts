@@ -47,4 +47,4 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Setup for SEO testing
-globalThis.structuredClone = globalThis.structuredClone || ((obj) => JSON.parse(JSON.stringify(obj)));
+globalThis.structuredClone = globalThis.structuredClone || (obj => JSON.parse(JSON.stringify(obj)));

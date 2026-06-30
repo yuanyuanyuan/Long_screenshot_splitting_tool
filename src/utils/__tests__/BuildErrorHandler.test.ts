@@ -78,7 +78,7 @@ describe('BuildErrorHandler', () => {
         type: 'workspace' as const,
         message: 'Test error message',
         suggestions: ['Suggestion 1', 'Suggestion 2'],
-        severity: 'error' as const
+        severity: 'error' as const,
       };
 
       const formatted = handler.formatError(buildError);
@@ -96,7 +96,7 @@ describe('BuildErrorHandler', () => {
         message: 'Test message',
         originalError,
         suggestions: ['Fix it'],
-        severity: 'error' as const
+        severity: 'error' as const,
       };
 
       const formatted = handler.formatError(buildError);

@@ -37,12 +37,15 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
   const viewport = useViewport();
 
   // 触摸反馈
-  const triggerHapticFeedback = useCallback((type: 'light' | 'medium' | 'heavy' = 'light') => {
-    if (enableTouchOptimization && viewport.isMobile && 'vibrate' in navigator) {
-      const patterns = { light: 10, medium: 20, heavy: 30 };
-      navigator.vibrate(patterns[type]);
-    }
-  }, [enableTouchOptimization, viewport.isMobile]);
+  const triggerHapticFeedback = useCallback(
+    (type: 'light' | 'medium' | 'heavy' = 'light') => {
+      if (enableTouchOptimization && viewport.isMobile && 'vibrate' in navigator) {
+        const patterns = { light: 10, medium: 20, heavy: 30 };
+        navigator.vibrate(patterns[type]);
+      }
+    },
+    [enableTouchOptimization, viewport.isMobile]
+  );
 
   // 添加调试状态Hook
   const debugState = useDebugState({
@@ -102,11 +105,14 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
   );
 
   // 处理导出
-  const handleExport = useCallback((format: 'pdf' | 'zip', options?: any) => {
-    // 导出逻辑将在ExportControls组件中处理
-    triggerHapticFeedback('medium');
-    console.log('Export requested:', format, options);
-  }, [triggerHapticFeedback]);
+  const handleExport = useCallback(
+    (format: 'pdf' | 'zip', options?: any) => {
+      // 导出逻辑将在ExportControls组件中处理
+      triggerHapticFeedback('medium');
+      console.log('Export requested:', format, options);
+    },
+    [triggerHapticFeedback]
+  );
 
   // 重置状态
   const handleReset = useCallback(() => {
@@ -142,9 +148,11 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
     <div className={`screenshot-splitter ${className} ${mobileOptimizedClass}`}>
       {/* 错误提示 - 移动端优化 */}
       {error && (
-        <div className={`error-message bg-red-100 border border-red-400 text-red-700 rounded ${
-          viewport.isMobile ? 'px-4 py-4 mb-6 text-base' : 'px-4 py-3 mb-4 text-sm'
-        }`}>
+        <div
+          className={`error-message bg-red-100 border border-red-400 text-red-700 rounded ${
+            viewport.isMobile ? 'px-4 py-4 mb-6 text-base' : 'px-4 py-3 mb-4 text-sm'
+          }`}
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-start flex-1">
               <span className="text-lg mr-2 flex-shrink-0">⚠️</span>
@@ -166,7 +174,7 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
               }`}
               style={{
                 touchAction: 'manipulation',
-                WebkitTapHighlightColor: 'transparent'
+                WebkitTapHighlightColor: 'transparent',
               }}
             >
               ×
@@ -189,13 +197,17 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
 
       {/* 处理状态指示器 - 移动端优化 */}
       {componentState.isProcessing && (
-        <div className={`processing-indicator bg-blue-100 border border-blue-400 text-blue-700 rounded ${
-          viewport.isMobile ? 'px-5 py-4 mb-8' : 'px-4 py-3 mb-4'
-        }`}>
+        <div
+          className={`processing-indicator bg-blue-100 border border-blue-400 text-blue-700 rounded ${
+            viewport.isMobile ? 'px-5 py-4 mb-8' : 'px-4 py-3 mb-4'
+          }`}
+        >
           <div className="flex items-center justify-center">
-            <div className={`animate-spin rounded-full border-b-2 border-blue-700 mr-3 ${
-              viewport.isMobile ? 'h-6 w-6' : 'h-4 w-4'
-            }`}></div>
+            <div
+              className={`animate-spin rounded-full border-b-2 border-blue-700 mr-3 ${
+                viewport.isMobile ? 'h-6 w-6' : 'h-4 w-4'
+              }`}
+            ></div>
             <span className={viewport.isMobile ? 'text-base font-medium' : 'text-sm'}>
               正在处理图片，请稍候...
             </span>
@@ -236,22 +248,25 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
       )}
 
       {/* 操作按钮 - 移动端优化 */}
-      <div className={`actions-section ${
-        viewport.isMobile ? 'flex-col space-y-4' : 'flex gap-4 items-center'
-      }`}>
+      <div
+        className={`actions-section ${
+          viewport.isMobile ? 'flex-col space-y-4' : 'flex gap-4 items-center'
+        }`}
+      >
         {componentState.hasFile && (
           <button
             onClick={handleReset}
             className={`
               reset-button bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white rounded transition-colors
-              ${viewport.isMobile 
-                ? 'w-full px-6 py-4 text-lg font-medium min-h-[48px] order-2' 
-                : 'px-4 py-2 text-sm'
+              ${
+                viewport.isMobile
+                  ? 'w-full px-6 py-4 text-lg font-medium min-h-[48px] order-2'
+                  : 'px-4 py-2 text-sm'
               }
             `}
             style={{
               touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent'
+              WebkitTapHighlightColor: 'transparent',
             }}
             disabled={componentState.isProcessing}
           >
@@ -260,27 +275,35 @@ export const ScreenshotSplitter: React.FC<ScreenshotSplitterProps> = ({
         )}
 
         {/* 状态信息 - 移动端优化 */}
-        <div className={`status-info text-gray-600 ${
-          viewport.isMobile 
-            ? 'w-full p-4 bg-gray-50 rounded-lg border border-gray-200 order-1' 
-            : 'flex-1 text-sm flex items-center'
-        }`}>
+        <div
+          className={`status-info text-gray-600 ${
+            viewport.isMobile
+              ? 'w-full p-4 bg-gray-50 rounded-lg border border-gray-200 order-1'
+              : 'flex-1 text-sm flex items-center'
+          }`}
+        >
           {componentState.hasFile ? (
             <div className={viewport.isMobile ? 'space-y-2' : ''}>
-              <div className={`flex items-center ${viewport.isMobile ? 'text-base font-medium' : 'text-sm'}`}>
+              <div
+                className={`flex items-center ${viewport.isMobile ? 'text-base font-medium' : 'text-sm'}`}
+              >
                 <span className="mr-2">📄</span>
                 <span className="truncate">{currentFile?.name}</span>
               </div>
-              
+
               {componentState.hasSlices && (
-                <div className={`flex items-center ${viewport.isMobile ? 'text-sm text-gray-500' : 'ml-2'}`}>
+                <div
+                  className={`flex items-center ${viewport.isMobile ? 'text-sm text-gray-500' : 'ml-2'}`}
+                >
                   <span className="mr-1">✂️</span>
                   <span>切片：{state.imageSlices.length}个</span>
                 </div>
               )}
-              
+
               {componentState.hasSelection && (
-                <div className={`flex items-center ${viewport.isMobile ? 'text-sm text-blue-600 font-medium' : 'ml-2'}`}>
+                <div
+                  className={`flex items-center ${viewport.isMobile ? 'text-sm text-blue-600 font-medium' : 'ml-2'}`}
+                >
                   <span className="mr-1">✅</span>
                   <span>已选择：{state.selectedSlices.size}个</span>
                 </div>

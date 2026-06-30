@@ -38,16 +38,15 @@ function startPreviewServer(filePath, port = 8080) {
 
       // 读取HTML文件
       const html = readFileSync(filePath, 'utf-8');
-      
+
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache',
       });
-      
+
       res.end(html);
-      
+
       console.log(`📄 服务请求: ${req.url}`);
-      
     } catch (error) {
       console.error('❌ 服务器错误:', error);
       res.writeHead(500, { 'Content-Type': 'text/plain' });

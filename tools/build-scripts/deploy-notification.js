@@ -19,19 +19,19 @@ class DeployNotification {
    */
   loadNotificationConfig() {
     const configPath = path.join(process.cwd(), 'notification.config.js');
-    
+
     if (fs.existsSync(configPath)) {
       return require(configPath);
     }
-    
+
     // 默认配置
     return {
       channels: {
         console: { enabled: true },
-        webhook: { 
+        webhook: {
           enabled: false,
           url: process.env.WEBHOOK_URL || '',
-          secret: process.env.WEBHOOK_SECRET || ''
+          secret: process.env.WEBHOOK_SECRET || '',
         },
         email: {
           enabled: false,
@@ -39,29 +39,29 @@ class DeployNotification {
             host: process.env.SMTP_HOST || '',
             port: process.env.SMTP_PORT || 587,
             user: process.env.SMTP_USER || '',
-            pass: process.env.SMTP_PASS || ''
+            pass: process.env.SMTP_PASS || '',
           },
-          recipients: (process.env.NOTIFICATION_EMAILS || '').split(',').filter(Boolean)
-        }
+          recipients: (process.env.NOTIFICATION_EMAILS || '').split(',').filter(Boolean),
+        },
       },
       templates: {
         success: {
           title: '✅ 部署成功',
-          color: '#28a745'
+          color: '#28a745',
         },
         failure: {
           title: '❌ 部署失败',
-          color: '#dc3545'
+          color: '#dc3545',
         },
         warning: {
           title: '⚠️ 部署警告',
-          color: '#ffc107'
+          color: '#ffc107',
         },
         rollback: {
           title: '🔄 部署回滚',
-          color: '#17a2b8'
-        }
-      }
+          color: '#17a2b8',
+        },
+      },
     };
   }
 
@@ -70,30 +70,29 @@ class DeployNotification {
    */
   async sendNotification(type, data) {
     console.log(`📢 发送${type}通知...`);
-    
+
     try {
       const notification = this.buildNotification(type, data);
       const results = [];
-      
+
       // 发送到各个通道
       if (this.config.channels.console.enabled) {
         results.push(await this.sendConsoleNotification(notification));
       }
-      
+
       if (this.config.channels.webhook.enabled) {
         results.push(await this.sendWebhookNotification(notification));
       }
-      
+
       if (this.config.channels.email.enabled) {
         results.push(await this.sendEmailNotification(notification));
       }
-      
+
       // 记录通知日志
       await this.logNotification(type, notification, results);
-      
+
       console.log('✅ 通知发送完成');
       return results;
-      
     } catch (error) {
       console.error('❌ 通知发送失败:', error.message);
       throw error;
@@ -106,7 +105,7 @@ class DeployNotification {
   buildNotification(type, data) {
     const template = this.config.templates[type] || this.config.templates.success;
     const timestamp = new Date().toISOString();
-    
+
     const notification = {
       type,
       title: template.title,
@@ -116,10 +115,10 @@ class DeployNotification {
         ...data,
         environment: process.env.NODE_ENV || 'development',
         branch: this.getCurrentBranch(),
-        commit: this.getCurrentCommit()
-      }
+        commit: this.getCurrentCommit(),
+      },
     };
-    
+
     // 根据类型添加特定内容
     switch (type) {
       case 'success':
@@ -137,7 +136,7 @@ class DeployNotification {
       default:
         notification.message = this.buildGenericMessage(data);
     }
-    
+
     return notification;
   }
 
@@ -146,25 +145,25 @@ class DeployNotification {
    */
   buildSuccessMessage(data) {
     const { deployId, duration, targets, mode } = data;
-    
+
     return {
       summary: `部署 ${deployId} 成功完成`,
       details: [
         `🎯 部署目标: ${Array.isArray(targets) ? targets.join(', ') : targets}`,
         `🔧 构建模式: ${mode}`,
         `⏱️ 部署耗时: ${duration}ms`,
-        `📅 完成时间: ${new Date().toLocaleString('zh-CN')}`
+        `📅 完成时间: ${new Date().toLocaleString('zh-CN')}`,
       ],
       actions: [
         {
           text: '查看部署状态',
-          url: this.getStatusUrl()
+          url: this.getStatusUrl(),
         },
         {
           text: '访问应用',
-          url: this.getAppUrl()
-        }
-      ]
+          url: this.getAppUrl(),
+        },
+      ],
     };
   }
 
@@ -173,25 +172,25 @@ class DeployNotification {
    */
   buildFailureMessage(data) {
     const { deployId, error, stage, duration } = data;
-    
+
     return {
       summary: `部署 ${deployId} 在 ${stage} 阶段失败`,
       details: [
         `❌ 错误信息: ${error}`,
         `📍 失败阶段: ${stage}`,
         `⏱️ 失败前耗时: ${duration}ms`,
-        `📅 失败时间: ${new Date().toLocaleString('zh-CN')}`
+        `📅 失败时间: ${new Date().toLocaleString('zh-CN')}`,
       ],
       actions: [
         {
           text: '查看错误日志',
-          url: this.getLogUrl(deployId)
+          url: this.getLogUrl(deployId),
         },
         {
           text: '执行回滚',
-          url: this.getRollbackUrl()
-        }
-      ]
+          url: this.getRollbackUrl(),
+        },
+      ],
     };
   }
 
@@ -200,20 +199,16 @@ class DeployNotification {
    */
   buildWarningMessage(data) {
     const { deployId, warnings, stage } = data;
-    
+
     return {
       summary: `部署 ${deployId} 完成但有警告`,
-      details: [
-        `⚠️ 警告阶段: ${stage}`,
-        `📋 警告信息:`,
-        ...warnings.map(w => `  • ${w}`)
-      ],
+      details: [`⚠️ 警告阶段: ${stage}`, `📋 警告信息:`, ...warnings.map(w => `  • ${w}`)],
       actions: [
         {
           text: '查看详细日志',
-          url: this.getLogUrl(deployId)
-        }
-      ]
+          url: this.getLogUrl(deployId),
+        },
+      ],
     };
   }
 
@@ -222,20 +217,20 @@ class DeployNotification {
    */
   buildRollbackMessage(data) {
     const { rollbackId, targetDeployId, reason } = data;
-    
+
     return {
       summary: `执行回滚操作 ${rollbackId}`,
       details: [
         `🎯 回滚目标: ${targetDeployId}`,
         `📝 回滚原因: ${reason}`,
-        `📅 回滚时间: ${new Date().toLocaleString('zh-CN')}`
+        `📅 回滚时间: ${new Date().toLocaleString('zh-CN')}`,
       ],
       actions: [
         {
           text: '查看回滚状态',
-          url: this.getStatusUrl()
-        }
-      ]
+          url: this.getStatusUrl(),
+        },
+      ],
     };
   }
 
@@ -246,7 +241,7 @@ class DeployNotification {
     return {
       summary: JSON.stringify(data, null, 2),
       details: [],
-      actions: []
+      actions: [],
     };
   }
 
@@ -258,23 +253,23 @@ class DeployNotification {
     console.log(`${notification.title} - ${notification.timestamp}`);
     console.log('='.repeat(60));
     console.log(notification.message.summary);
-    
+
     if (notification.message.details.length > 0) {
       console.log('\n详细信息:');
       notification.message.details.forEach(detail => {
         console.log(`  ${detail}`);
       });
     }
-    
+
     if (notification.message.actions.length > 0) {
       console.log('\n相关链接:');
       notification.message.actions.forEach(action => {
         console.log(`  ${action.text}: ${action.url}`);
       });
     }
-    
+
     console.log('='.repeat(60) + '\n');
-    
+
     return { channel: 'console', status: 'success' };
   }
 
@@ -285,31 +280,32 @@ class DeployNotification {
     if (!this.config.channels.webhook.url) {
       return { channel: 'webhook', status: 'skipped', reason: 'No webhook URL configured' };
     }
-    
+
     try {
       const payload = {
         text: notification.title,
-        attachments: [{
-          color: notification.color,
-          title: notification.message.summary,
-          fields: notification.message.details.map(detail => ({
-            value: detail,
-            short: false
-          })),
-          actions: notification.message.actions,
-          timestamp: notification.timestamp
-        }]
+        attachments: [
+          {
+            color: notification.color,
+            title: notification.message.summary,
+            fields: notification.message.details.map(detail => ({
+              value: detail,
+              short: false,
+            })),
+            actions: notification.message.actions,
+            timestamp: notification.timestamp,
+          },
+        ],
       };
-      
+
       await this.sendHttpRequest(this.config.channels.webhook.url, payload);
-      
+
       return { channel: 'webhook', status: 'success' };
-      
     } catch (error) {
-      return { 
-        channel: 'webhook', 
-        status: 'error', 
-        error: error.message 
+      return {
+        channel: 'webhook',
+        status: 'error',
+        error: error.message,
       };
     }
   }
@@ -321,19 +317,18 @@ class DeployNotification {
     if (!this.config.channels.email.recipients.length) {
       return { channel: 'email', status: 'skipped', reason: 'No recipients configured' };
     }
-    
+
     try {
       // 这里可以集成实际的邮件发送服务
       // 例如使用 nodemailer 或其他邮件服务
       console.log('📧 邮件通知功能需要配置SMTP服务');
-      
+
       return { channel: 'email', status: 'pending', reason: 'Email service not configured' };
-      
     } catch (error) {
-      return { 
-        channel: 'email', 
-        status: 'error', 
-        error: error.message 
+      return {
+        channel: 'email',
+        status: 'error',
+        error: error.message,
       };
     }
   }
@@ -345,7 +340,7 @@ class DeployNotification {
     return new Promise((resolve, reject) => {
       const postData = JSON.stringify(data);
       const urlObj = new URL(url);
-      
+
       const options = {
         hostname: urlObj.hostname,
         port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
@@ -353,17 +348,17 @@ class DeployNotification {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
-        }
+          'Content-Length': Buffer.byteLength(postData),
+        },
       };
-      
-      const req = https.request(options, (res) => {
+
+      const req = https.request(options, res => {
         let responseData = '';
-        
-        res.on('data', (chunk) => {
+
+        res.on('data', chunk => {
           responseData += chunk;
         });
-        
+
         res.on('end', () => {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             resolve(responseData);
@@ -372,11 +367,11 @@ class DeployNotification {
           }
         });
       });
-      
-      req.on('error', (error) => {
+
+      req.on('error', error => {
         reject(error);
       });
-      
+
       req.write(postData);
       req.end();
     });
@@ -391,21 +386,21 @@ class DeployNotification {
       type,
       notification,
       results,
-      success: results.every(r => r.status === 'success' || r.status === 'skipped')
+      success: results.every(r => r.status === 'success' || r.status === 'skipped'),
     };
-    
+
     const logFile = path.join(this.logDir, 'notifications.json');
     let logs = [];
-    
+
     if (fs.existsSync(logFile)) {
       logs = JSON.parse(fs.readFileSync(logFile, 'utf8'));
     }
-    
+
     logs.unshift(logEntry);
-    
+
     // 只保留最近100条通知记录
     logs = logs.slice(0, 100);
-    
+
     fs.writeFileSync(logFile, JSON.stringify(logs, null, 2));
   }
 
@@ -478,14 +473,14 @@ class DeployNotification {
    */
   async testNotifications() {
     console.log('🧪 测试通知系统...');
-    
+
     const testData = {
       deployId: 'test_' + Date.now(),
       duration: 5000,
       targets: ['github-pages'],
-      mode: 'both'
+      mode: 'both',
     };
-    
+
     try {
       await this.sendNotification('success', testData);
       console.log('✅ 通知系统测试成功');
@@ -500,31 +495,33 @@ class DeployNotification {
 if (require.main === module) {
   const args = process.argv.slice(2);
   const command = args[0];
-  
+
   const notification = new DeployNotification();
-  
+
   switch (command) {
     case 'test':
-      notification.testNotifications()
+      notification
+        .testNotifications()
         .then(() => process.exit(0))
         .catch(error => {
           console.error('测试失败:', error);
           process.exit(1);
         });
       break;
-      
+
     case 'send':
       const type = args[1] || 'success';
       const data = JSON.parse(args[2] || '{}');
-      
-      notification.sendNotification(type, data)
+
+      notification
+        .sendNotification(type, data)
         .then(() => process.exit(0))
         .catch(error => {
           console.error('发送失败:', error);
           process.exit(1);
         });
       break;
-      
+
     default:
       console.log('用法:');
       console.log('  node deploy-notification.js test           # 测试通知系统');

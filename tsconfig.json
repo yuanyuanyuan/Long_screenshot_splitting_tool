@@ -33,10 +33,10 @@
   },
   "include": ["src", "shared-components", "config"],
   "exclude": [
-    "node_modules", 
+    "node_modules",
     "dist",
     "**/*.test.*",
-    "**/*.spec.*", 
+    "**/*.spec.*",
     "**/__tests__/**",
     "**/test-setup/**",
     "**/tests/**",

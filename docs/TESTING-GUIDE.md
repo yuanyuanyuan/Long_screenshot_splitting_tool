@@ -20,12 +20,12 @@ pyramid
 
 ### 测试覆盖率目标
 
-| 测试类型 | 覆盖率目标 | 当前覆盖率 | 工具 |
-|----------|------------|------------|------|
-| 单元测试 | ≥90% | 95%+ | Vitest + RTL |
-| 集成测试 | ≥80% | 85%+ | Vitest + RTL |
-| E2E 测试 | 核心流程 | 100% | Playwright |
-| 整体覆盖率 | ≥90% | 93%+ | - |
+| 测试类型   | 覆盖率目标 | 当前覆盖率 | 工具         |
+| ---------- | ---------- | ---------- | ------------ |
+| 单元测试   | ≥90%       | 95%+       | Vitest + RTL |
+| 集成测试   | ≥80%       | 85%+       | Vitest + RTL |
+| E2E 测试   | 核心流程   | 100%       | Playwright   |
+| 整体覆盖率 | ≥90%       | 93%+       | -            |
 
 ---
 
@@ -36,7 +36,7 @@ pyramid
 ```json
 {
   "测试框架": "Vitest 3.2.4",
-  "组件测试": "React Testing Library 16.3.0", 
+  "组件测试": "React Testing Library 16.3.0",
   "DOM 匹配器": "@testing-library/jest-dom 6.6.4",
   "用户交互": "@testing-library/user-event 14.6.1",
   "E2E 测试": "Playwright (通过工具脚本)",
@@ -48,6 +48,7 @@ pyramid
 ### 配置文件
 
 #### vitest.config.ts
+
 ```typescript
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
@@ -66,28 +67,23 @@ export default defineConfig({
           branches: 80,
           functions: 80,
           lines: 90,
-          statements: 90
-        }
+          statements: 90,
+        },
       },
-      exclude: [
-        'node_modules/',
-        'dist/',
-        '*.config.js',
-        '*.config.ts',
-        'src/vite-env.d.ts'
-      ]
-    }
+      exclude: ['node_modules/', 'dist/', '*.config.js', '*.config.ts', 'src/vite-env.d.ts'],
+    },
   },
   resolve: {
     alias: {
       '@': '/src',
-      '@shared': '/shared-components'
-    }
-  }
+      '@shared': '/shared-components',
+    },
+  },
 });
 ```
 
 #### 测试设置文件 (src/test-setup.ts)
+
 ```typescript
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
@@ -146,6 +142,7 @@ global.FileReader = vi.fn().mockImplementation(() => ({
 ### 工具函数测试
 
 #### 示例：文本格式化工具测试
+
 ```typescript
 // src/utils/__tests__/textFormatter.test.ts
 import { describe, it, expect } from 'vitest';
@@ -175,26 +172,28 @@ describe('TextFormatter', () => {
   describe('truncate', () => {
     it('应该截断长文本', () => {
       const text = 'This is a very long text that should be truncated';
-      expect(TextFormatter.truncate(text, { maxLength: 20 }))
-        .toBe('This is a very long...');
+      expect(TextFormatter.truncate(text, { maxLength: 20 })).toBe('This is a very long...');
     });
 
     it('应该保留完整单词', () => {
       const text = 'This is a test';
-      expect(TextFormatter.truncate(text, { maxLength: 10, preserveWords: true }))
-        .toBe('This is a...');
+      expect(TextFormatter.truncate(text, { maxLength: 10, preserveWords: true })).toBe(
+        'This is a...'
+      );
     });
 
     it('应该使用自定义省略号', () => {
       const text = 'This is a test';
-      expect(TextFormatter.truncate(text, { maxLength: 10, ellipsis: ' [...]' }))
-        .toBe('This is a [...]');
+      expect(TextFormatter.truncate(text, { maxLength: 10, ellipsis: ' [...]' })).toBe(
+        'This is a [...]'
+      );
     });
   });
 });
 ```
 
 #### 示例：图片处理工具测试
+
 ```typescript
 // src/utils/__tests__/imageProcessor.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -206,14 +205,14 @@ const mockCanvas = {
     drawImage: vi.fn(),
     getImageData: vi.fn(() => ({ data: new Uint8Array(4) })),
     putImageData: vi.fn(),
-    canvas: { toDataURL: vi.fn(() => 'data:image/png;base64,mock') }
+    canvas: { toDataURL: vi.fn(() => 'data:image/png;base64,mock') },
   })),
   width: 800,
-  height: 600
+  height: 600,
 };
 
 global.HTMLCanvasElement = vi.fn(() => mockCanvas);
-document.createElement = vi.fn((tagName) => {
+document.createElement = vi.fn(tagName => {
   if (tagName === 'canvas') return mockCanvas;
   return {};
 });
@@ -267,15 +266,14 @@ describe('ImageProcessor', () => {
     it('应该拒绝无效文件格式', async () => {
       const file = new File(['mock'], 'test.txt', { type: 'text/plain' });
 
-      await expect(ImageProcessor.splitImage(file, 400))
-        .rejects.toThrow('不支持的文件格式');
+      await expect(ImageProcessor.splitImage(file, 400)).rejects.toThrow('不支持的文件格式');
     });
   });
 
   describe('validateImageFile', () => {
     it('应该验证支持的图片格式', () => {
       const validFormats = ['image/png', 'image/jpeg', 'image/webp'];
-      
+
       validFormats.forEach(type => {
         const file = new File(['mock'], `test.${type.split('/')[1]}`, { type });
         expect(ImageProcessor.validateImageFile(file)).toBe(true);
@@ -304,6 +302,7 @@ describe('ImageProcessor', () => {
 ### React 组件测试
 
 #### 示例：Button 组件测试
+
 ```typescript
 // shared-components/components/Button/__tests__/Button.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -337,7 +336,7 @@ describe('Button Component', () => {
 
   it('应该在加载状态下禁用按钮', () => {
     render(<Button loading loadingText="加载中...">提交</Button>);
-    
+
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
     expect(button).toHaveTextContent('加载中...');
@@ -377,6 +376,7 @@ describe('Button Component', () => {
 ```
 
 #### 示例：FileUploader 组件测试
+
 ```typescript
 // src/components/__tests__/FileUploader.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -394,7 +394,7 @@ describe('FileUploader Component', () => {
 
   it('应该渲染文件上传区域', () => {
     render(<FileUploader onFileSelect={mockOnFileSelect} />);
-    
+
     expect(screen.getByText(/拖拽文件到此处/i)).toBeInTheDocument();
     expect(screen.getByText(/或点击选择文件/i)).toBeInTheDocument();
   });
@@ -414,7 +414,7 @@ describe('FileUploader Component', () => {
   it('应该验证文件类型', async () => {
     const user = userEvent.setup();
     render(
-      <FileUploader 
+      <FileUploader
         onFileSelect={mockOnFileSelect}
         onError={mockOnError}
         accept="image/png,image/jpeg"
@@ -433,7 +433,7 @@ describe('FileUploader Component', () => {
   it('应该验证文件大小', async () => {
     const user = userEvent.setup();
     render(
-      <FileUploader 
+      <FileUploader
         onFileSelect={mockOnFileSelect}
         onError={mockOnError}
         maxSize={1024} // 1KB
@@ -492,6 +492,7 @@ describe('FileUploader Component', () => {
 ### Hook 测试
 
 #### 示例：useImageProcessor Hook 测试
+
 ```typescript
 // src/hooks/__tests__/useImageProcessor.test.ts
 import { renderHook, act, waitFor } from '@testing-library/react';
@@ -502,9 +503,9 @@ import { useImageProcessor } from '../useImageProcessor';
 class MockWorker {
   onmessage: ((event: MessageEvent) => void) | null = null;
   onerror: ((event: ErrorEvent) => void) | null = null;
-  
+
   constructor(public url: string) {}
-  
+
   postMessage(data: any) {
     // Simulate async processing
     setTimeout(() => {
@@ -513,7 +514,7 @@ class MockWorker {
       }
     }, 100);
   }
-  
+
   terminate() {}
 }
 
@@ -625,6 +626,7 @@ describe('useImageProcessor', () => {
 ### 组件间交互测试
 
 #### 示例：完整的图片处理流程测试
+
 ```typescript
 // tests/integration/image-processing-flow.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
@@ -635,13 +637,13 @@ import { App } from '../../src/App';
 describe('Image Processing Integration', () => {
   it('应该完成完整的图片处理流程', async () => {
     const user = userEvent.setup();
-    
+
     render(<App />);
 
     // 1. 上传文件
     const file = new File(['mock image data'], 'test.png', { type: 'image/png' });
     const fileInput = screen.getByLabelText(/选择文件/i);
-    
+
     await user.upload(fileInput, file);
 
     // 2. 等待文件加载完成
@@ -676,13 +678,13 @@ describe('Image Processing Integration', () => {
 
   it('应该处理错误情况', async () => {
     const user = userEvent.setup();
-    
+
     render(<App />);
 
     // 上传无效文件
     const invalidFile = new File(['invalid'], 'test.txt', { type: 'text/plain' });
     const fileInput = screen.getByLabelText(/选择文件/i);
-    
+
     await user.upload(fileInput, invalidFile);
 
     // 验证错误提示
@@ -697,7 +699,7 @@ describe('Image Processing Integration', () => {
 
   it('应该支持语言切换', async () => {
     const user = userEvent.setup();
-    
+
     render(<App />);
 
     // 初始语言是中文
@@ -716,6 +718,7 @@ describe('Image Processing Integration', () => {
 ### API 集成测试
 
 #### 示例：导出功能集成测试
+
 ```typescript
 // tests/integration/export-functionality.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
@@ -747,11 +750,11 @@ describe('Export Functionality Integration', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock URL.createObjectURL and URL.revokeObjectURL
     global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
     global.URL.revokeObjectURL = vi.fn();
-    
+
     // Mock link click for download
     const mockClick = vi.fn();
     global.HTMLAnchorElement.prototype.click = mockClick;
@@ -760,9 +763,9 @@ describe('Export Functionality Integration', () => {
   it('应该成功导出PDF', async () => {
     const user = userEvent.setup();
     const onExportComplete = vi.fn();
-    
+
     render(
-      <ExportControls 
+      <ExportControls
         segments={mockSegments}
         onExportComplete={onExportComplete}
       />
@@ -781,9 +784,9 @@ describe('Export Functionality Integration', () => {
   it('应该成功导出ZIP', async () => {
     const user = userEvent.setup();
     const onExportComplete = vi.fn();
-    
+
     render(
-      <ExportControls 
+      <ExportControls
         segments={mockSegments}
         onExportComplete={onExportComplete}
       />
@@ -800,14 +803,14 @@ describe('Export Functionality Integration', () => {
   it('应该处理导出错误', async () => {
     const user = userEvent.setup();
     const onExportComplete = vi.fn();
-    
+
     // Mock export error
     vi.mocked(require('jspdf').jsPDF).mockImplementation(() => {
       throw new Error('Export failed');
     });
-    
+
     render(
-      <ExportControls 
+      <ExportControls
         segments={mockSegments}
         onExportComplete={onExportComplete}
       />
@@ -825,7 +828,7 @@ describe('Export Functionality Integration', () => {
 
   it('应该显示导出进度', async () => {
     const user = userEvent.setup();
-    
+
     render(<ExportControls segments={mockSegments} />);
 
     const exportPdfButton = screen.getByText(/导出PDF/i);
@@ -850,6 +853,7 @@ describe('Export Functionality Integration', () => {
 ### Playwright 测试配置
 
 #### playwright.config.ts
+
 ```typescript
 import { defineConfig, devices } from '@playwright/test';
 
@@ -898,6 +902,7 @@ export default defineConfig({
 ### E2E 测试示例
 
 #### 完整用户流程测试
+
 ```typescript
 // tests/e2e/screenshot-splitter.e2e.ts
 import { test, expect } from '@playwright/test';
@@ -1034,6 +1039,7 @@ test.describe('Screenshot Splitter E2E', () => {
 ```
 
 #### 性能测试
+
 ```typescript
 // tests/e2e/performance.e2e.ts
 import { test, expect } from '@playwright/test';
@@ -1044,12 +1050,15 @@ test.describe('Performance Tests', () => {
 
     // 测量页面加载性能
     const performanceMetrics = await page.evaluate(() => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      const navigation = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
       return {
         domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
         loadComplete: navigation.loadEventEnd - navigation.navigationStart,
         firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime || 0,
-        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
+        firstContentfulPaint:
+          performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
       };
     });
 
@@ -1075,26 +1084,24 @@ test.describe('Performance Tests', () => {
     await page.goto('/');
 
     // 获取初始内存使用
-    const initialMemory = await page.evaluate(() => 
-      (performance as any).memory?.usedJSHeapSize || 0
+    const initialMemory = await page.evaluate(
+      () => (performance as any).memory?.usedJSHeapSize || 0
     );
 
     // 处理多个文件
     for (let i = 0; i < 3; i++) {
       const fileInput = page.locator('input[type="file"]');
       await fileInput.setInputFiles(`tests/fixtures/test-screenshot-${i + 1}.png`);
-      
+
       await page.click('button:has-text("开始分割")');
       await expect(page.locator('.processing-complete')).toBeVisible();
-      
+
       // 清除结果
       await page.click('button:has-text("清除")');
     }
 
     // 检查内存使用是否合理
-    const finalMemory = await page.evaluate(() => 
-      (performance as any).memory?.usedJSHeapSize || 0
-    );
+    const finalMemory = await page.evaluate(() => (performance as any).memory?.usedJSHeapSize || 0);
 
     // 内存增长不应超过50MB
     const memoryGrowth = finalMemory - initialMemory;
@@ -1135,6 +1142,7 @@ npx playwright show-report # 查看E2E测试报告
 ### 测试脚本配置
 
 #### package.json 测试脚本
+
 ```json
 {
   "scripts": {
@@ -1156,6 +1164,7 @@ npx playwright show-report # 查看E2E测试报告
 ### 智能测试运行脚本
 
 #### scripts/test-runner.js
+
 ```javascript
 #!/usr/bin/env node
 
@@ -1195,20 +1204,20 @@ class SmartTestRunner {
     const configs = {
       'ultra-light': {
         nodeOptions: '--max-old-space-size=512',
-        vitestArgs: ['run', '--pool=forks', '--poolOptions.forks.maxForks=1', '--reporter=basic']
+        vitestArgs: ['run', '--pool=forks', '--poolOptions.forks.maxForks=1', '--reporter=basic'],
       },
-      'light': {
+      light: {
         nodeOptions: '--max-old-space-size=1024',
-        vitestArgs: ['run', '--pool=forks', '--poolOptions.forks.maxForks=2']
+        vitestArgs: ['run', '--pool=forks', '--poolOptions.forks.maxForks=2'],
       },
-      'standard': {
+      standard: {
         nodeOptions: '--max-old-space-size=2048',
-        vitestArgs: ['run']
+        vitestArgs: ['run'],
       },
-      'comprehensive': {
+      comprehensive: {
         nodeOptions: '--max-old-space-size=4096',
-        vitestArgs: ['run', '--coverage', '--reporter=verbose']
-      }
+        vitestArgs: ['run', '--coverage', '--reporter=verbose'],
+      },
     };
 
     return configs[this.mode] || configs['standard'];
@@ -1219,10 +1228,10 @@ class SmartTestRunner {
       const env = { ...process.env, NODE_OPTIONS: config.nodeOptions };
       const child = spawn('npx', ['vitest', ...config.vitestArgs], {
         stdio: 'inherit',
-        env
+        env,
       });
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         if (code === 0) {
           console.log('✅ 所有测试通过');
           resolve();
@@ -1232,7 +1241,7 @@ class SmartTestRunner {
         }
       });
 
-      child.on('error', (error) => {
+      child.on('error', error => {
         console.error('❌ 测试运行错误:', error);
         reject(error);
       });
@@ -1241,13 +1250,13 @@ class SmartTestRunner {
 
   async generatePerformanceReport() {
     console.log('📊 生成性能报告...');
-    
+
     const reportPath = path.join(process.cwd(), 'test-performance-report.json');
     const report = {
       timestamp: new Date().toISOString(),
       mode: this.mode,
       memory: process.memoryUsage(),
-      duration: process.uptime()
+      duration: process.uptime(),
     };
 
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
@@ -1268,13 +1277,14 @@ runner.run().catch(console.error);
 测试覆盖率报告包括以下指标：
 
 - **Statements**: 语句覆盖率 (目标: ≥90%)
-- **Branches**: 分支覆盖率 (目标: ≥80%) 
+- **Branches**: 分支覆盖率 (目标: ≥80%)
 - **Functions**: 函数覆盖率 (目标: ≥90%)
 - **Lines**: 行覆盖率 (目标: ≥90%)
 
 ### 质量门禁
 
 #### vitest.config.ts 质量门禁配置
+
 ```typescript
 export default defineConfig({
   test: {
@@ -1284,36 +1294,36 @@ export default defineConfig({
           branches: 80,
           functions: 90,
           lines: 90,
-          statements: 90
+          statements: 90,
         },
         // 特定文件或目录的要求
         'src/utils/': {
           branches: 90,
           functions: 95,
           lines: 95,
-          statements: 95
+          statements: 95,
         },
         'shared-components/': {
           branches: 85,
           functions: 90,
           lines: 90,
-          statements: 90
-        }
-      }
-    }
-  }
+          statements: 90,
+        },
+      },
+    },
+  },
 });
 ```
 
 ### 性能基准
 
-| 指标 | 目标值 | 当前值 | 状态 |
-|------|--------|--------|------|
-| 单元测试执行时间 | <30s | 25s | ✅ |
-| 集成测试执行时间 | <60s | 45s | ✅ |
-| E2E测试执行时间 | <5min | 4min | ✅ |
-| 内存使用峰值 | <2GB | 1.5GB | ✅ |
-| 测试覆盖率 | ≥90% | 95% | ✅ |
+| 指标             | 目标值 | 当前值 | 状态 |
+| ---------------- | ------ | ------ | ---- |
+| 单元测试执行时间 | <30s   | 25s    | ✅   |
+| 集成测试执行时间 | <60s   | 45s    | ✅   |
+| E2E测试执行时间  | <5min  | 4min   | ✅   |
+| 内存使用峰值     | <2GB   | 1.5GB  | ✅   |
+| 测试覆盖率       | ≥90%   | 95%    | ✅   |
 
 ---
 
@@ -1322,14 +1332,15 @@ export default defineConfig({
 ### GitHub Actions 测试工作流
 
 #### .github/workflows/test.yml
+
 ```yaml
 name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   unit-tests:
@@ -1337,67 +1348,67 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x, 20.x]
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linter
-      run: npm run lint
-    
-    - name: Run type check
-      run: npm run type-check
-    
-    - name: Run unit tests
-      run: npm run test:coverage
-    
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage/coverage-final.json
-        flags: unittests
-        name: codecov-umbrella
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run unit tests
+        run: npm run test:coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
 
   e2e-tests:
     runs-on: ubuntu-latest
     needs: unit-tests
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    
-    - name: Build application
-      run: npm run build
-    
-    - name: Run E2E tests
-      run: npx playwright test
-    
-    - name: Upload E2E test results
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run E2E tests
+        run: npx playwright test
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 ```
 
 ---
@@ -1415,6 +1426,7 @@ jobs:
 ### 常见反模式和解决方案
 
 #### ❌ 反模式：测试实现细节
+
 ```typescript
 // 错误：测试组件内部状态
 it('should update internal counter state', () => {
@@ -1425,6 +1437,7 @@ it('should update internal counter state', () => {
 ```
 
 #### ✅ 正确做法：测试行为和输出
+
 ```typescript
 // 正确：测试用户可见的行为
 it('should increment counter when increment is called', () => {
@@ -1435,27 +1448,29 @@ it('should increment counter when increment is called', () => {
 ```
 
 #### ❌ 反模式：过度Mock
+
 ```typescript
 // 错误：Mock了太多东西，测试变得无意义
 it('should process image', () => {
   const mockProcessImage = vi.fn().mockResolvedValue([]);
   const mockUseImageProcessor = vi.fn(() => ({ processImage: mockProcessImage }));
-  
+
   // 这个测试实际上什么都没测试
 });
 ```
 
 #### ✅ 正确做法：最小化Mock
+
 ```typescript
 // 正确：只Mock外部依赖
 it('should process image and return segments', async () => {
   // 只Mock Web Worker，测试实际的逻辑
   global.Worker = MockWorker;
-  
+
   const { result } = renderHook(() => useImageProcessor());
   const file = new File(['test'], 'test.png', { type: 'image/png' });
   const segments = await result.current.processImage(file, 800);
-  
+
   expect(segments).toHaveLength(2);
 });
 ```
@@ -1463,13 +1478,10 @@ it('should process image and return segments', async () => {
 ### 测试数据管理
 
 #### 测试夹具 (Fixtures)
+
 ```typescript
 // tests/fixtures/index.ts
-export const mockImageFile = () => new File(
-  ['mock image data'], 
-  'test.png', 
-  { type: 'image/png' }
-);
+export const mockImageFile = () => new File(['mock image data'], 'test.png', { type: 'image/png' });
 
 export const mockImageSegments = () => [
   {
@@ -1477,19 +1489,20 @@ export const mockImageSegments = () => [
     dataUrl: 'data:image/png;base64,mock1',
     width: 800,
     height: 400,
-    index: 0
+    index: 0,
   },
   {
-    id: '2', 
+    id: '2',
     dataUrl: 'data:image/png;base64,mock2',
     width: 800,
     height: 400,
-    index: 1
-  }
+    index: 1,
+  },
 ];
 ```
 
 #### 工厂函数
+
 ```typescript
 // tests/factories/imageSegmentFactory.ts
 export const createImageSegment = (overrides = {}) => ({
@@ -1498,7 +1511,7 @@ export const createImageSegment = (overrides = {}) => ({
   width: 800,
   height: 400,
   index: 0,
-  ...overrides
+  ...overrides,
 });
 
 // 使用
@@ -1516,6 +1529,6 @@ const segment = createImageSegment({ width: 1200, height: 600 });
 
 ---
 
-*📝 最后更新: 2025-08-26*  
-*🧪 测试指南版本: v1.0.0*  
-*📊 当前测试覆盖率: 95%+*
+_📝 最后更新: 2025-08-26_  
+_🧪 测试指南版本: v1.0.0_  
+_📊 当前测试覆盖率: 95%+_

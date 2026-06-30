@@ -3,12 +3,12 @@
  * 支持实时更新页面元数据和结构化数据
  */
 
-import type { 
-  SEOMetadata, 
+import type {
+  SEOMetadata,
   StructuredDataType,
   // PageType,
   // Language,
-  ViewportInfo
+  ViewportInfo,
 } from '../../types/seo.types';
 
 /**
@@ -30,8 +30,8 @@ export class DynamicMetaInjector {
       return;
     }
 
-    this.observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    this.observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
           // 检测到DOM变化时，可以触发元数据重新评估
           this.validateInjectedTags();
@@ -72,9 +72,7 @@ export class DynamicMetaInjector {
       { property: 'og:type', content: metadata.ogType },
     ];
 
-    ogTags.forEach(tag => 
-      this.updateOrCreateMetaProperty(tag.property, tag.content)
-    );
+    ogTags.forEach(tag => this.updateOrCreateMetaProperty(tag.property, tag.content));
   }
 
   /**
@@ -88,9 +86,7 @@ export class DynamicMetaInjector {
       { name: 'twitter:image', content: metadata.twitterImage || metadata.ogImage },
     ];
 
-    twitterTags.forEach(tag => 
-      this.updateOrCreateTag(tag.name, tag.content)
-    );
+    twitterTags.forEach(tag => this.updateOrCreateTag(tag.name, tag.content));
   }
 
   /**
@@ -98,7 +94,7 @@ export class DynamicMetaInjector {
    */
   injectStructuredData(structuredData: StructuredDataType | Record<string, unknown>): void {
     const existingScript = document.querySelector('script[type="application/ld+json"]');
-    
+
     if (existingScript) {
       existingScript.textContent = JSON.stringify(structuredData, null, 2);
     } else {
@@ -174,15 +170,15 @@ export class DynamicMetaInjector {
     this.injectBasicMetaTags(metadata);
     this.injectOpenGraphTags(metadata);
     this.injectTwitterCardTags(metadata);
-    
+
     if (structuredData) {
       this.injectStructuredData(structuredData);
     }
-    
+
     if (metadata.hreflang && Object.keys(metadata.hreflang).length > 0) {
       this.injectHreflangTags(metadata.hreflang);
     }
-    
+
     this.injectPerformanceTags(viewportInfo);
   }
 
@@ -210,7 +206,7 @@ export class DynamicMetaInjector {
     if (!content) return;
 
     let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
-    
+
     if (meta) {
       meta.content = content;
     } else {
@@ -231,7 +227,7 @@ export class DynamicMetaInjector {
     if (!content) return;
 
     let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
-    
+
     if (meta) {
       meta.content = content;
     } else {
@@ -250,7 +246,7 @@ export class DynamicMetaInjector {
    */
   private generateViewportContent(viewportInfo: ViewportInfo): string {
     const baseViewport = 'width=device-width, initial-scale=1.0';
-    
+
     // 根据设备类型调整视口设置
     switch (viewportInfo.deviceType) {
       case 'mobile':
@@ -268,7 +264,7 @@ export class DynamicMetaInjector {
   private validateInjectedTags(): void {
     // 检查注入的标签是否仍然存在
     const existingTags = new Set<string>();
-    
+
     this.injectedTags.forEach(tagId => {
       const element = document.querySelector(`[data-injected="${tagId}"]`);
       if (element) {
@@ -306,7 +302,7 @@ export class RealTimeMetadataUpdater {
   updateTitle(title: string): void {
     this.queueUpdate(() => {
       document.title = title;
-      this.injector.injectBasicMetaTags({ 
+      this.injector.injectBasicMetaTags({
         title,
         description: '',
         keywords: [],
@@ -317,7 +313,7 @@ export class RealTimeMetadataUpdater {
         ogUrl: '',
         twitterCard: 'summary',
         canonicalUrl: '',
-        hreflang: {}
+        hreflang: {},
       });
     });
   }
@@ -348,7 +344,7 @@ export class RealTimeMetadataUpdater {
       if (metadata.title) {
         document.title = metadata.title;
       }
-      
+
       const fullMetadata: SEOMetadata = {
         title: metadata.title || document.title,
         description: metadata.description || '',
@@ -360,7 +356,7 @@ export class RealTimeMetadataUpdater {
         ogUrl: metadata.ogUrl || '',
         twitterCard: metadata.twitterCard || 'summary',
         canonicalUrl: metadata.canonicalUrl || '',
-        hreflang: metadata.hreflang || {}
+        hreflang: metadata.hreflang || {},
       };
 
       this.injector.injectBasicMetaTags(fullMetadata);
@@ -382,7 +378,7 @@ export class RealTimeMetadataUpdater {
     try {
       // 批量处理更新，避免频繁DOM操作
       const updates = this.updateQueue.splice(0);
-      
+
       // 使用 requestAnimationFrame 确保在合适的时机更新
       await new Promise(resolve => {
         requestAnimationFrame(() => {
@@ -398,7 +394,7 @@ export class RealTimeMetadataUpdater {
       });
     } finally {
       this.isProcessing = false;
-      
+
       // 如果队列中还有更新，继续处理
       if (this.updateQueue.length > 0) {
         setTimeout(() => this.processQueue(), 100);
@@ -421,6 +417,8 @@ export const realTimeUpdater = new RealTimeMetadataUpdater();
 
 // 导出便利函数
 export const updatePageTitle = (title: string) => realTimeUpdater.updateTitle(title);
-export const updatePageDescription = (description: string) => realTimeUpdater.updateDescription(description);
+export const updatePageDescription = (description: string) =>
+  realTimeUpdater.updateDescription(description);
 export const updatePageKeywords = (keywords: string[]) => realTimeUpdater.updateKeywords(keywords);
-export const updatePageMetadata = (metadata: Partial<SEOMetadata>) => realTimeUpdater.updateMetadata(metadata);
+export const updatePageMetadata = (metadata: Partial<SEOMetadata>) =>
+  realTimeUpdater.updateMetadata(metadata);

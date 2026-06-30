@@ -55,7 +55,7 @@ class RobotsGenerator {
 
     // 基础规则
     lines.push(`User-agent: ${this.config.userAgent}`);
-    
+
     // 允许的路径
     this.config.allow.forEach(path => {
       lines.push(`Allow: ${path}`);
@@ -75,7 +75,7 @@ class RobotsGenerator {
 
     // Sitemap位置
     lines.push(`Sitemap: ${this.config.sitemapUrl}`);
-    
+
     lines.push(''); // 空行
 
     // 自定义规则
@@ -96,7 +96,7 @@ class RobotsGenerator {
     lines.push('Allow: /*.webp');
     lines.push('Allow: /*.svg');
     lines.push('Allow: /*.ico');
-    
+
     lines.push('');
     lines.push('# 移动端优化');
     lines.push('User-agent: Googlebot-Mobile');
@@ -122,7 +122,7 @@ class RobotsGenerator {
       const cacheTime = new Date(this.cache.lastGenerated);
       const now = new Date();
       const hoursDiff = (now.getTime() - cacheTime.getTime()) / (1000 * 60 * 60);
-      
+
       if (hoursDiff < 24) {
         return this.cache;
       }
@@ -136,7 +136,7 @@ class RobotsGenerator {
         const cacheTime = new Date(parsed.lastGenerated);
         const now = new Date();
         const hoursDiff = (now.getTime() - cacheTime.getTime()) / (1000 * 60 * 60);
-        
+
         if (hoursDiff < 24) {
           this.cache = parsed;
           return parsed;
@@ -204,7 +204,7 @@ class RobotsGenerator {
 
     for (const line of lines) {
       const trimmed = line.trim();
-      
+
       if (trimmed.startsWith('User-agent:')) {
         hasUserAgent = true;
       } else if (trimmed.startsWith('Sitemap:')) {
@@ -233,7 +233,7 @@ class RobotsGenerator {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -253,7 +253,7 @@ class RobotsGenerator {
         'Allow: /',
         'Disallow: /api/',
         'Disallow: /admin/',
-      ]
+      ],
     };
   }
 

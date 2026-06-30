@@ -6,7 +6,7 @@
 import {
   ISharedStateManager,
   SharedState,
-  StateChangeEvent
+  StateChangeEvent,
 } from '../interfaces/ComponentInterface';
 
 export class SharedStateManager implements ISharedStateManager {
@@ -28,7 +28,7 @@ export class SharedStateManager implements ISharedStateManager {
    */
   set<T = any>(key: string, value: T, source?: string): void {
     const oldValue = this.state[key];
-    
+
     // 如果值没有变化，则不触发更新
     if (this.isEqual(oldValue, value)) {
       return;
@@ -41,7 +41,7 @@ export class SharedStateManager implements ISharedStateManager {
       oldValue,
       newValue: value,
       timestamp: Date.now(),
-      source
+      source,
     };
 
     // 添加到历史记录
@@ -70,7 +70,7 @@ export class SharedStateManager implements ISharedStateManager {
       oldValue,
       newValue: undefined,
       timestamp: Date.now(),
-      source
+      source,
     };
 
     // 添加到历史记录
@@ -88,7 +88,7 @@ export class SharedStateManager implements ISharedStateManager {
    */
   clear(source?: string): void {
     const keys = Object.keys(this.state);
-    
+
     if (keys.length === 0) {
       return;
     }
@@ -103,7 +103,7 @@ export class SharedStateManager implements ISharedStateManager {
         oldValue: oldState[key],
         newValue: undefined,
         timestamp: Date.now(),
-        source
+        source,
       };
 
       // 添加到历史记录
@@ -131,7 +131,7 @@ export class SharedStateManager implements ISharedStateManager {
     if (!this.watchers.has(key)) {
       this.watchers.set(key, new Set());
     }
-    
+
     this.watchers.get(key)!.add(handler);
     console.log(`Added watcher for key: ${key}`);
   }
@@ -149,7 +149,7 @@ export class SharedStateManager implements ISharedStateManager {
    */
   unwatch(key: string, handler?: (event: StateChangeEvent) => void): void {
     const keyWatchers = this.watchers.get(key);
-    
+
     if (!keyWatchers) {
       return;
     }
@@ -162,7 +162,7 @@ export class SharedStateManager implements ISharedStateManager {
     } else {
       this.watchers.delete(key);
     }
-    
+
     console.log(`Removed watcher for key: ${key}`);
   }
 
@@ -175,7 +175,7 @@ export class SharedStateManager implements ISharedStateManager {
     } else {
       this.globalWatchers.clear();
     }
-    
+
     console.log('Removed global state watcher(s)');
   }
 
@@ -188,18 +188,18 @@ export class SharedStateManager implements ISharedStateManager {
     // 收集所有变更
     Object.entries(updates).forEach(([key, value]) => {
       const oldValue = this.state[key];
-      
+
       if (!this.isEqual(oldValue, value)) {
         this.state[key] = value;
-        
+
         const changeEvent: StateChangeEvent = {
           key,
           oldValue,
           newValue: value,
           timestamp: Date.now(),
-          source
+          source,
         };
-        
+
         changes.push(changeEvent);
         this.addToHistory(changeEvent);
       }
@@ -243,14 +243,16 @@ export class SharedStateManager implements ISharedStateManager {
     globalWatchers: number;
     historySize: number;
   } {
-    const watcherCount = Array.from(this.watchers.values())
-      .reduce((total, watchers) => total + watchers.size, 0);
+    const watcherCount = Array.from(this.watchers.values()).reduce(
+      (total, watchers) => total + watchers.size,
+      0
+    );
 
     return {
       stateKeys: Object.keys(this.state).length,
       watchers: watcherCount,
       globalWatchers: this.globalWatchers.size,
-      historySize: this.history.length
+      historySize: this.history.length,
     };
   }
 
@@ -259,7 +261,7 @@ export class SharedStateManager implements ISharedStateManager {
    */
   private notifyWatchers(key: string, event: StateChangeEvent): void {
     const keyWatchers = this.watchers.get(key);
-    
+
     if (keyWatchers) {
       keyWatchers.forEach(handler => {
         try {
@@ -289,7 +291,7 @@ export class SharedStateManager implements ISharedStateManager {
    */
   private addToHistory(event: StateChangeEvent): void {
     this.history.push(event);
-    
+
     // 限制历史记录大小
     if (this.history.length > this.maxHistorySize) {
       this.history = this.history.slice(-this.maxHistorySize);
@@ -338,7 +340,7 @@ export class SharedStateManager implements ISharedStateManager {
     this.watchers.clear();
     this.globalWatchers.clear();
     this.history = [];
-    
+
     console.log('SharedStateManager destroyed');
   }
 }

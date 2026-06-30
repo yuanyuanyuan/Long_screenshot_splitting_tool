@@ -27,28 +27,28 @@ class HealthCheckGenerator {
    */
   async generateHealthCheckFiles(outputDir) {
     console.log('🏥 生成健康检查文件...');
-    
+
     // 确保输出目录存在
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     // 生成主健康检查页面
     await this.generateMainHealthCheck(outputDir);
-    
+
     // 生成组件健康检查页面
     if (this.deployConfig.components) {
       for (const component of this.deployConfig.components) {
         await this.generateComponentHealthCheck(outputDir, component);
       }
     }
-    
+
     // 生成健康检查API
     await this.generateHealthCheckAPI(outputDir);
-    
+
     // 生成状态页面
     await this.generateStatusPage(outputDir);
-    
+
     console.log('✅ 健康检查文件生成完成');
   }
 
@@ -619,7 +619,7 @@ class HealthCheckGenerator {
     if (!fs.existsSync(componentDir)) {
       fs.mkdirSync(componentDir, { recursive: true });
     }
-    
+
     fs.writeFileSync(path.join(componentDir, 'health.html'), componentHealthHtml.trim());
     console.log(`✅ 组件 ${component.name} 健康检查页面生成完成`);
   }
@@ -1088,8 +1088,9 @@ class HealthCheckGenerator {
 if (require.main === module) {
   const generator = new HealthCheckGenerator();
   const outputDir = process.argv[2] || path.join(process.cwd(), 'dist', 'health');
-  
-  generator.generateHealthCheckFiles(outputDir)
+
+  generator
+    .generateHealthCheckFiles(outputDir)
     .then(() => {
       console.log('✅ 所有健康检查文件生成完成');
       process.exit(0);

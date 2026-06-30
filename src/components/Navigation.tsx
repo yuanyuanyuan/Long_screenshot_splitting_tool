@@ -99,7 +99,7 @@ const NavigationButton = memo<{
   // 计算按钮样式 - 移动端优化
   const buttonStyle = useMemo(() => {
     if (!isMobile) return undefined;
-    
+
     return {
       minWidth: '44px',
       minHeight: '44px',
@@ -168,7 +168,11 @@ const ProgressBar = memo<{
     >
       <div className="nav-progress-bar" style={progressStyle} />
       <span className="nav-progress-text" aria-live="polite">
-        {t('navigation.progress.completed', { completed: completedSteps, total: totalSteps, percentage })}
+        {t('navigation.progress.completed', {
+          completed: completedSteps,
+          total: totalSteps,
+          percentage,
+        })}
       </span>
     </div>
   );
@@ -193,10 +197,10 @@ const Navigation = memo<NavigationProps>(
     const viewport = useViewport();
     // 性能监控
     const performanceMonitor = usePerformanceMonitor('Navigation');
-    
+
     // 移动端自适应状态
     const [isMobileView, setIsMobileView] = useState(false);
-    
+
     useEffect(() => {
       setIsMobileView(mobileOptimized && viewport.isMobile);
     }, [mobileOptimized, viewport.isMobile]);
@@ -236,23 +240,26 @@ const Navigation = memo<NavigationProps>(
     }, [getPreviousAvailableStep, handleNavigate]);
 
     // 滑动手势处理（移动端）
-    const swipeHandlers = useSwipeGestures({
-      onSwipeLeft: useCallback(() => {
-        if (enableSwipeNavigation && canGoNext) {
-          handleNext();
-        }
-      }, [enableSwipeNavigation, canGoNext, handleNext]),
-      
-      onSwipeRight: useCallback(() => {
-        if (enableSwipeNavigation && canGoPrevious) {
-          handlePrevious();
-        }
-      }, [enableSwipeNavigation, canGoPrevious, handlePrevious])
-    }, {
-      minDistance: 50,
-      maxDuration: 500,
-      preventDefault: true
-    });
+    const swipeHandlers = useSwipeGestures(
+      {
+        onSwipeLeft: useCallback(() => {
+          if (enableSwipeNavigation && canGoNext) {
+            handleNext();
+          }
+        }, [enableSwipeNavigation, canGoNext, handleNext]),
+
+        onSwipeRight: useCallback(() => {
+          if (enableSwipeNavigation && canGoPrevious) {
+            handlePrevious();
+          }
+        }, [enableSwipeNavigation, canGoPrevious, handlePrevious]),
+      },
+      {
+        minDistance: 50,
+        maxDuration: 500,
+        preventDefault: true,
+      }
+    );
 
     // 键盘快捷键处理
     const handleKeyDown = useCallback(
@@ -281,45 +288,53 @@ const Navigation = memo<NavigationProps>(
       return classes.join(' ');
     }, [className, isMobileView]);
 
-  // 渲染导航按钮列表，使用useMemo优化
-  const navigationButtons = useMemo(() => {
-    // 移动端使用TouchNav组件
-    if (isMobileView) {
-      const touchNavItems = navigationItems.map(item => ({
-        id: item.path,
-        label: t(item.name),
-        icon: item.icon ? <span>{item.icon}</span> : undefined,
-        onClick: () => handleNavigate(item.path),
-        active: item.active,
-        disabled: item.disabled,
-      }));
-      
-      return (
-        <TouchNav
-          items={touchNavItems}
-          orientation="horizontal"
-          showLabels={true}
+    // 渲染导航按钮列表，使用useMemo优化
+    const navigationButtons = useMemo(() => {
+      // 移动端使用TouchNav组件
+      if (isMobileView) {
+        const touchNavItems = navigationItems.map(item => ({
+          id: item.path,
+          label: t(item.name),
+          icon: item.icon ? <span>{item.icon}</span> : undefined,
+          onClick: () => handleNavigate(item.path),
+          active: item.active,
+          disabled: item.disabled,
+        }));
+
+        return (
+          <TouchNav
+            items={touchNavItems}
+            orientation="horizontal"
+            showLabels={true}
+            hapticFeedback={hapticFeedback}
+            swipeEnabled={enableSwipeNavigation}
+          />
+        );
+      }
+
+      // 桌面端使用传统按钮
+      return navigationItems.map(item => (
+        <NavigationButton
+          key={item.path}
+          item={{
+            ...item,
+            name: t(item.name), // 翻译导航项名称
+          }}
+          onNavigate={handleNavigate}
+          showTooltips={showTooltips}
+          isMobile={isMobileView}
           hapticFeedback={hapticFeedback}
-          swipeEnabled={enableSwipeNavigation}
         />
-      );
-    }
-    
-    // 桌面端使用传统按钮
-    return navigationItems.map(item => (
-      <NavigationButton
-        key={item.path}
-        item={{
-          ...item,
-          name: t(item.name) // 翻译导航项名称
-        }}
-        onNavigate={handleNavigate}
-        showTooltips={showTooltips}
-        isMobile={isMobileView}
-        hapticFeedback={hapticFeedback}
-      />
-    ));
-  }, [navigationItems, handleNavigate, showTooltips, t, isMobileView, hapticFeedback, enableSwipeNavigation]);
+      ));
+    }, [
+      navigationItems,
+      handleNavigate,
+      showTooltips,
+      t,
+      isMobileView,
+      hapticFeedback,
+      enableSwipeNavigation,
+    ]);
 
     return (
       <nav
@@ -339,33 +354,41 @@ const Navigation = memo<NavigationProps>(
         )}
 
         {/* 导航按钮组 */}
-        <div 
-          className={`nav-buttons ${isMobileView ? 'mobile-nav-buttons' : ''}`} 
-          role="group" 
+        <div
+          className={`nav-buttons ${isMobileView ? 'mobile-nav-buttons' : ''}`}
+          role="group"
           aria-label={t('navigation.accessibility.navButtons')}
-          style={isMobileView ? {
-            display: 'flex',
-            overflowX: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            scrollSnapType: 'x mandatory',
-            gap: '8px',
-            padding: '8px'
-          } : undefined}
+          style={
+            isMobileView
+              ? {
+                  display: 'flex',
+                  overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  gap: '8px',
+                  padding: '8px',
+                }
+              : undefined
+          }
         >
           {navigationButtons}
         </div>
 
         {/* 快捷导航按钮和语言切换器 */}
-        <div 
-          className={`nav-shortcuts ${isMobileView ? 'mobile-shortcuts' : ''}`} 
-          role="group" 
+        <div
+          className={`nav-shortcuts ${isMobileView ? 'mobile-shortcuts' : ''}`}
+          role="group"
           aria-label={t('navigation.accessibility.shortcuts')}
-          style={isMobileView ? {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            gap: '12px',
-            padding: '8px'
-          } : undefined}
+          style={
+            isMobileView
+              ? {
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  padding: '8px',
+                }
+              : undefined
+          }
         >
           <button
             className={`nav-shortcut prev ${isMobileView ? 'mobile-shortcut' : ''}`}
@@ -373,13 +396,17 @@ const Navigation = memo<NavigationProps>(
             disabled={!canGoPrevious}
             aria-label={t('navigation.shortcuts.previous')}
             title={showTooltips ? t('navigation.shortcuts.previousTooltip') : undefined}
-            style={isMobileView ? {
-              minWidth: '44px',
-              minHeight: '44px',
-              padding: '8px 16px',
-              borderRadius: '12px',
-              touchAction: 'manipulation'
-            } : undefined}
+            style={
+              isMobileView
+                ? {
+                    minWidth: '44px',
+                    minHeight: '44px',
+                    padding: '8px 16px',
+                    borderRadius: '12px',
+                    touchAction: 'manipulation',
+                  }
+                : undefined
+            }
           >
             ← {isMobileView ? '' : t('navigation.shortcuts.previous')}
           </button>
@@ -390,34 +417,43 @@ const Navigation = memo<NavigationProps>(
             disabled={!canGoNext}
             aria-label={t('navigation.shortcuts.next')}
             title={showTooltips ? t('navigation.shortcuts.nextTooltip') : undefined}
-            style={isMobileView ? {
-              minWidth: '44px',
-              minHeight: '44px',
-              padding: '8px 16px',
-              borderRadius: '12px',
-              touchAction: 'manipulation'
-            } : undefined}
+            style={
+              isMobileView
+                ? {
+                    minWidth: '44px',
+                    minHeight: '44px',
+                    padding: '8px 16px',
+                    borderRadius: '12px',
+                    touchAction: 'manipulation',
+                  }
+                : undefined
+            }
           >
             {isMobileView ? '' : t('navigation.shortcuts.next')} →
           </button>
 
           {/* 语言切换器 */}
-          <div className={`nav-language-switcher ${isMobileView ? 'mobile-language-switcher' : 'ml-4'}`}>
+          <div
+            className={`nav-language-switcher ${isMobileView ? 'mobile-language-switcher' : 'ml-4'}`}
+          >
             <CompactLanguageSwitcher />
           </div>
         </div>
-        
+
         {/* 移动端滑动提示 */}
         {isMobileView && enableSwipeNavigation && (
-          <div className="swipe-hint" style={{
-            position: 'absolute',
-            bottom: '-20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            fontSize: '11px',
-            color: '#999',
-            textAlign: 'center'
-          }}>
+          <div
+            className="swipe-hint"
+            style={{
+              position: 'absolute',
+              bottom: '-20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '11px',
+              color: '#999',
+              textAlign: 'center',
+            }}
+          >
             👈 {t('navigation.swipe.hint')} 👉
           </div>
         )}
@@ -425,7 +461,8 @@ const Navigation = memo<NavigationProps>(
         {/* 调试信息（仅开发环境） */}
         {process.env.NODE_ENV === 'development' && (
           <div className="nav-debug" style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-            {t('navigation.debug.currentStep')}: {navigationMetrics.currentStepIndex + 1}/{navigationMetrics.totalSteps}
+            {t('navigation.debug.currentStep')}: {navigationMetrics.currentStepIndex + 1}/
+            {navigationMetrics.totalSteps}
             {' | '}
             {t('navigation.debug.progress')}: {navigationMetrics.progressPercentage}%
           </div>

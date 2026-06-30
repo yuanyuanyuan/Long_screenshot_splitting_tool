@@ -39,19 +39,19 @@ function generateRobotsTxt() {
   } else {
     // 生成默认规则
     robotsContent += `User-agent: ${robotsConfig.userAgent}\n`;
-    
+
     robotsConfig.allow.forEach(rule => {
       robotsContent += `Allow: ${rule}\n`;
     });
-    
+
     robotsConfig.disallow.forEach(rule => {
       robotsContent += `Disallow: ${rule}\n`;
     });
-    
+
     if (robotsConfig.crawlDelay) {
       robotsContent += `Crawl-delay: ${robotsConfig.crawlDelay}\n`;
     }
-    
+
     if (robotsConfig.sitemapUrl) {
       robotsContent += `\nSitemap: ${robotsConfig.sitemapUrl}\n`;
     }
@@ -67,41 +67,43 @@ function generateRobotsTxt() {
  */
 function generateSitemap() {
   const sitemapConfig = seoConfig.sitemap;
-  
+
   let sitemapContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  sitemapContent += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
+  sitemapContent +=
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
 
   sitemapConfig.staticPages.forEach(page => {
     // 为每种语言生成URL
     page.languages.forEach((lang, index) => {
       const url = index === 0 ? page.url : `/${lang}${page.url === '/' ? '' : page.url}`;
       // 修复URL拼接逻辑 - 避免双斜杠和协议问题
-      const cleanBaseUrl = sitemapConfig.baseUrl.endsWith('/') 
-        ? sitemapConfig.baseUrl.slice(0, -1) 
+      const cleanBaseUrl = sitemapConfig.baseUrl.endsWith('/')
+        ? sitemapConfig.baseUrl.slice(0, -1)
         : sitemapConfig.baseUrl;
       const fullUrl = url === '/' ? cleanBaseUrl : `${cleanBaseUrl}${url}`;
-      
+
       sitemapContent += '  <url>\n';
       sitemapContent += `    <loc>${fullUrl}</loc>\n`;
       sitemapContent += `    <lastmod>${page.lastmod}</lastmod>\n`;
       sitemapContent += `    <changefreq>${page.changefreq}</changefreq>\n`;
       sitemapContent += `    <priority>${page.priority}</priority>\n`;
-      
+
       // 添加多语言链接
       if (page.languages.length > 1) {
         page.languages.forEach(altLang => {
-          const altUrl = altLang === seoConfig.site.defaultLanguage 
-            ? page.url 
-            : `/${altLang}${page.url === '/' ? '' : page.url}`;
+          const altUrl =
+            altLang === seoConfig.site.defaultLanguage
+              ? page.url
+              : `/${altLang}${page.url === '/' ? '' : page.url}`;
           // 修复多语言URL拼接逻辑
-          const cleanAltBaseUrl = sitemapConfig.baseUrl.endsWith('/') 
-            ? sitemapConfig.baseUrl.slice(0, -1) 
+          const cleanAltBaseUrl = sitemapConfig.baseUrl.endsWith('/')
+            ? sitemapConfig.baseUrl.slice(0, -1)
             : sitemapConfig.baseUrl;
           const altFullUrl = altUrl === '/' ? cleanAltBaseUrl : `${cleanAltBaseUrl}${altUrl}`;
           sitemapContent += `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${altFullUrl}"/>\n`;
         });
       }
-      
+
       sitemapContent += '  </url>\n';
     });
   });
@@ -127,7 +129,7 @@ function generateSEOMetadata() {
     structuredData: seoConfig.structuredData,
     analytics: seoConfig.analytics,
     socialMedia: seoConfig.socialMedia,
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   };
 
   const metadataPath = path.join(DIST_DIR, 'seo-metadata.json');
@@ -140,7 +142,7 @@ function generateSEOMetadata() {
  */
 async function main() {
   console.log('🚀 开始生成SEO文件...');
-  
+
   // 确保dist目录存在
   if (!fs.existsSync(DIST_DIR)) {
     console.error('❌ dist目录不存在，请先运行构建');
@@ -151,12 +153,12 @@ async function main() {
     generateRobotsTxt();
     generateSitemap();
     generateSEOMetadata();
-    
+
     console.log('🎉 SEO文件生成完成！');
     console.log(`📁 文件位置: ${DIST_DIR}`);
     console.log('📄 生成的文件:');
     console.log('  - robots.txt');
-    console.log('  - sitemap.xml'); 
+    console.log('  - sitemap.xml');
     console.log('  - seo-metadata.json');
   } catch (error) {
     console.error('❌ SEO文件生成失败:', error.message);
