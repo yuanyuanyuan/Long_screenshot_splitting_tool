@@ -1,0 +1,33 @@
+# Build outputs
+dist/
+deploy/
+build/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Lock files (avoid accidental diffs)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Local AI / editor tool artifacts (not part of source code)
+.agents/
+.claude/
+.serena/
+.playwright-mcp/
+.vibedev/
+.obsidian/
+.vercel/
+.codebuddy/
+.husky/
+.turbo/
+.cache/
+
+# Legacy documentation drafts (will be batch-reformatted in a separate pass)
+docs/
+
+# Minified / generated assets that prettier should not touch
+*.min.js
+*.min.css
